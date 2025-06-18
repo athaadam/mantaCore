@@ -1,0 +1,146 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.left-panel {
+  width: 75%;
+  background-color: #6A5ACD;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px;
+}
+
+.left-panel h1 {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.brand {
+  position: absolute;
+  left: 40px;
+  bottom: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.brand img {
+  width: 200px;      /* Atur sesuai kebutuhan */
+  height: auto;      /* Ini menjaga rasio aspek gambar */
+  display: block;
+}
+
+.right-panel {
+  width: 25%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.form-wrapper {
+  width: 100%;
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(0%);
+}
+
+.form-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.form-box h2 {
+  color: #6A5ACD;
+  font-size: 4rem;
+  margin-bottom: 60px;
+}
+
+.form-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-box input { 
+  font-size: 1rem;
+  align-self: center;
+  width: 70%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-box button {
+  margin-top: 20px;
+  align-self: center;
+  width: 30%;
+  padding: 10px;
+  background-color: #6A5ACD;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: 500;
+}
+
+.form-box button:hover {
+  background-color: #5a4ac5;
+}
+
+.forgot {
+  align-self: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #362B6D;
+  text-decoration: none;
+  transition: 0.1s;
+  font-weight: 500;
+}
+
+.forgot:hover {
+  color: #211a42;
+  text-decoration: none;
+}
+
+.switch {
+  margin-top: 70px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.switch a {
+  color: #6A5ACD;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.switch a:hover {
+  color:#362B6D;
+}
