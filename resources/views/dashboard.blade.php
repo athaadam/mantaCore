@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MantaCore Dashboard</title>
+  <link rel="stylesheet" href="{{asset('css/dashboard.css')}}" />
+  <link rel="stylesheet" href="{{asset('css/page.css')}}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Tambahkan di dalam .dashboard-container, sebelum .sidebar -->
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <img src="{{asset('images/logo.png')}}" alt="MantaCore" />
+      </div>
+      <ul>
+        <li class="active"><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/sales">Sales Report</a></li>
+        <li><a href="/purchase-approval">Purchase Approval</a></li>
+        <li><a href="/inventory">Inventory</a></li>
+        <li><a href="/account-manage">Account Management</a></li>
+        <li><a href="/profile">Profile</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h1>Dashboard</h1>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="card">
+          <div class="card-icon">
+            <img src="{{asset('images/Sales.png')}}" alt="Sales" />
+          </div>
+          <div class="card-info">
+            <div class="card-title">Total Sales</div>
+            <div class="card-value">Rp400.000.000</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <img src="{{asset('images/PnL.png')}}" alt="PNL" />
+          </div>
+          <div class="card-info">
+            <div class="card-title">Today's Profit & Loss</div>
+            <div class="card-value">+Rp2.000.000</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <img src="{{asset('images/PnL.png')}}" alt="PNL" />
+          </div>
+          <div class="card-info">
+            <div class="card-title">Lifetime Profit & Loss</div>
+            <div class="card-value">+Rp2.000.000</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Sales and Transaction -->
+      <div class="charts-row">
+        <div class="chart-box">
+          <h3>Top Sales Item</h3>
+          <canvas id="salesChart"></canvas>
+        </div>
+
+        <div class="transaction-box">
+          <h3>Transaction History</h3>
+          <table>
+            <tr><th>Date</th><th>Item</th><th>Author</th><th>Amount</th></tr>
+            <tr><td>April 1, 2025</td><td>Tumbler, Spoon</td><td>ADM</td><td>Rp20.000</td></tr>
+            <tr><td>April 1, 2025</td><td>Rice, Carrot, Spoon</td><td>ADM</td><td>Rp20.000</td></tr>
+            <tr><td>April 1, 2025</td><td>Rice, Carrot, Spoon</td><td>ADM</td><td>Rp20.000</td></tr>
+            <tr><td>April 1, 2025</td><td>Rice, Carrot, Spoon</td><td>ADM</td><td>Rp20.000</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Purchase Request -->
+      <div class="purchase-box">
+        <h3>Purchase Request</h3>
+        <table>
+          <tr><th>Date</th><th>Title</th><th>Author</th><th>Amount</th><th>Status</th></tr>
+          <tr>
+            <td>April 1, 2025</td>
+            <td>Pembelian bahan baku duar</td>
+            <td>ADM</td>
+            <td>Rp4.000.000</td>
+            <td><span class="status declined">Declined</span></td>
+          </tr>
+          <tr>
+            <td>April 1, 2025</td>
+            <td>Pembelian bahan baku duar</td>
+            <td>ADM</td>
+            <td>Rp4.000.000</td>
+            <td><span class="status pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td>April 1, 2025</td>
+            <td>Pembelian bahan baku duar</td>
+            <td>ADM</td>
+            <td>Rp4.000.000</td>
+            <td><span class="status approved">Approved</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Tumbler', 'Tumbler', 'Tumbler', 'Tumbler', 'Tumbler'],
+        datasets: [{
+          label: 'Sales',
+          data: [20000, 15000, 12000, 6000, 5000],
+          backgroundColor: '#9370DB',
+          borderRadius: 5,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `Rp${ctx.raw.toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => 'Rp' + value.toLocaleString()
+            }
+          }
+        }
+      }
+    });
+  </script>
+  <script>
+  document.querySelectorAll('.sidebar ul li').forEach(function(li) {
+    li.addEventListener('click', function(e) {
+      const link = li.querySelector('a');
+      if (link) {
+        // Hindari double navigation jika klik langsung pada <a>
+        if (e.target !== link) {
+          window.location.href = link.getAttribute('href');
+        }
+      }
+    });
+  });
+</script>
+</body>
+</html>
