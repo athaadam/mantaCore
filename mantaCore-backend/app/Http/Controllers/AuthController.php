@@ -39,11 +39,35 @@ class AuthController extends Controller
             'company' => 'nullable|string|max:100',
         ]);
 
-        // Insert company jika diisi
+        //cek apakah company sudah ada
+        $existingCompany = null;
+        if ($request->filled('company')) {
+            $existingCompany = DB::table('company')
+                ->where('companyName', $request->company)
+                ->first();
+            //jika sudah ada kirim esan error
+            if ($existingCompany) {
+                return back()->with('error', 'Company sudah terdaftar');
+            }
+        }
+
+        // cek apakah company name ada spasi
+        if (strpos($request->company, ' ') !== false) {
+            return back()->with('error', 'Company name tidak boleh mengandung spasi');
+        }
+
+        // cek aakah company name mengandung karakter khusus
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $request->company)) {
+            return back()->with('error', 'Company name hanya boleh mengandung huruf dan angka');
+        }
+        // Simpan company baru jika ada
         $companyID = null;
         if ($request->filled('company')) {
-            $companyID = DB::table('company')->insertGetId([
-                'companyName' => $request->company
+            $companyID = DB::table
+            ('company')->insertGetId([
+                'companyName' => $request->company,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
         }
 

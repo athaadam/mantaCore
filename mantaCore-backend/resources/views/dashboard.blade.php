@@ -9,6 +9,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  @if(!session()->has('username'))
+    <script>window.location.href = "/";</script>
+  @endif
   <div class="dashboard-container">
     <!-- Tambahkan di dalam .dashboard-container, sebelum .sidebar -->
     <!-- Sidebar -->
