@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MantaCore Purchase Approval</title>
+  <link rel="stylesheet" href="asset/style/page.css" />
+  <link rel="stylesheet" href="asset/style/purchaseApproval.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <img src="asset/img/logo.png" alt="MantaCore" />
+      </div>
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="sales.html">Sales Report</a></li>
+        <li class="active"><a href="purchaseApproval.html">Purchase Approval</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+        <li><a href="accountManage.html">Account Management</a></li>
+        <li><a href="profile.html">Profile</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="main-content">
+            <h1>Purchase Approval</h1>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="card card-blue">
+                <h3>Total Requests</h3>
+                <p class="card-value">120</p>
+                </div>
+                <div class="card card-green">
+                <h3>Approved</h3>
+                <p class="card-value">80</p>
+                </div>
+                <div class="card card-yellow">
+                <h3>Pending</h3>
+                <p class="card-value">30</p>
+                </div>
+                <div class="card card-red">
+                <h3>Rejected</h3>
+                <p class="card-value">10</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <label for="date-from">From:</label>
+                <input type="date" id="date-from" name="date-from" />
+                <label for="date-to">To:</label>
+                <input type="date" id="date-to" name="date-to" />
+                <select>
+                    <option>Category</option>
+                    <option>Finance</option>
+                    <option>Production</option>
+                    <option>Logistics</option>
+                </select>
+                <select>
+                    <option>Status: All</option>
+                    <option>Approved</option>
+                    <option>Pending</option>
+                    <option>Rejected</option>
+                </select>
+                <button class="btn-primary">Apply Filter</button>
+                <button class="btn-export" style="margin-left:auto;">Export as PDF</button>
+            </div>
+
+            <!-- Purchase Request Table -->
+            <div class="table-section">
+                <table class="purchase-table">
+                <thead>
+                    <tr>
+                    <th>Date</th>
+                    <th>Request ID</th>
+                    <th>Requester</th>
+                    <th>Category</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-04-01</td>
+                        <td>PR-001</td>
+                        <td>John Doe</td>
+                        <td>Production</td>
+                        <td>Fork, Spoon</td>
+                        <td>Rp3.000.000</td>
+                        <td><span class="badge badge-pending">Pending</span></td>
+                        <td><a>View Detail</a></td>
+                    </tr>
+                    <tr>
+                        <td>2025-04-02</td>
+                        <td>PR-002</td>
+                        <td>Jane Smith</td>
+                        <td>Finance</td>
+                        <td>Laptop</td>
+                        <td>Rp15.000.000</td>
+                        <td><span class="badge badge-approved">Approved</span></td>
+                        <td><a>View Detail</a></td>
+                    </tr>
+                    <tr>
+                        <td>2025-04-03</td>
+                        <td>PR-003</td>
+                        <td>Ali Akbar</td>
+                        <td>Logistics</td>
+                        <td>Truck Spare Part</td>
+                        <td>Rp20.000.000</td>
+                        <td><span class="badge badge-rejected">Rejected</span></td>
+                        <td><a>View Detail</a></td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button>&laquo; Prev</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Next &raquo;</button>
+            </div>
+
+            <!-- Modal Detail -->
+<div class="modal" id="detailModal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Purchase Request Detail</h2>
+    <p><strong>Request ID:</strong> <span id="detail-id">PR-001</span></p>
+    <p><strong>Requester:</strong> <span id="detail-requester">John Doe</span></p>
+    <p><strong>Department:</strong> <span id="detail-dept">Production</span></p>
+    <p><strong>Items:</strong> <span id="detail-items">Fork, Spoon</span></p>
+    <p><strong>Amount:</strong> <span id="detail-amount">Rp3.000.000</span></p>
+    <p><strong>Status:</strong>
+      <select id="detail-status">
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </p>
+    <button id="save-status">Save</button>
+  </div>
+</div>
+
+        </div>
+    </div>
+  </div>
+  </script>
+  <script src="/assets/js/sidebar.js">
+</script>
+</body>
+</html>

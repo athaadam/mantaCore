@@ -1,0 +1,225 @@
+.main-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0;
+}
+
+
+/* Futuristic Glass Filter Bar */
+.top-filter {
+  background: rgba(106,90,205,0.10);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px 0 rgba(106,90,205,0.10), 0 1.5px 8px 0 rgba(106,90,205,0.08);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(138, 43, 226, 0.18);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  margin-top: 12px;
+  transition: box-shadow 0.2s;
+}
+
+.top-filter input[type="date"] {
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid #a48be0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  color: #6a5acd;
+  box-shadow: 0 2px 8px rgba(106,90,205,0.06);
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.top-filter input[type="date"]:focus {
+  border: 1.5px solid #7e6bc4;
+  box-shadow: 0 0 0 2px #bfcfff;
+}
+
+.transaction-filter-row span,
+.top-filter span {
+  font-weight: bold;
+  color: #7e6bc4;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary, .btn-export {
+  background: linear-gradient(90deg, #6a5acd 60%, #a48be0 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 12px 0 rgba(106,90,205,0.10);
+  letter-spacing: 0.5px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-export:hover {
+  background: linear-gradient(90deg, #7e6bc4 60%, #6a5acd 100%);
+  box-shadow: 0 4px 18px 0 rgba(106,90,205,0.18);
+}
+
+@media (max-width: 900px) {
+  .top-filter, .transaction-filter-row {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 12px;
+  }
+}
+
+
+.transaction-filter-row input[type="date"] {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.summary-cards {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 32px;
+  margin-bottom: 32px;
+  margin-top: 18px;
+}
+.summary-cards .card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(44,44,44,0.12);
+  padding: 18px 32px 18px 22px;
+  min-width: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.summary-cards .card-title {
+  color: #6a5acd;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.summary-cards .card-value {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #222;
+}
+.charts-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+.chart-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(44,44,44,0.12);
+  padding: 18px 24px 24px 24px;
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.chart-box canvas#pieChart {
+  width: 300px !important;
+  height: 300px !important;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.legend {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legend-color {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+.transaction-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.transaction-filter-row select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+.btn-primary {
+  background: #6a5acd;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-export {
+  background: #6a5acd;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+}
+.transaction-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(44,44,44,0.12);
+  padding: 18px 24px 24px 24px;
+  margin-bottom: 32px;
+}
+.transaction-box table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+.transaction-box th, .transaction-box td {
+  text-align: left;
+  padding: 7px 6px;
+  border-bottom: 1px solid #eee;
+}
+.transaction-box th {
+  font-weight: 600;
+}
+.transaction-box a {
+  color: #6a5acd;
+  text-decoration: none;
+  font-weight: 500;
+}
+@media (max-width: 900px) {
+  .main-header-row, .summary-cards, .charts-row, .transaction-filter-row {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .summary-cards .card, .chart-box {
+    min-width: 0;
+    width: 100%;
+  }
+  .btn-export {
+    margin-left: 0;
+  }
+}
