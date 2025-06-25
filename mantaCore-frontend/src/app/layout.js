@@ -14,6 +14,10 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "MantaCore",
   description: "ERP Application for Business Workflow",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {

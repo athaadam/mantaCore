@@ -1,13 +1,5 @@
 import Sidebar from "@/components/sidebar";
 
-export const metadata = {
-  title: {
-    default: 'Admin Panel',
-    template: '%s | Admin Panel',
-  },
-  description: 'Panel admin untuk mengelola data.',
-};
-
 export default function AdminLayout({ children }) {
   return (
     <main className="admin-layout flex min-h-screen">
