@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Session;
 
 class CheckLogin
 {
-    public function handle(Request $request, Closure $next): Response
-    {
-        if (!Session::has('username')) {
-            return redirect('/');
-        }
+    // public function handle(Request $request, Closure $next): Response
+    // {
+    //     if (!Session::has('username')) {
+    //         return redirect('/');
+    //     }
 
-        return $next($request);
-    }
+    //     return $next($request);
+    // }
 }
 

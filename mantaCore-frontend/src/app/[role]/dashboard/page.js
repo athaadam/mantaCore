@@ -6,7 +6,7 @@ import PurchaseRequestTable from '@/components/dashboard/purchaserequesttable';
 
 
 export default function DashboardPage() {
-
+  
   const summaryData = {
     totalSales: 400000000,
     todayPnL: 2000000,
@@ -160,7 +160,7 @@ export default function DashboardPage() {
       <div className="bg-white p-6 rounded-xl drop-shadow-lg mt-6 flex flex-col">
         <PurchaseRequestTable
           requests={purchaseRequests}
-          itemsPerPage={5}
+          itemsPerPage={3}
         />
       </div>
     </div>

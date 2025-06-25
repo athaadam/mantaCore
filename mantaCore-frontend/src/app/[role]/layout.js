@@ -1,6 +1,6 @@
 import Sidebar from "@/components/sidebar";
 
-export default function AdminLayout({ children }) {
+export default function MainLayout({ children }) {
   return (
     <main className="admin-layout flex min-h-screen">
       <Sidebar />
