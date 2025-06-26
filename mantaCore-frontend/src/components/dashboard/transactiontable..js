@@ -9,14 +9,6 @@ export default function TransactionTable({ transactions = [], itemsPerPage }) {
     const startIdx = (currentPage - 1) * itemsPerPage;
     const currentData = transactions.slice(startIdx, startIdx + itemsPerPage);
 
-    const handlePrev = () => {
-        if (currentPage > 1) setCurrentPage(prev => prev - 1);
-    };
-
-    const handleNext = () => {
-        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-    };
-
     return (
         <div className="bg-white p-6 rounded-xl shadow flex-[1.2] min-w-[320px] min-h-[280px] flex flex-col">
             <h3 className="text-xl text-gray-800 font-semibold mb-4">Transaction History</h3>

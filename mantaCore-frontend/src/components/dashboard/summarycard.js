@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function SummaryCard({ icon, title, value }) {
   return (
-    <div className="bg-white flex items-center gap-4 p-6 w-[320px] min-h-[90px] shadow rounded">
+    <div className="bg-white flex items-center gap-4 p-6 w-full h-[120px] shadow rounded-xl">
       <div className="flex items-center justify-center w-[60px] h-[60px] bg-[#f3f0ff] rounded">
         <Image src={icon} alt={title} width={60} height={60} className="object-contain" />
       </div>

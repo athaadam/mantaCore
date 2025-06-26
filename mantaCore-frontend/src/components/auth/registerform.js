@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Alert from '@/components/alert'
+
 
 export default function RegisterForm({ onSwitch }) {
+    const [alert, setAlert] = useState(null)
     const [form, setForm] = useState({
         username: '',
         password: '',
@@ -16,11 +19,23 @@ export default function RegisterForm({ onSwitch }) {
         setForm({ ...form, [name]: value })
     }
 
+    const handleEmptyInput = () => {
+        setAlert({ message: 'All fields are required', type: 'warning' })
+    }
+
+    const handlePasswordMismatch = () => {
+        setAlert({ message: 'Passwords do not match', type: 'error' })
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
+        if (!form.username || !form.password || !form.confirmPassword || !form.email) {
+            handleEmptyInput()
+            return
+        }
 
         if (form.password !== form.confirmPassword) {
-            alert('Passwords do not match!')
+            handlePasswordMismatch()
             return
         }
 
@@ -33,13 +48,21 @@ export default function RegisterForm({ onSwitch }) {
     return (
         <div className="flex flex-col w-full flex-shrink-0 text-center">
             <h2 className="text-[#6A5ACD] text-[4rem] mb-[60px]">Register</h2>
-
+            <div className="mb-[20px]">
+                {alert && (
+                <Alert
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+                )}
+            </div>
             <form className="flex flex-col gap-[15px]" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     name="username"
                     placeholder="Username"
-                    required
+                    // required
                     value={form.username}
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
@@ -48,7 +71,7 @@ export default function RegisterForm({ onSwitch }) {
                     type="password"
                     name="password"
                     placeholder="Password"
-                    required
+                    // required
                     value={form.password}
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
@@ -57,7 +80,7 @@ export default function RegisterForm({ onSwitch }) {
                     type="password"
                     name="confirmPassword"
                     placeholder="Confirmation Password"
-                    required
+                    // required
                     value={form.confirmPassword}
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
@@ -66,7 +89,7 @@ export default function RegisterForm({ onSwitch }) {
                     type="email"
                     name="email"
                     placeholder="Email"
-                    required
+                    // required
                     value={form.email}
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"

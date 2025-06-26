@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MantaCore Sales Report</title>
-  <link rel="stylesheet" href="asset/style/page.css" />
-  <link rel="stylesheet" href="asset/style/sales.css" />
+  <link rel="stylesheet" href="/assets/styles/page.css" />
+  <link rel="stylesheet" href="/assets/styles/sales.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
   <div class="dashboard-container">
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
-        <img src="asset/img/logo.png" alt="MantaCore" />
+        <img src="assets/logo.png" alt="MantaCore" />
       </div>
       <ul>
         <li><a href="dashboard.html">Dashboard</a></li>
@@ -31,9 +33,9 @@
       <div class="main-header-row">
         <h1>Sales Report</h1>
         <div class="top-filter">
-            <input type="date" id="startDate" value="2025-04-24">
-            <span style="margin: 0 6px;">-</span>
-            <input type="date" id="endDate" value="2025-06-20">
+          <input type="date" id="startDate" value="2025-04-24">
+          <span style="margin: 0 6px;">-</span>
+          <input type="date" id="endDate" value="2025-06-20">
         </div>
       </div>
 
@@ -81,14 +83,14 @@
         <span>-</span>
         <input type="date" id="endDate2" value="2025-06-20">
         <select>
-            <option>Product Category</option>
+          <option>Product Category</option>
         </select>
         <select>
-            <option>Suitor</option>
+          <option>Suitor</option>
         </select>
         <button class="btn-primary">Apply Filter</button>
         <button class="btn-export">Export as PDF</button>
-    </div>
+      </div>
       <div class="transaction-box">
         <table>
           <thead>
@@ -163,6 +165,6 @@
     });
   </script>
   <script src="/assets/js/sidebar.js">
-</script>
+  </script>
 </body>
 </html>

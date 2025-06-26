@@ -23,7 +23,7 @@ function getChartOptions() {
     return {
         responsive: true,
         plugins: {
-            legend: { display: false },
+            legend: { display: true },
             tooltip: {
                 callbacks: {
                     label: (context) => `Rp${Number(context.raw).toLocaleString()}`,

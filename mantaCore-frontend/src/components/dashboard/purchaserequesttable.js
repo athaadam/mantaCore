@@ -11,14 +11,6 @@ export default function PurchaseRequestTable({ requests = [], itemsPerPage = 5 }
     const startIdx = (currentPage - 1) * itemsPerPage;
     const currentData = requests.slice(startIdx, startIdx + itemsPerPage);
 
-    const handlePrev = () => {
-        if (currentPage > 1) setCurrentPage(prev => prev - 1);
-    };
-
-    const handleNext = () => {
-        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-    };
-
     return (
         <>
             <h3 className="text-xl text-gray-800 font-semibold mb-4">Purchase Request</h3>
@@ -46,6 +38,13 @@ export default function PurchaseRequestTable({ requests = [], itemsPerPage = 5 }
                             </td>
                         </tr>
                     ))}
+                    {currentData.length === 0 && (
+                        <tr>
+                            <td colSpan="5" className="text-center py-4 text-gray-500">
+                                No purchase requests available.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
 
