@@ -2,47 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index(): Response { return response(Item::all()); }
+
+    public function store(Request $request): Response {
+        $data = $request->validate([
+            'name'        => 'required|string|max:255',
+            'itemPrice'   => 'required|numeric',
+            'category'    => 'nullable|string',
+            'type'        => 'nullable|string',
+            'units'       => 'nullable|string',
+            'description' => 'nullable|string',
+        ]);
+        $item = Item::create($data);
+        return response($item, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(Item $item): Response { return response($item); }
+
+    public function update(Request $request, Item $item): Response {
+        $data = $request->validate([
+            'name'        => 'sometimes|required|string|max:255',
+            'itemPrice'   => 'sometimes|required|numeric',
+            'category'    => 'nullable|string',
+            'type'        => 'nullable|string',
+            'units'       => 'nullable|string',
+            'description' => 'nullable|string',
+        ]);
+        $item->update($data);
+        return response($item);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(Item $item): Response {
+        $item->delete();
+        return response(null, 204);
     }
 }

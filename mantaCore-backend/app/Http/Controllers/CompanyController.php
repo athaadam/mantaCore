@@ -2,47 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    // GET /api/companies
+    public function index(): Response { return response(Company::all()); }
+
+    // POST /api/companies
+    public function store(Request $request): Response {
+        $data = $request->validate(['companyName' => 'required|string|max:255']);
+        $company = Company::create($data);
+        return response($company, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    // GET /api/companies/{company}
+    public function show(Company $company): Response { return response($company); }
+
+    // PUT/PATCH /api/companies/{company}
+    public function update(Request $request, Company $company): Response {
+        $data = $request->validate(['companyName' => 'sometimes|required|string|max:255']);
+        $company->update($data);
+        return response($company);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    // DELETE /api/companies/{company}
+    public function destroy(Company $company): Response {
+        $company->delete();
+        return response(null, 204);
     }
 }

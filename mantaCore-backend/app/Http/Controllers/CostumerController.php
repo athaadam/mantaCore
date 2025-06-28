@@ -2,47 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Costumer;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CostumerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index(): Response { return response(Costumer::all()); }
+
+    public function store(Request $request): Response {
+        $data = $request->validate(['username' => 'required|string|unique:costumers,username']);
+        $costumer = Costumer::create($data);
+        return response($costumer, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(Costumer $costumer): Response { return response($costumer); }
+
+    public function update(Request $request, Costumer $costumer): Response {
+        $data = $request->validate([
+            'username' => 'sometimes|required|string|unique:costumers,username,' . $costumer->costumerID . ',costumerID',
+        ]);
+        $costumer->update($data);
+        return response($costumer);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(Costumer $costumer): Response {
+        $costumer->delete();
+        return response(null, 204);
     }
 }
