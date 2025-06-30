@@ -34,7 +34,31 @@ const summaryStructure = [
         title: 'Active Customers',
         icon: '/customer.svg',
         isCurrency: false,
-    }
+    },
+    {
+        key: 'totalRequests',
+        title: 'Total Requests',
+        icon: '/request.svg',
+        isCurrency: false,
+    },
+    {
+        key: 'approvedRequests',
+        title: 'Approved Requests',
+        icon: '/approved.svg',
+        isCurrency: false,
+    },
+    {
+        key: 'pendingRequests',
+        title: 'Pending Requests',
+        icon: '/pending.svg',
+        isCurrency: false,
+    },
+    {
+        key: 'rejectedRequests',
+        title: 'Rejected Requests',
+        icon: '/rejected.svg',
+        isCurrency: false,
+    },
 ];
 
 export default summaryStructure;
