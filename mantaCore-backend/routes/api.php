@@ -34,12 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
     Route::delete('/deleteItem/{id}', [ItemController::class, 'deleteItem']);
 
-    Route::apiResources([
-        'companies'      => CompanyController::class,
-        'purchases'      => PurchaseController::class,
-        'purchase-items' => PurchaseItemController::class,
-        'users'          => UserController::class,
-    ]);
+    //purchases
+    Route::get('/getAllPurchases', [PurchaseController::class, 'getAllPurchases']);
+    Route::post('/createPurchase', [PurchaseController::class, 'createPurchase']);
+    Route::get('/getPurchase/{id}', [PurchaseController::class, 'getPurchaseById']);
+    Route::post('/updatePurchase/{id}', [PurchaseController::class, 'updatePurchase']);
+    Route::delete('/deletePurchase/{id}', [PurchaseController::class, 'deletePurchase']);
 
     Route::get('/user', function (Request $request) {
         return $request->user();
