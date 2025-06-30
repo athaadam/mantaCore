@@ -1,35 +1,74 @@
 import { NextResponse } from 'next/server'
 
-export function middleware(request) {
+export async function middleware(request) {
+    const token = request.cookies.get('auth')?.value
     const path = request.nextUrl.pathname
-    const roleMatch = path.match(/^\/([^\/]+)/)
-    const role = roleMatch ? roleMatch[1] : null
 
-    const allowedRoles = ['admin', 'cashier', 'inventory-manager']
-    const auth = request.cookies.get('auth')?.value
+    const isRoot = path === '/'
+    const isAPI = path.startsWith('/api')
+    const roleInPath = path.split('/')[1]
 
-    const isProtected = allowedRoles.some((r) => path.startsWith(`/${r}`))
+    // Tidak punya token & bukan root atau API → redirect ke login
+    if (!token && !isRoot && !isAPI) {
+        return NextResponse.redirect(new URL('/', request.url))
+    }
 
-    // // ⛔ Blokir role yang tidak valid
-    // if (role && !allowedRoles.includes(role) && path.startsWith(`/${role}/`)) {
-    //     return NextResponse.redirect(new URL('/', request.url))
-    // }
+    // Punya token & berada di halaman root → redirect ke dashboard
+    if (token && isRoot) {
+        const redirect = await redirectToRoleDashboard(token, request)
+        if (redirect) return redirect
+    }
 
-    // // 🔐 Cek login: jika halaman butuh auth tapi user belum login
-    // if (!auth && isProtected) {
-    //     return NextResponse.redirect(new URL('/', request.url))
-    // }
-
-    // // 🔁 Kalau user sudah login dan buka /login, redirect ke dashboard
-    // if (auth && path === '/') {
-    //     return NextResponse.redirect(new URL(`/${auth}/dashboard`, request.url))
-    // }
+    // Punya token & role di path → validasi akses role
+    if (token && !isAPI && roleInPath) {
+        const redirect = await validateRoleAccess(token, roleInPath, request)
+        if (redirect) return redirect
+    }
 
     return NextResponse.next()
 }
 
+async function redirectToRoleDashboard(token, request) {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (!res.ok) throw new Error()
+        const data = await res.json()
+        const role = data.user?.role
+
+        if (!role) throw new Error()
+        return NextResponse.redirect(new URL(`/${role}/dashboard`, request.url))
+    } catch {
+        const res = NextResponse.redirect(new URL('/', request.url))
+        res.cookies.delete('auth')
+        return res
+    }
+}
+
+async function validateRoleAccess(token, roleInPath, request) {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (!res.ok) throw new Error()
+        const data = await res.json()
+        const role = data.user?.role
+
+        if (!role || role !== roleInPath) {
+            return NextResponse.redirect(new URL(`/${role}/dashboard`, request.url))
+        }
+    } catch {
+        const res = NextResponse.redirect(new URL('/', request.url))
+        res.cookies.delete('auth')
+        return res
+    }
+}
+
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|api).*)',
+        '/((?!_next/|.*\\.(?:js|json|ico|png|jpg|jpeg|svg|webmanifest|txt|gif|html|css|js)$).*)',
     ],
 }

@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useParams, useRouter } from 'next/navigation'
-import { useRole } from '@/context/rolecontext' // pastikan path-nya sesuai
+import { useRole } from '@/context/rolecontext'
+import Cookies from 'js-cookie' 
 
 const NAV_ITEMS = [
   { name: 'Dashboard', path: 'dashboard' },
@@ -22,7 +23,7 @@ export default function Sidebar() {
   const { setRole } = useRole() // ✅ ambil context role
 
   const handleLogout = async () => {
-    const token = localStorage.getItem('token')
+    const token = Cookies.get('auth')
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/logout`, {
@@ -37,11 +38,10 @@ export default function Sidebar() {
       const data = await response.json()
 
       if (response.ok) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('role')
-        setRole('') // ✅ reset context
+        Cookies.remove('auth')
+        setRole('')
 
-        router.push('/') // ✅ redirect ke halaman login/home
+        router.push('/')
       } else {
         alert(data.message || 'Logout failed')
       }

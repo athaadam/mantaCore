@@ -1,11 +1,90 @@
-export default function ProfilePage() {
+import { cookies } from "next/headers";
+import Image from "next/image";
+
+export default async function ProfilePage() {
+    const cookieStore = cookies();
+    const token = cookieStore.get("auth")?.value;
+
+    if (!token) {
+        return <div className="text-center mt-10 text-red-500">Unauthorized</div>;
+    }
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+    });
+
+    if (!res.ok) {
+        return <div className="text-center mt-10 text-red-500">Failed to load user data</div>;
+    }
+
+    const data = await res.json();
+    const user = {
+        name: data.user.username,
+        role: data.user.role,
+        email: "Admin@Yahoo.com",
+        username: data.user.username,
+        companyName: data.company.companyName,
+        subscriptionUntil: "December 31, 2025",
+        joinedSince: new Date(data.user.created_at).toLocaleDateString(),
+    };
+    console.log(data);
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold">Profile Dashboard</h1>
-            <p className="text-gray-600">View and manage your profile information here.</p>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-                {/* Profile information form or display component would go here */}
+        <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
+            <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+                User Profile
+            </h1>
+
+            <div className="bg-white p-6 rounded-xl shadow-md max-w-3xl mx-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b pb-4">
+                    <div className="flex items-center gap-4">
+                        <Image
+                            src="/user.jpg"
+                            alt="User Avatar"
+                            width={64}
+                            height={64}
+                            className="rounded-full object-cover"
+                        />
+                        <div>
+                            <h2 className="text-xl font-semibold">{user.name}</h2>
+                            <p className="text-gray-500 capitalize">{user.role}</p>
+                        </div>
+                    </div>
+                    <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition cursor-pointer rounded-2xl">
+                        Edit
+                    </button>
+                </div>
+
+                {/* Details */}
+                <div className="mt-6 space-y-4">
+                    <div>
+                        <p className="font-semibold text-gray-700">Email</p>
+                        <p>{user.email}</p>
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-700">Company Name</p>
+                        <p>{user.companyName}</p>
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-700">Subscription Active Until</p>
+                        <p>{user.subscriptionUntil}</p>
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-700">Joined Since</p>
+                        <p>{user.joinedSince}</p>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="mt-6 flex justify-end gap-2">
+                    <button className="bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 transition cursor-pointer rounded-2xl">
+                        Change Password
+                    </button>
+                    <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition cursor-pointer rounded-2xl">
+                        Delete Account
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole } from '@/context/rolecontext'
 import Alert from '@/components/alert'
+import Cookies from 'js-cookie'
 
 export default function LoginForm({ onSwitch }) {
     const router = useRouter()
@@ -11,9 +12,6 @@ export default function LoginForm({ onSwitch }) {
     const [password, setPassword] = useState('')
     const [alert, setAlert] = useState(null)
     const { setRole } = useRole()
-
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -40,13 +38,21 @@ export default function LoginForm({ onSwitch }) {
             }
 
             if (response.ok) {
-                localStorage.setItem('token', data.token)
-                localStorage.setItem('role', data.role)
+                Cookies.set('auth', data.token,)
 
-                setRole(data.role) // Update role context
+                // Ambil data profile
+                const profileRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
+                    headers: {
+                        Authorization: `Bearer ${data.token}`,
+                    },
+                })
+
+                const profile = await profileRes.json()
+
+                setRole(profile.user.role)
                 setAlert({ message: 'Login successful', type: 'success' })
 
-                router.push(`/${data.role}/dashboard`) // ✅ ini benar
+                router.push(`/${profile.role}/dashboard`)
             } else {
                 setAlert({ message: data.message || 'Login failed', type: 'error' })
             }

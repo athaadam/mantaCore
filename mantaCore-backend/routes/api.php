@@ -42,6 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/deletePurchase/{id}', [PurchaseController::class, 'deletePurchase']);
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return response()->json([
+            'user' => $request->user(),
+            'company' => $request->user()->company,
+        ]);
     });
 });

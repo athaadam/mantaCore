@@ -8,7 +8,7 @@ import TransactionFilterRow from '@/components/sales/transactionfilter';
 import TransactionHistory from '@/components/sales/transactionhistory';
 
 
-export default function DashboardPage() {
+export default function SalesPage() {
 
     const summaryData = {
         totalSales: 400000000,
