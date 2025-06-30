@@ -27,9 +27,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
     Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
 
+    // items
+    Route::get('/getAllItems', [ItemController::class, 'getAllItems']);
+    Route::get('/getItem/{id}', [ItemController::class, 'getItemById']);
+    Route::post('/createItem', [ItemController::class, 'createItem']);
+    Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
+    Route::delete('/deleteItem/{id}', [ItemController::class, 'deleteItem']);
+
     Route::apiResources([
         'companies'      => CompanyController::class,
-        'items'          => ItemController::class,
         'purchases'      => PurchaseController::class,
         'purchase-items' => PurchaseItemController::class,
         'users'          => UserController::class,
