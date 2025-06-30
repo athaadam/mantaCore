@@ -19,42 +19,62 @@ export default function RegisterForm({ onSwitch }) {
         setForm({ ...form, [name]: value })
     }
 
-    const handleEmptyInput = () => {
-        setAlert({ message: 'All fields are required', type: 'warning' })
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    const handlePasswordMismatch = () => {
-        setAlert({ message: 'Passwords do not match', type: 'error' })
-    }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: form.username,
+                    password: form.password,
+                    password_confirmation: form.confirmPassword,
+                    company: form.company,
+                }),
+            });
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if (!form.username || !form.password || !form.confirmPassword || !form.email) {
-            handleEmptyInput()
-            return
+            const text = await response.text();
+            let data;
+
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error('Response is not valid JSON');
+            }
+
+            if (response.ok) {
+                setAlert({ message: 'Registration successful', type: 'success' });
+            } else {
+                const errors = data?.errors;
+                if (errors) {
+                    const errorList = Object.values(errors).flat().join('\n');
+                    setAlert({ message: errorList, type: 'error' });
+                } else {
+                    setAlert({ message: data.message || 'Registration failed', type: 'error' });
+                }
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            setAlert({ message: 'Server/network error.', type: 'error' });
         }
+    };
 
-        if (form.password !== form.confirmPassword) {
-            handlePasswordMismatch()
-            return
-        }
 
-        // Simulasi registrasi
-        console.log('Registering:', form)
-
-        // Di sini bisa panggil API register
-    }
 
     return (
         <div className="flex flex-col w-full flex-shrink-0 text-center">
             <h2 className="text-[#6A5ACD] text-[4rem] mb-[60px]">Register</h2>
             <div className="mb-[20px]">
                 {alert && (
-                <Alert
-                    message={alert.message}
-                    type={alert.type}
-                    onClose={() => setAlert(null)}
-                />
+                    <Alert
+                        message={alert.message}
+                        type={alert.type}
+                        onClose={() => setAlert(null)}
+                    />
                 )}
             </div>
             <form className="flex flex-col gap-[15px]" onSubmit={handleSubmit}>
@@ -116,7 +136,7 @@ export default function RegisterForm({ onSwitch }) {
                 <button
                     type="button"
                     onClick={onSwitch}
-                    className="text-[#6A5ACD] font-semibold hover:text-[#362B6D] underline underline-offset-2"
+                    className="text-[#6A5ACD] font-semibold hover:text-[#362B6D] underline underline-offset-2 cursor-pointer"
                 >
                     Login
                 </button>

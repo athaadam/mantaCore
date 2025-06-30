@@ -13,37 +13,48 @@ export default function LoginForm({ onSwitch }) {
     const { setRole } = useRole()
 
 
-    const handleEmptyInput = () => {
-        setAlert({ message: 'Username and password cannot be empty', type: 'error' });
-    };
 
-    const getRoleByUsername = (username) => {
-        if (username === 'admin') return 'admin'
-        if (username === 'cashier') return 'cashier'
-        if (username === 'inventory') return 'inventory-manager'
-        return null
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                }),
+            })
 
-        if (username.trim() === '' || password.trim() === '') {
-            handleEmptyInput(e)
-            return
-        }
+            const text = await response.text()
+            let data
 
-        // Simulasi role, ganti nanti dengan validasi dari backend
-        const role = getRoleByUsername(username)
-        if (!role) {
-            setAlert({ message: 'Invalid role/username', type: 'error' })
-            return
+            try {
+                data = JSON.parse(text)
+            } catch {
+                throw new Error('Response is not valid JSON')
+            }
+
+            if (response.ok) {
+                localStorage.setItem('token', data.token)
+                localStorage.setItem('role', data.role)
+
+                setRole(data.role) // Update role context
+                setAlert({ message: 'Login successful', type: 'success' })
+
+                router.push(`/${data.role}/dashboard`) // ✅ ini benar
+            } else {
+                setAlert({ message: data.message || 'Login failed', type: 'error' })
+            }
+        } catch (err) {
+            console.error('Login error:', err)
+            setAlert({ message: 'An error occurred during login', type: 'error' })
         }
-        setRole(role)
-        document.cookie = `auth=${role}; path=/; max-age=86400`
-        router.push(`/${role}/dashboard`)
     }
-
-
 
     return (
         <div className="flex flex-col w-full flex-shrink-0 text-center">
@@ -95,7 +106,7 @@ export default function LoginForm({ onSwitch }) {
                 <button
                     type="button"
                     onClick={onSwitch}
-                    className="text-[#6A5ACD] font-semibold hover:text-[#362B6D] underline underline-offset-2"
+                    className="text-[#6A5ACD] font-semibold hover:text-[#362B6D] underline underline-offset-2 cursor-pointer"
                 >
                     Create now
                 </button>
