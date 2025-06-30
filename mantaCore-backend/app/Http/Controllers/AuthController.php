@@ -2,106 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     $username = $request->input('username');
-    //     $password = $request->input('password');
+    // 🔐 Login pakai username
+    public function login(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
 
-    //     // Cek ke database user
-    //     $user = DB::table('user')
-    //         ->where('username', $username)
-    //         ->where('password', $password) // ⚠️ Harusnya pakai Hash::check di produksi
-    //         ->first();
+        $user = User::where('username', $credentials['username'])->first();
 
-    //     if ($user) {
-    //         // Simpan session
-    //         Session::put('userID', $user->userID);
-    //         Session::put('username', $user->username);
-    //         Session::put('role', $user->role);
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
-    //         return redirect('/dashboard');
-    //     }
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-    //     return back()->with('error', 'Username atau Password salah');
-    // }
+        return response()->json([
+            'message' => 'Login successful',
+            'token'   => $token,
+            'user'    => $user,
+            'role'    => $user->role, // tambahkan ini
+        ]);
+    }
 
-    // public function register(Request $request)
-    // {
-    //     $request->validate([
-    //         'username' => 'required|unique:user,username',
-    //         'password' => 'required|confirmed|min:4',
-    //         'company' => 'nullable|string|max:100',
-    //     ]);
+    // 📝 Register pakai username + company
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'username' => 'required|string|unique:users,username',
+            'password' => 'required|string|min:8|confirmed',
+            'company'  => 'required|string|max:255',
+        ]);
 
-    //     //cek apakah company sudah ada
-    //     $existingCompany = null;
-    //     if ($request->filled('company')) {
-    //         $existingCompany = DB::table('company')
-    //             ->where('companyName', $request->company)
-    //             ->first();
-    //         //jika sudah ada kirim esan error
-    //         if ($existingCompany) {
-    //             return back()->with('error', 'Company sudah terdaftar');
-    //         }
-    //     }
+        // Cek apakah company sudah ada
+        $existingCompany = Company::where('companyName', $data['company'])->first();
+        if ($existingCompany) {
+            return response()->json([
+                'message' => 'Company name already exists'
+            ], 409);
+        }
 
-    //     // cek apakah company name ada spasi
-    //     if (strpos($request->company, ' ') !== false) {
-    //         return back()->with('error', 'Company name tidak boleh mengandung spasi');
-    //     }
+        // Buat company baru
+        $company = Company::create([
+            'companyName' => $data['company'],
+        ]);
 
-    //     // cek aakah company name mengandung karakter khusus
-    //     if (!preg_match('/^[a-zA-Z0-9]+$/', $request->company)) {
-    //         return back()->with('error', 'Company name hanya boleh mengandung huruf dan angka');
-    //     }
-    //     // Simpan company baru jika ada
-    //     $companyID = null;
-    //     if ($request->filled('company')) {
-    //         $companyID = DB::table
-    //         ('company')->insertGetId([
-    //             'companyName' => $request->company,
-    //             'created_at' => now(),
-    //             'updated_at' => now()
-    //         ]);
-    //     }
+        // Buat user baru
+        $user = User::create([
+            'username'   => $data['username'],
+            'password'   => bcrypt($data['password']),
+            'companyID'  => $company->companyID,
+            'role'       => 'user', // default role
+        ]);
 
-    //     // Simpan user baru
-    //     $userID = DB::table('user')->insertGetId([
-    //         'username' => $request->username,
-    //         'password' => $request->password, // ⚠️ Untuk produksi pakai Hash::make
-    //         'companyID' => $companyID,
-    //         'role' => 'admin'
-    //     ]);
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-    //     // Auto login setelah register
-    //     Session::put('userID', $userID);
-    //     Session::put('username', $request->username);
-    //     Session::put('role', 'admin');
+        return response()->json([
+            'message' => 'Registration successful',
+            'token'   => $token,
+            'user'    => $user,
+            'company' => $company,
+        ]);
+    }
 
-    //     return redirect('/dashboard');
-    // }
-
-    // public function dashboard()
-    // {
-    //     if (!Session::has('username')) {
-    //         return redirect('/');
-    //     }
-
-    //     return view('dashboard', [
-    //         'username' => Session::get('username'),
-    //         'role' => Session::get('role')
-    //     ]);
-    // }
-
-    // public function logout()
-    // {
-    //     Session::flush();
-    //     return redirect('/');
-    // }
+    // 🗑️ Logout
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logged out successfully']);
+    }
 }
