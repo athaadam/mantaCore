@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Alert from '@/components/global/Alert';
 import { createAccount } from '@/libs/api/account-management';
 import InputField from '@/components/account-management/InputField';
+import { updateAccount } from '@/libs/api/account-management';
 
 const initialFormState = {
     username: '',
@@ -54,11 +55,17 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
         setLoading(true);
 
         try {
+            const token = document.cookie.split('; ').find(row => row.startsWith('auth='))?.split('=')[1];
             if (editingAccount) {
-                const updated = { ...editingAccount, ...form };
+                // Hilangkan password jika kosong (tidak diubah)
+                const updatePayload = { ...form };
+                if (!updatePayload.password) {
+                    delete updatePayload.password;
+                    delete updatePayload.password_confirmation;
+                }
+                const updated = await updateAccount(editingAccount.userID, updatePayload, token);
                 onUpdate(updated);
             } else {
-                const token = document.cookie.split('; ').find(row => row.startsWith('auth='))?.split('=')[1];
                 const newUser = await createAccount(form, token);
                 onAdd(newUser);
             }
@@ -71,6 +78,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
         }
     };
 
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 mb-10">
             <InputField
@@ -82,8 +90,8 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
             <InputField
                 name="email"
                 type="email"
-                value={form.email} o
-                nChange={handleChange}
+                value={form.email}
+                onChange={handleChange}
                 placeholder="Email"
                 required
             />
@@ -126,11 +134,21 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
             <div className="flex gap-2 items-center">
                 <button
                     type="submit"
-                    disabled={loading}
-                    className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"
+                    disabled={loading || (editingAccount?.role === 'admin')}
+                    className={`px-6 py-2 rounded text-white 
+        ${editingAccount?.role === 'admin'
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-purple-600 hover:bg-purple-700'}`}
                 >
-                    {loading ? 'Processing...' : editingAccount ? 'Update Account' : 'Add Account'}
+                    {editingAccount?.role === 'admin'
+                        ? 'Admin Locked'
+                        : loading
+                            ? 'Processing...'
+                            : editingAccount
+                                ? 'Update Account'
+                                : 'Add Account'}
                 </button>
+
                 {editingAccount && (
                     <button
                         type="button"
@@ -141,7 +159,6 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                     </button>
                 )}
             </div>
-
             {alert && (
                 <div className="w-full">
                     <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />

@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
-import Action from "@/components/profile/Action";
 import { getProfile } from "@/libs/api/auth";
 import { formatDate } from "@/utils/formatdate";
+import { ProfileAction, EditAccountAction } from '@/components/profile/Action';
+
 
 export default async function ProfilePage() {
 
@@ -43,9 +44,7 @@ export default async function ProfilePage() {
                             <p className="text-gray-500 capitalize">{user.role}</p>
                         </div>
                     </div>
-                    <button className="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition cursor-pointer">
-                        Edit
-                    </button>
+                    <EditAccountAction role={user.role} />
                 </div>
 
                 {/* Details */}
@@ -74,7 +73,7 @@ export default async function ProfilePage() {
 
                 {/* Actions */}
                 <div className="mt-6 flex justify-end gap-2">
-                    <Action role={user.role} />
+                    <ProfileAction role={user.role} />
                 </div>
             </div>
         </div>

@@ -4,11 +4,16 @@ import { useState } from 'react';
 import NewAccountForm from './NewAccountForm';
 import AccountList from './AccountList';
 import Alert from '../global/Alert';
+import Cookies from 'js-cookie';
+import { deleteAccountById } from '@/libs/api/account-management';
 
 export default function AccountManagementClient({ initialData }) {
     const [accounts, setAccounts] = useState(initialData || []);
     const [editingAccount, setEditingAccount] = useState(null);
     const [alert, setAlert] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
 
     const handleAddAccount = (newAccount) => {
         setAccounts(prev => [...prev, newAccount]);
@@ -24,49 +29,28 @@ export default function AccountManagementClient({ initialData }) {
     };
 
     const handleDeleteAccount = async (id) => {
-        const confirmDelete = confirm('Are you sure you want to delete this account?');
-        if (!confirmDelete) return;
-
-        const userToDelete = accounts.find(acc => acc.userID === id);
-        console.log('🗑️ Deleting user:', userToDelete); // ✅ Log user yang akan dihapus
+        if (!confirm('Are you sure you want to delete this account?')) return;
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/deleteUser/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('auth='))?.split('=')[1]}`,
-                    'Accept': 'application/json',
-                },
-            });
-
-            const text = await res.text();
-            let data;
-
-            try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error('Invalid response from server');
-            }
-
-            if (!res.ok) {
-                const errorMsg = data?.message || 'Failed to delete user';
-                setAlert({ message: errorMsg, type: 'error' });
-                return;
-            }
-
+            const token = Cookies.get('auth');
+            await deleteAccountById(id, token);
             setAccounts(prev => prev.filter(acc => acc.userID !== id));
             if (editingAccount?.userID === id) setEditingAccount(null);
+            // ✅ Hapus dari array
+            const updatedAccounts = accounts.filter(acc => acc.userID !== id);
+            setAccounts(updatedAccounts);
 
+            // ✅ Hitung ulang total page
+            const newTotalPages = Math.ceil(updatedAccounts.length / itemsPerPage);
+            if (currentPage > newTotalPages) {
+                setCurrentPage(newTotalPages || 1);
+            }
             setAlert({ message: 'User deleted successfully.', type: 'success' });
-
         } catch (err) {
             console.error('❌ Failed to delete user:', err.message);
-            setAlert({ message: err.message || 'Delete failed', type: 'error' });
+            setAlert({ message: err.message, type: 'error' });
         }
     };
-
-
-
 
     const handleEditAccount = (account) => {
         setEditingAccount(account);
@@ -93,7 +77,9 @@ export default function AccountManagementClient({ initialData }) {
                 )}
                 <AccountList
                     accounts={accounts}
-                    itemsPerPage={5}
+                    itemsPerPage={itemsPerPage}
+                    currentPage={currentPage}
+                    onPageChange={setCurrentPage}
                     onDelete={handleDeleteAccount}
                     onEdit={handleEditAccount}
                 />

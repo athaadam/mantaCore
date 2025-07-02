@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Pagination from '../global/Pagination';
 
-export default function AccountList({ accounts, itemsPerPage, onDelete, onEdit }) {
-    const [currentPage, setCurrentPage] = useState(1);
+export default function AccountList({ accounts, itemsPerPage, currentPage, onPageChange, onDelete, onEdit }) {
 
     const totalPages = Math.ceil(accounts.length / itemsPerPage);
     const startIdx = (currentPage - 1) * itemsPerPage;
@@ -74,8 +72,8 @@ export default function AccountList({ accounts, itemsPerPage, onDelete, onEdit }
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPrev={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    onNext={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onPrev={() => onPageChange(Math.max(currentPage - 1, 1))}
+                    onNext={() => onPageChange(Math.min(currentPage + 1, totalPages))}
                 />
             )}
         </div>

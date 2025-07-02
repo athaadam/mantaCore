@@ -19,9 +19,15 @@ export default function Alert({ message, type = 'info', onClose }) {
   }, [onClose]);
 
   return (
-    <div className={`p-4 rounded-md ${alertStyles[type]} shadow-md transition-opacity `}>
+    <div className={`relative p-4 rounded-md ${alertStyles[type]} shadow-md transition-opacity`}>
+      <button
+        onClick={onClose}
+        className="absolute top-1 right-2 text-sm text-gray-700 hover:text-black cursor-pointer"
+        aria-label="Close"
+      >
+        ✕
+      </button>
       <span className="font-medium">{message}</span>
     </div>
   );
-
 }

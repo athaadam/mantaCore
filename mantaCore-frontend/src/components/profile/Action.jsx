@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 import { useRouter } from 'next/navigation';
 
-export default function ProfileAction({ role }) {
+export function ProfileAction({ role }) {
     const router = useRouter();
     return (
         <div className="mt-6 flex justify-end gap-2">
@@ -16,5 +16,17 @@ export default function ProfileAction({ role }) {
                 Delete Account
             </button>
         </div>
+    );
+}
+
+export function EditAccountAction({ role }) {
+    const router = useRouter();
+    return (
+        <button
+            className="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition cursor-pointer"
+            onClick={() => router.push(`/${role}/profile/edit-account`)}
+        >
+            Edit
+        </button>
     );
 }

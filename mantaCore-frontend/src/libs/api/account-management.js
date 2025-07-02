@@ -48,7 +48,7 @@ export async function createAccount(form, token) {
 }
 
 
-export async function deleteAccount(id, token) {
+export async function deleteAccountById(id, token) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/deleteUser/${id}`, {
         method: 'DELETE',
         headers: {
@@ -63,13 +63,41 @@ export async function deleteAccount(id, token) {
     try {
         data = JSON.parse(text);
     } catch {
+        throw new Error('Invalid response from server');
+    }
+
+    if (!res.ok) throw new Error(data?.message || 'Failed to delete user');
+
+    return data;
+}
+
+export async function updateAccount(id, form, token) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/updateUser/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+    });
+
+    const text = await res.text();
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch {
         throw new Error('Invalid server response');
     }
 
     if (!res.ok) {
-        const errorMessage = data?.message || 'Failed to delete user';
+        const errors = data?.errors;
+        const errorMessage = errors
+            ? Object.values(errors).flat().join('\n')
+            : data.message || 'Failed to update user';
         throw new Error(errorMessage);
     }
 
-    return data;
+    return data.user;
 }
