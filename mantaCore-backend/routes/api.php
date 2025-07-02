@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     InvoiceItemController,
     PurchaseController,
     PurchaseItemController,
-    UserController
+    UserController,
+    AccountManage
 };
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -48,5 +49,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/getCostumer/{id}', [CostumerController::class, 'getCostumerById']);
         Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
         Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
+
+        Route::middleware('admin')->group(function () {
+            //account manage
+            Route::post('/addUser', [AccountManage::class, 'addUser']);
+            Route::delete('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
+
+        });
     });
 });
