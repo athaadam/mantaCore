@@ -41,6 +41,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/updatePurchase/{id}', [PurchaseController::class, 'updatePurchase']);
     Route::delete('/deletePurchase/{id}', [PurchaseController::class, 'deletePurchase']);
 
+    //costumer
+    Route::get('/getAllCostumers', [CostumerController::class, 'getAllCostumers']);
+    Route::post('/createCostumer', [CostumerController::class, 'createCostumer']);
+    Route::get('/getCostumer/{id}', [CostumerController::class, 'getCostumerById']);
+    Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
+    Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
+
     Route::get('/user', function (Request $request) {
         return response()->json([
             'user' => $request->user(),

@@ -4,30 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\Costumer;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 class CostumerController extends Controller
 {
-    public function index(): Response { return response(Costumer::all()); }
-
-    public function store(Request $request): Response {
-        $data = $request->validate(['username' => 'required|string|unique:costumers,username']);
-        $costumer = Costumer::create($data);
-        return response($costumer, 201);
+    // ✅ GET: Semua costumer
+    public function getAllCostumers(): JsonResponse
+    {
+        $costumers = Costumer::all();
+        return response()->json($costumers);
     }
 
-    public function show(Costumer $costumer): Response { return response($costumer); }
+    // ✅ GET: Costumer by ID
+    public function getCostumerById(int $id): JsonResponse
+    {
+        $costumer = Costumer::find($id);
 
-    public function update(Request $request, Costumer $costumer): Response {
-        $data = $request->validate([
-            'username' => 'sometimes|required|string|unique:costumers,username,' . $costumer->costumerID . ',costumerID',
+        if (!$costumer) {
+            return response()->json(['message' => 'Costumer not found'], 404);
+        }
+
+        return response()->json($costumer);
+    }
+
+    // ✅ POST: Tambah costumer baru
+    public function createCostumer(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'username' => 'required|string|max:255|unique:costumers,username',
         ]);
-        $costumer->update($data);
-        return response($costumer);
+
+        $costumer = Costumer::create($validated);
+
+        return response()->json([
+            'message'  => 'Costumer created successfully',
+            'costumer' => $costumer,
+        ], 201);
     }
 
-    public function destroy(Costumer $costumer): Response {
+    // ✅ PUT: Update costumer
+    public function updateCostumer(Request $request, int $id): JsonResponse
+    {
+        $costumer = Costumer::find($id);
+        if (!$costumer) {
+            return response()->json(['message' => 'Costumer not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'username' => 'required|string|max:255|unique:costumers,username,' . $id . ',costumerID',
+        ]);
+
+        $costumer->update($validated);
+
+        return response()->json([
+            'message'  => 'Costumer updated successfully',
+            'costumer' => $costumer,
+        ]);
+    }
+
+    // ✅ DELETE: Hapus costumer
+    public function deleteCostumer(int $id): JsonResponse
+    {
+        $costumer = Costumer::find($id);
+        if (!$costumer) {
+            return response()->json(['message' => 'Costumer not found'], 404);
+        }
+
         $costumer->delete();
-        return response(null, 204);
+
+        return response()->json(['message' => 'Costumer deleted successfully']);
     }
 }
