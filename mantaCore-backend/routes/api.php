@@ -12,7 +12,7 @@ use App\Http\Controllers\{
     PurchaseController,
     PurchaseItemController,
     UserController,
-    AccountManage
+    AccountManage,
 };
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,38 +29,48 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('subscription')->group(function () {
-        // invoices
-        Route::get('/getAllInvoices', [InvoiceController::class, 'getAllInvoices']);
-        Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']);
-        Route::get('/getInvoice/{id}', [InvoiceController::class, 'getInvoiceById']);
-        Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
-        Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
 
-        // items
-        Route::get('/getAllItems', [ItemController::class, 'getAllItems']);
-        Route::get('/getItem/{id}', [ItemController::class, 'getItemById']);
-        Route::post('/createItem', [ItemController::class, 'createItem']);
-        Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
-        Route::delete('/deleteItem/{id}', [ItemController::class, 'deleteItem']);
+        //cashier
+        Route::middleware('cashier')->group(function () {
+            // invoices
+            Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']);
+            Route::get('/getmyInvoices', [InvoiceController::class, 'getMyInvoices']);
+            Route::get('/getInvoice/{id}', [InvoiceController::class, 'getInvoiceById']);
+            Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
+            Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
 
-        //purchases
-        Route::get('/getAllPurchases', [PurchaseController::class, 'getAllPurchases']);
-        Route::post('/createPurchase', [PurchaseController::class, 'createPurchase']);
-        Route::get('/getPurchase/{id}', [PurchaseController::class, 'getPurchaseById']);
-        Route::post('/updatePurchase/{id}', [PurchaseController::class, 'updatePurchase']);
-        Route::delete('/deletePurchase/{id}', [PurchaseController::class, 'deletePurchase']);
+            //costumer
+            Route::get('/getAllCostumers', [CostumerController::class, 'getAllCostumers']);
+            Route::post('/createCostumer', [CostumerController::class, 'createCostumer']);
+            Route::get('/getCostumer/{id}', [CostumerController::class, 'getCostumerById']);
+            Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
+            Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
+        });
 
-        //costumer
-        Route::get('/getAllCostumers', [CostumerController::class, 'getAllCostumers']);
-        Route::post('/createCostumer', [CostumerController::class, 'createCostumer']);
-        Route::get('/getCostumer/{id}', [CostumerController::class, 'getCostumerById']);
-        Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
-        Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
+        //management
+        Route::middleware('management')->group(function () {
 
+            // items
+            Route::get('/getAllItems', [ItemController::class, 'getAllItems']);
+            Route::get('/getItem/{id}', [ItemController::class, 'getItemById']);
+            Route::post('/createItem', [ItemController::class, 'createItem']);
+            Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
+            Route::delete('/deleteItem/{id}', [ItemController::class, 'deleteItem']);
+
+            //purchases
+            Route::post('/createPurchase', [PurchaseController::class, 'createPurchase']);
+            Route::get('/getPurchase/{id}', [PurchaseController::class, 'getPurchaseById']);
+            Route::get('/getMyPurchases', [PurchaseController::class, 'getMyPurchases']);
+            Route::post('/updatePurchase/{id}', [PurchaseController::class, 'updatePurchase']);
+            Route::delete('/deletePurchase/{id}', [PurchaseController::class, 'deletePurchase']);
+        });
+
+        //admin
         Route::middleware('admin')->group(function () {
             //account manage
             Route::post('/addUser', [AccountManage::class, 'addUser']);
             Route::delete('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
+            Route::post('/updateUser/{userID}', [AccountManage::class, 'updateUser']);
 
             // invoices
             Route::get('/getAllInvoices', [InvoiceController::class, 'getAllInvoices']);

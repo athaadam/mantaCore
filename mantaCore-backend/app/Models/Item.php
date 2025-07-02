@@ -12,13 +12,13 @@ class Item extends Model
     protected $primaryKey = 'itemID';
 
     protected $fillable = [
+        'companyID',
         'name',
         'itemPrice',
         'category',
         'type',
         'units',
-        'description',
-        'stock', // ← tambahkan ini
+        'stock',
     ];
 
     public function invoiceItems()  { return $this->hasMany(InvoiceItem::class,  'itemID'); }
