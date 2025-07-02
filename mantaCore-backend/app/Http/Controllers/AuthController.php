@@ -57,7 +57,7 @@ class AuthController extends Controller
             'username'   => $data['username'],
             'password'   => bcrypt($data['password']),
             'companyID'  => $company->companyID,
-            'role'       => 'user', // default role
+            'role'       => 'Administrator',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

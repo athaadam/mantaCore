@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
+import Action from "@/components/profile/action";
 
 export default async function ProfilePage() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("auth")?.value;
 
     if (!token) {
@@ -28,7 +29,6 @@ export default async function ProfilePage() {
         subscriptionUntil: "December 31, 2025",
         joinedSince: new Date(data.user.created_at).toLocaleDateString(),
     };
-    console.log(data);
     return (
         <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
             <h1 className="text-3xl font-semibold text-gray-800 mb-6">
@@ -51,7 +51,7 @@ export default async function ProfilePage() {
                             <p className="text-gray-500 capitalize">{user.role}</p>
                         </div>
                     </div>
-                    <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition cursor-pointer rounded-2xl">
+                    <button className="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition cursor-pointer">
                         Edit
                     </button>
                 </div>
@@ -78,12 +78,7 @@ export default async function ProfilePage() {
 
                 {/* Actions */}
                 <div className="mt-6 flex justify-end gap-2">
-                    <button className="bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 transition cursor-pointer rounded-2xl">
-                        Change Password
-                    </button>
-                    <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition cursor-pointer rounded-2xl">
-                        Delete Account
-                    </button>
+                    <Action role={user.role} />
                 </div>
             </div>
         </div>

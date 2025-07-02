@@ -1,31 +1,128 @@
-export default function InventoryPage() {
-    return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold">Inventory Dashboard</h1>
-            <p className="text-gray-600">Manage your inventory and stock levels here.</p>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Inventory Summary</h2>
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-blue-100 p-4 rounded-lg">
-                        <h3 className="text-lg font-medium">Total Items</h3>
-                        <p className="text-xl font-bold">1500</p>
-                    </div>
-                    <div className="bg-green-100 p-4 rounded-lg">
-                        <h3 className="text-lg font-medium">Items in Stock</h3>
-                        <p className="text-xl font-bold">1200</p>
-                    </div>
-                    <div className="bg-yellow-100 p-4 rounded-lg">
-                        <h3 className="text-lg font-medium">Low Stock Alerts</h3>
-                        <p className="text-xl font-bold">5</p>
-                    </div>
-                </div>
-            </div>
+import InventoryClient from "@/components/inventory/inventoryclient";
 
-            {/* Inventory Table */}
-            <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h2 className="text-xl font-semibold mb-4">Inventory Items</h2>
-                {/* Table component would go here */}
-            </div>
+export default function InventoryPage() {
+
+    const itemsData = [
+        {
+            name: 'Tumbler',
+            type: 'Drinkware',
+            stock: 100,
+            unit: 'pcs',
+            price: 20000,
+            description: 'High quality tumbler for beverages',
+        },
+        {
+            name: 'Spoon',
+            type: 'Cutlery',
+            stock: 150,
+            unit: 'pcs',
+            price: 5000,
+            description: 'Stainless steel spoon',
+        },
+        {
+            name: 'Rice',
+            type: 'Food',
+            stock: 50,
+            unit: 'kg',
+            price: 15000,
+            description: 'Premium quality rice',
+        },
+        {
+            name: 'Carrot',
+            type: 'Vegetable',
+            stock: 200,
+            unit: 'kg',
+            price: 8000,
+            description: 'Fresh organic carrots',
+        },
+        {
+            name: 'Plate',
+            type: 'Tableware',
+            stock: 120,
+            unit: 'pcs',
+            price: 10000,
+            description: 'Ceramic dinner plate',
+        },
+        {
+            name: 'Fork',
+            type: 'Cutlery',
+            stock: 130,
+            unit: 'pcs',
+            price: 6000,
+            description: 'Stainless steel fork',
+        },
+        {
+            name: 'Knife',
+            type: 'Cutlery',
+            stock: 110,
+            unit: 'pcs',
+            price: 7000,
+            description: 'Sharp kitchen knife',
+        },
+        {
+            name: 'Glass',
+            type: 'Drinkware',
+            stock: 90,
+            unit: 'pcs',
+            price: 8000,
+            description: 'Clear glass for drinks',
+        },
+        {
+            name: 'Chicken',
+            type: 'Meat',
+            stock: 60,
+            unit: 'kg',
+            price: 35000,
+            description: 'Fresh chicken meat',
+        },
+        {
+            name: 'Beef',
+            type: 'Meat',
+            stock: 40,
+            unit: 'kg',
+            price: 80000,
+            description: 'Premium beef cuts',
+        },
+        {
+            name: 'Potato',
+            type: 'Vegetable',
+            stock: 180,
+            unit: 'kg',
+            price: 6000,
+            description: 'Organic potatoes',
+        },
+        {
+            name: 'Milk',
+            type: 'Dairy',
+            stock: 70,
+            unit: 'ltr',
+            price: 12000,
+            description: 'Fresh cow milk',
+        },
+        {
+            name: 'Egg',
+            type: 'Dairy',
+            stock: 200,
+            unit: 'pcs',
+            price: 2000,
+            description: 'Free-range eggs',
+        },
+        {
+            name: 'Salt',
+            type: 'Spices',
+            stock: 300,
+            unit: 'kg',
+            price: 4000,
+            description: 'Refined table salt',
+        },
+    ];
+
+    return (
+        <div className="flex-1 px-6 py-8  min-h-screen">
+            <h1 className="text-3xl font-bold text-gray-800 mb-8">Inventory</h1>
+           <InventoryClient
+           initialItems={itemsData}
+              />
         </div>
     );
 }

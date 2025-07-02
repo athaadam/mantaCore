@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import TopSales from '@/components/topsales'
-import SummaryCards from '@/components/dashboard/summarycards';
+import SummaryCards from '@/components/summarycards';
 import TransactionTable from '@/components/dashboard/transactiontable.';
 import PurchaseRequestTable from '@/components/dashboard/purchaserequesttable';
 
@@ -166,7 +166,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Purchase Requests */}
-      <div className="bg-white p-6 rounded-xl drop-shadow-lg mt-6 flex-[1.2] flex flex-col w-full h-[300px] min-w-[400px] flex-shrink-0">
+      <div className="bg-white p-6 rounded-xl drop-shadow-lg mt-6 flex-[1.2] flex flex-col w-full h-[300px] min-w-[400px] flex-shrink-0 px-6 py-4">
         <PurchaseRequestTable
           requests={purchaseRequests}
           itemsPerPage={3}

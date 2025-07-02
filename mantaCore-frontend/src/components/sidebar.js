@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useParams, useRouter } from 'next/navigation'
 import { useRole } from '@/context/rolecontext'
-import Cookies from 'js-cookie' 
+import Cookies from 'js-cookie'
 
 const NAV_ITEMS = [
   { name: 'Dashboard', path: 'dashboard' },
@@ -61,7 +61,7 @@ export default function Sidebar() {
         <ul className="space-y-2 px-4">
           {NAV_ITEMS.map(({ name, path }) => {
             const href = path ? `/${role}/${path}` : null
-            const isActive = href && pathname === href
+            const isActive = href && pathname.startsWith(href)
 
             if (name === 'Logout') {
               return (

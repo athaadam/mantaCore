@@ -47,7 +47,14 @@ export default function RegisterForm({ onSwitch }) {
             }
 
             if (response.ok) {
-                setAlert({ message: 'Registration successful', type: 'success' });
+                setAlert({ message: 'Registration successful please login', type: 'success' });
+                setForm({
+                    username: '',
+                    password: '',
+                    confirmPassword: '',
+                    email: '',
+                    company: '',
+                });
             } else {
                 const errors = data?.errors;
                 if (errors) {

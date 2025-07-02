@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Pagination from '@/components/pagination'; // Pastikan file ini ada
+import Pagination from '@/components/pagination';
 
 export default function TransactionHistory({ transactions, itemsPerPage }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +18,7 @@ export default function TransactionHistory({ transactions, itemsPerPage }) {
                     <table className="min-w-full">
                         <thead>
                             <tr>
-                                {['Date', 'Invoice ID', 'Suitor', 'Item', 'Customer ID', 'Amount', 'Details'].map((header) => (
+                                {['Date', 'Invoice ID', 'Suitor', 'Item', 'Customer ID', 'Amount', 'Action'].map((header) => (
                                     <th
                                         key={header}
                                         className="px-6 py-3 border-b text-left font-medium text-gray-700 uppercase tracking-wider"
@@ -40,15 +40,9 @@ export default function TransactionHistory({ transactions, itemsPerPage }) {
                                         <td className="px-6 py-4 border-b text-gray-700">{transaction.customerId}</td>
                                         <td className="px-6 py-4 border-b text-gray-700">{transaction.amount}</td>
                                         <td className="px-6 py-4 border-b">
-                                            <button className="bg-purple-800 hover:bg-purple-900 text-white px-4 py-2 rounded cursor-pointer">
-                                                View Details
-                                            </button>
-                                            <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded ml-2 cursor-pointer">
-                                                Edit
-                                            </button>
-                                            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ml-2 cursor-pointer">
-                                                Delete
-                                            </button>
+                                            <a href="#" className="text-[#6A5ACD] hover:underline">
+                                                View Detail
+                                            </a>
                                         </td>
                                     </tr>
                                 ))
