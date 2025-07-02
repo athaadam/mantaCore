@@ -1,103 +1,38 @@
-import AccountList from '@/components/account-management/accountlist';
-import NewAccountForm from '@/components/account-management/newaccountform';
+import { cookies } from 'next/headers';
+import AccountManagementClient from '@/components/account-management/AccountManagementClient';
+
+export default async function AccountManagementPage() {
+    // Ambil token dari cookie
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth')?.value;
+
+    if (!token) {
+        return <div className="text-center mt-10 text-red-500">Unauthorized</div>;
+    }
+
+    // Fetch data dari Laravel API dengan Authorization header
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/getAllUsers`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+        },
+        cache: 'no-store',
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text(); // ← penting: baca isi error response
+        console.error('❌ Failed to fetch users');
+        console.error('Status:', res.status, res.statusText);
+        console.error('Response body:', errorText);
+
+        return <div className="text-center mt-10 text-red-500">Failed to load user data</div>;
+    }
 
 
-export default function AccountManagementPage() {
+    console.log(res.message);
 
-    const accounts = [
-        {
-            id: 1,
-            name: 'John Doe',
-            username: 'johndoe',
-            role: 'Administrator',
-            status: 'Active',
-        },
-        {
-            id: 2,
-            name: 'Jane Smith',
-            username: 'janesmith',
-            role: 'Cashier',
-            status: 'Active',
-        },
-        {
-            id: 3,
-            name: 'Alice Johnson',
-            username: 'alicej',
-            role: 'Viewer',
-            status: 'Inactive',
-        },
-        {
-            id: 4,
-            name: 'Bob Williams',
-            username: 'bobw',
-            role: 'Administrator',
-            status: 'Active',
-        },
-        {
-            id: 5,
-            name: 'Carol Evans',
-            username: 'carole',
-            role: 'Cashier',
-            status: 'Inactive',
-        },
-        {
-            id: 6,
-            name: 'David Brown',
-            username: 'davidb',
-            role: 'Viewer',
-            status: 'Active',
-        },
-        {
-            id: 7,
-            name: 'Emily Clark',
-            username: 'emilyc',
-            role: 'Administrator',
-            status: 'Active',
-        },
-        {
-            id: 8,
-            name: 'Frank Harris',
-            username: 'frankh',
-            role: 'Cashier',
-            status: 'Inactive',
-        },
-        {
-            id: 9,
-            name: 'Grace Lee',
-            username: 'gracel',
-            role: 'Viewer',
-            status: 'Active',
-        },
-        {
-            id: 10,
-            name: 'Henry King',
-            username: 'henryk',
-            role: 'Administrator',
-            status: 'Inactive',
-        },
-        {
-            id: 11,
-            name: 'Ivy Martinez',
-            username: 'ivym',
-            role: 'Cashier',
-            status: 'Active',
-        },
-        {
-            id: 12,
-            name: 'Jack Nelson',
-            username: 'jackn',
-            role: 'Viewer',
-            status: 'Active',
-        },
-        {
-            id: 13,
-            name: 'Karen Ortiz',
-            username: 'kareno',
-            role: 'Administrator',
-            status: 'Active',
-        },
-    ];
-
+    const accounts = await res.json();
+    console.log(accounts);
 
     return (
         <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
@@ -109,17 +44,7 @@ export default function AccountManagementPage() {
                 Add New Account
             </h2>
 
-            {/* Form tanpa card */}
-            <NewAccountForm />
-
-            {/* Tabel akun */}
-            <div className="mt-6">
-                <AccountList
-                    accounts={accounts}
-                    itemsPerPage={5}
-                />
-                
-            </div>
+            <AccountManagementClient initialData={accounts} />
         </div>
     );
 }

@@ -12,6 +12,7 @@ export default function RegisterForm({ onSwitch }) {
         confirmPassword: '',
         email: '',
         company: '',
+        phone: '',
     })
 
     const handleChange = (e) => {
@@ -33,7 +34,9 @@ export default function RegisterForm({ onSwitch }) {
                     username: form.username,
                     password: form.password,
                     password_confirmation: form.confirmPassword,
+                    email: form.email,
                     company: form.company,
+                    phone_number: form.phone,
                 }),
             });
 
@@ -54,6 +57,7 @@ export default function RegisterForm({ onSwitch }) {
                     confirmPassword: '',
                     email: '',
                     company: '',
+                    phone: '',
                 });
             } else {
                 const errors = data?.errors;
@@ -129,7 +133,15 @@ export default function RegisterForm({ onSwitch }) {
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
                 />
-
+                <input
+                    type="text"
+                    name="phone"
+                    placeholder="Phone Number"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
+                    pattern='^\+?[0-9\s-]{7,15}$'
+                />
                 <button
                     type="submit"
                     className="mt-[20px] self-center w-[30%] p-[10px] bg-[#6A5ACD] text-white rounded-[6px] text-[1.2rem] cursor-pointer transition hover:bg-[#5a4ac5] font-medium"

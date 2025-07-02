@@ -51,6 +51,7 @@ export default function LoginForm({ onSwitch }) {
 
                 setRole(profile.user.role)
                 setAlert({ message: 'Login successful', type: 'success' })
+                console.log(profile)
 
                 router.push(`/${profile.role}/dashboard`)
             } else {

@@ -23,10 +23,11 @@ export default async function ProfilePage() {
     const user = {
         name: data.user.username,
         role: data.user.role,
-        email: "Admin@Yahoo.com",
+        email: data.user.email,
+        phone: data.user.phone_number || 'N/A',
         username: data.user.username,
         companyName: data.company.companyName,
-        subscriptionUntil: "December 31, 2025",
+        subscriptionUntil: new Date(data.company.subscription_until).toLocaleDateString(),
         joinedSince: new Date(data.user.created_at).toLocaleDateString(),
     };
     return (
@@ -65,6 +66,10 @@ export default async function ProfilePage() {
                     <div>
                         <p className="font-semibold text-gray-700">Company Name</p>
                         <p>{user.companyName}</p>
+                    </div>
+                     <div>
+                        <p className="font-semibold text-gray-700">Phone Number</p>
+                        <p>{user.phone}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Subscription Active Until</p>
