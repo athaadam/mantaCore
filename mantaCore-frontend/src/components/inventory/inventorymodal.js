@@ -10,7 +10,7 @@
             <input name="name" value={item.name} onChange={onChange} placeholder="Item Name" className="w-full border px-4 py-2 rounded-lg" required />
             <input name="type" value={item.type} onChange={onChange} placeholder="Type" className="w-full border px-4 py-2 rounded-lg" required />
             <input name="stock" value={item.stock} onChange={onChange} placeholder="Stock" type="number" className="w-full border px-4 py-2 rounded-lg" required />
-            <input name="unit" value={item.unit} onChange={onChange} placeholder="Unit" className="w-full border px-4 py-2 rounded-lg" required />
+            <input name="units" value={item.unit} onChange={onChange} placeholder="Unit" className="w-full border px-4 py-2 rounded-lg" required />
             <input name="price" value={item.price} onChange={onChange} placeholder="Price" type="number" className="w-full border px-4 py-2 rounded-lg" required />
             <textarea name="description" value={item.description} onChange={onChange} placeholder="Description" className="w-full border px-4 py-2 rounded-lg" required />
             <div className="flex justify-end gap-3">

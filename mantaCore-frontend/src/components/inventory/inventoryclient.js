@@ -57,10 +57,10 @@ export default function InventoryClient({ initialItems }) {
                 <InventoryFilter types={itemTypes} onChange={handleFilter} />
                 <InventoryActions onAdd={() => setShowModal(true)} />
             </div>
-            <InventoryTable 
-            items={items} 
-            onDelete={handleDelete}
-            itemsPerPage={5}
+            <InventoryTable
+                items={items}
+                onDelete={handleDelete}
+                itemsPerPage={5}
             />
             <InventoryModal
                 isOpen={showModal}

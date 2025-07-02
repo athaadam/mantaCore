@@ -20,7 +20,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete }) {
               <th className="py-3 px-4 font-semibold text-gray-700">Item Name</th>
               <th className="py-3 px-4 font-semibold text-gray-700">Type</th>
               <th className="py-3 px-4 font-semibold text-gray-700">Stock</th>
-              <th className="py-3 px-4 font-semibold text-gray-700">Unit</th>
+              <th className="py-3 px-4 font-semibold text-gray-700">Units</th>
               <th className="py-3 px-4 font-semibold text-gray-700">Price</th>
               <th className="py-3 px-4 font-semibold text-gray-700">Description</th>
               <th className="py-3 px-4 font-semibold text-gray-700">Action</th>
@@ -34,8 +34,8 @@ export default function InventoryTable({ items, itemsPerPage, onDelete }) {
                   <td className="py-4 px-4">{item.name}</td>
                   <td className="py-4 px-4">{item.type}</td>
                   <td className="py-4 px-4">{item.stock}</td>
-                  <td className="py-4 px-4">{item.unit}</td>
-                  <td className="py-4 px-4">Rp {item.price.toLocaleString('id-ID')}</td>
+                  <td className="py-4 px-4">{item.units}</td>
+                  <td className="py-4 px-4">Rp {item.itemPrice.toLocaleString('id-ID')}</td>
                   <td className="py-4 px-4">{item.description}</td>
                   <td className="py-4 px-4 whitespace-nowrap">
                     <button className="text-purple-600 hover:text-purple-800 font-medium mr-3 cursor-pointer">Edit</button>
