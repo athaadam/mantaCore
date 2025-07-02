@@ -9,9 +9,12 @@ return new class extends Migration {
         Schema::create('companies', function (Blueprint $table) {
             $table->id('companyID');
             $table->string('companyName');
+            $table->timestamp('subscription_start')->nullable(); // Tanggal mulai langganan
+            $table->timestamp('subscription_until')->nullable(); // Tanggal akhir langganan
             $table->timestamps();
         });
     }
+
     public function down(): void {
         Schema::dropIfExists('companies');
     }

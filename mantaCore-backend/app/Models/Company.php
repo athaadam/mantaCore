@@ -13,11 +13,15 @@ class Company extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['companyName'];
+    // Tambahkan kolom subscription_start dan subscription_until ke fillable
+    protected $fillable = [
+        'companyName',
+        'subscription_start',
+        'subscription_until',
+    ];
 
     /* ────── RELATIONS ────── */
     public function users()     { return $this->hasMany(User::class,    'companyID'); }
     public function invoices()  { return $this->hasMany(Invoice::class, 'companyID'); }
     public function purchases() { return $this->hasMany(Purchase::class,'companyID'); }
 }
-

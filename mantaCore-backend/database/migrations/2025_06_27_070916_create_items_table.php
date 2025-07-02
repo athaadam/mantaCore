@@ -13,10 +13,11 @@ return new class extends Migration {
             $table->string('category');
             $table->string('type');
             $table->string('units');
-            $table->text('description')->nullable();
+            $table->integer('stock')->default(0); // Tambahkan kolom stok
             $table->timestamps();
         });
     }
+
     public function down(): void {
         Schema::dropIfExists('items');
     }

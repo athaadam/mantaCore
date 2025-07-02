@@ -34,9 +34,11 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'username' => 'required|string|unique:users,username',
-            'password' => 'required|string|min:8|confirmed',
-            'company'  => 'required|string|max:255',
+            'username'      => 'required|string|unique:users,username',
+            'password'      => 'required|string|min:8|confirmed',
+            'company'       => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'phone_number'  => 'required|string|max:20',
         ]);
 
         // Cek apakah company sudah ada
@@ -47,17 +49,25 @@ class AuthController extends Controller
             ], 409);
         }
 
+        // Buat waktu langganan 30 hari dari sekarang
+        $now = now();
+        $subscriptionUntil = $now->copy()->addDays(30);
+
         // Buat company baru
         $company = Company::create([
-            'companyName' => $data['company'],
+            'companyName'        => $data['company'],
+            'subscription_start' => $now,
+            'subscription_until' => $subscriptionUntil,
         ]);
 
         // Buat user baru
         $user = User::create([
-            'username'   => $data['username'],
-            'password'   => bcrypt($data['password']),
-            'companyID'  => $company->companyID,
-            'role'       => 'Administrator',
+            'username'     => $data['username'],
+            'password'     => bcrypt($data['password']),
+            'email'        => $data['email'],
+            'phone_number' => $data['phone_number'],
+            'companyID'    => $company->companyID,
+            'role'         => 'admin',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -69,6 +79,7 @@ class AuthController extends Controller
             'company' => $company,
         ]);
     }
+
 
     // 🗑️ Logout
     public function logout(Request $request)

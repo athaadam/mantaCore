@@ -8,18 +8,33 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens,HasFactory;
+    use HasApiTokens, HasFactory;
 
     protected $primaryKey = 'userID';
-    protected $fillable = ['companyID','username','password','role'];
-    protected $hidden   = ['password','remember_token'];
 
-    /* casts agar password auto-hash (Laravel 10) */
-    protected $casts = ['password' => 'hashed'];
+    // Tambahkan email dan phone_number ke fillable
+    protected $fillable = [
+        'companyID',
+        'username',
+        'email',
+        'phone_number',
+        'password',
+        'role',
+    ];
 
+    // password & remember_token disembunyikan dalam response
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    // Auto-hash password jika menggunakan Laravel >=10
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    /* ────── RELATIONS ────── */
     public function company()   { return $this->belongsTo(Company::class, 'companyID'); }
     public function invoices()  { return $this->hasMany(Invoice::class, 'userID'); }
     public function purchases() { return $this->hasMany(Purchase::class,'userID'); }
 }
-
-

@@ -36,8 +36,11 @@ class ItemController extends Controller
                 'category'    => 'nullable|string|max:255',
                 'type'        => 'nullable|string|max:255',
                 'units'       => 'nullable|string|max:50',
-                'description' => 'nullable|string',
+                'stock'       => 'nullable|integer|min:0', // ubah dari required ke nullable
             ]);
+
+            // Beri default 0 jika stock tidak dikirim
+            $validated['stock'] = $validated['stock'] ?? 0;
 
             $item = Item::create($validated);
 
@@ -50,8 +53,6 @@ class ItemController extends Controller
             return response()->json([
                 'message' => 'Error occurred while creating item',
                 'error'   => $e->getMessage(),
-                // uncomment di debugging lokal:
-                // 'trace'   => $e->getTrace()
             ], 500);
         }
     }
@@ -70,7 +71,6 @@ class ItemController extends Controller
             'category'    => 'nullable|string|max:255',
             'type'        => 'nullable|string|max:255',
             'units'       => 'nullable|string|max:50',
-            'description' => 'nullable|string',
         ]);
 
         $item->update($validated);
