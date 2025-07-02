@@ -8,62 +8,84 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountManage extends Controller
 {
-    //funtcion menambah user
+    // ✅ Tambah user baru (khusus admin/management)
     public function addUser(Request $request)
     {
-        // Optional: Batasi hanya management yang bisa menambah user
-        // if ($request->user()->role !== 'management') {
+        // Optional: Batasi hanya admin/management yang boleh nambah user
+        // if (!in_array($request->user()->role, ['admin', 'management'])) {
         //     return response()->json(['message' => 'Unauthorized'], 403);
         // }
 
         $data = $request->validate([
-            'username'      => 'required|string|unique:users,username',
-            'password'      => 'required|string|min:8|confirmed',
-            'email'         => 'required|email|unique:users,email',
-            'phone_number'  => 'required|string|max:20',
-            'role'          => 'required|string|in:cashier,management', // role harus diisi
+            'username'     => 'required|string|unique:users,username',
+            'password'     => 'required|string|min:8|confirmed',
+            'email'        => 'required|email|unique:users,email',
+            'phone_number' => 'required|string|max:20',
+            'role'         => 'required|string|in:cashier,management', // valid roles
         ]);
 
-        //ambil company id user yang sedang login
+        // Ambil company ID dari user yang sedang login
         $companyID = $request->user()->companyID;
 
-        //buat user baru
+        // Buat user baru
         $user = User::create([
             'companyID'    => $companyID,
-            'username'     => $data['username'],    
+            'username'     => $data['username'],
             'password'     => Hash::make($data['password']),
             'email'        => $data['email'],
             'phone_number' => $data['phone_number'],
             'role'         => $data['role'],
         ]);
+
         return response()->json([
             'message' => 'User created successfully',
             'user'    => $user,
         ], 201);
     }
 
-    //function menghapus user
+    // ✅ Hapus user berdasarkan userID
     public function deleteUser(Request $request, $userID)
     {
-        // Optional: Batasi hanya management yang bisa menghapus user
-        // if ($request->user()->role !== 'management') {
-        //     return response()->json(['message' => 'Unauthorized'], 403);
-        // }
-
-        $user = User::find($userID);
+        $user = User::where('userID', $userID)->first();
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        // Cek apakah user yang akan dihapus adalah user yang sedang login
-        if ($user->id === $request->user()->id) { // gunakan id, bukan userID
+
+        // Tidak boleh hapus diri sendiri
+        if ($user->userID === $request->user()->userID) {
             return response()->json(['message' => 'You cannot delete yourself'], 403);
         }
-        // Cek apakah user yang akan dihapus adalah admin
+
+        // Tidak boleh hapus admin
         if ($user->role === 'admin') {
             return response()->json(['message' => 'You cannot delete an admin user'], 403);
         }
-        // Hapus user
+
         $user->delete();
+
         return response()->json(['message' => 'User deleted successfully'], 200);
+    }
+
+    // ✅ Update user berdasarkan userID
+    public function updateUser(Request $request, $userID)
+    {
+        $user = User::where('userID', $userID)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $data = $request->validate([
+            'username'     => 'sometimes|string|unique:users,username,' . $user->userID . ',userID',
+            'email'        => 'sometimes|email|unique:users,email,' . $user->userID . ',userID',
+            'phone_number' => 'sometimes|string|max:20',
+            'role'         => 'sometimes|string|in:cashier,management',
+        ]);
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user'    => $user,
+        ]);
     }
 }

@@ -9,24 +9,29 @@ use Illuminate\Http\Response;
 
 class ItemController extends Controller
 {
-    // Get all items
-    public function getAllItems(): Response
+    // ✅ Get all items milik company user
+    public function getAllItems(Request $request): Response
     {
-        $items = Item::all();
+        $companyID = $request->user()->companyID;
+
+        $items = Item::where('companyID', $companyID)->get();
         return response($items, 200);
     }
 
-    // Get item by ID
-    public function getItemById(int $id): Response
+    // ✅ Get item by ID (cek company juga)
+    public function getItemById(Request $request, int $id): Response
     {
-        $item = Item::find($id);
+        $companyID = $request->user()->companyID;
+
+        $item = Item::where('companyID', $companyID)->find($id);
         if (!$item) {
             return response(['message' => 'Item not found'], 404);
         }
+
         return response($item, 200);
     }
 
-    // Create a new item
+    // ✅ Create a new item dengan companyID
     public function createItem(Request $request): JsonResponse
     {
         try {
@@ -36,11 +41,11 @@ class ItemController extends Controller
                 'category'    => 'nullable|string|max:255',
                 'type'        => 'nullable|string|max:255',
                 'units'       => 'nullable|string|max:50',
-                'stock'       => 'nullable|integer|min:0', // ubah dari required ke nullable
+                'stock'       => 'nullable|integer|min:0',
             ]);
 
-            // Beri default 0 jika stock tidak dikirim
             $validated['stock'] = $validated['stock'] ?? 0;
+            $validated['companyID'] = $request->user()->companyID;
 
             $item = Item::create($validated);
 
@@ -57,12 +62,14 @@ class ItemController extends Controller
         }
     }
 
-    // Update an existing item
+    // ✅ Update item (cek apakah item milik company user)
     public function updateItem(Request $request, int $id): JsonResponse
     {
-        $item = Item::find($id);
+        $companyID = $request->user()->companyID;
+        $item = Item::where('companyID', $companyID)->find($id);
+
         if (!$item) {
-            return response()->json(['message' => 'Item not found'], 404);
+            return response()->json(['message' => 'Item not found or unauthorized'], 404);
         }
 
         $validated = $request->validate([
@@ -81,12 +88,14 @@ class ItemController extends Controller
         ]);
     }
 
-    // Delete an item
-    public function deleteItem(int $id): JsonResponse
+    // ✅ Delete item (cek ownership)
+    public function deleteItem(Request $request, int $id): JsonResponse
     {
-        $item = Item::find($id);
+        $companyID = $request->user()->companyID;
+        $item = Item::where('companyID', $companyID)->find($id);
+
         if (!$item) {
-            return response()->json(['message' => 'Item not found'], 404);
+            return response()->json(['message' => 'Item not found or unauthorized'], 404);
         }
 
         $item->delete();

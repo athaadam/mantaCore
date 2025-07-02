@@ -219,4 +219,22 @@ class InvoiceController extends Controller
             ], 500);
         }
     }
+
+    //getmyinvoices
+    public function getMyInvoices(Request $request): JsonResponse
+    {
+        //cek jika invoice yang saya buat kosong
+        if (!$request->invoice()->count()) {
+            return response()->json(['message' => 'No invoices found'], 404);
+        }
+        
+        $user = $request->user();
+        $invoices = Invoice::with(['user', 'company', 'costumer', 'items.item'])
+            ->where('userID', $user->userID)
+            ->get();
+        return response()->json([
+            'message' => 'Invoices fetched successfully',
+            'invoices' => $invoices,
+        ]);
+    }
 }
