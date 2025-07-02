@@ -1,4 +1,4 @@
-import Action from "@/components/profile/change-password/action";
+import Action from "@/components/profile/change-password/Action";
 
 export default function ChangePasswordPage() {
     return (

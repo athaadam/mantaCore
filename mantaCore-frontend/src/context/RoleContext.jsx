@@ -1,10 +1,11 @@
 'use client'
+
 import { createContext, useContext, useState } from 'react'
 
 const RoleContext = createContext()
 
 export const RoleProvider = ({ children }) => {
-  const [role, setRole] = useState('') // kosong saat awal
+  const [role, setRole] = useState('')
 
   return (
     <RoleContext.Provider value={{ role, setRole }}>

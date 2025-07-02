@@ -1,5 +1,5 @@
 // ✅ src/app/[role]/purchase-approval/page.js
-import SummaryCards from '@/components/summarycards';
+import SummaryCards from '@/components/global/SummaryCards';
 import PurchaseApprovalClient from '@/components/purchase-approval/PurchaseApprovalClient';
 
 export default function PurchaseApprovalPage() {

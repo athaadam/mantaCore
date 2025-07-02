@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import InventoryFilter from './inventoryfilter';
+import InventoryFilter from './InventoryFilter';
 import InventoryActions from './inventoryaction';
-import InventoryTable from './inventorytable';
+import InventoryTable from './InventoryTable';
 import InventoryModal from './inventorymodal';
 
 export default function InventoryClient({ initialItems }) {

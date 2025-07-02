@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import TopSales from '@/components/topsales'
-import SummaryCards from '@/components/summarycards';
-import TransactionTable from '@/components/dashboard/transactiontable.';
-import PurchaseRequestTable from '@/components/dashboard/purchaserequesttable';
+import TopSales from '@/components/global/TopSales'
+import SummaryCards from '@/components/global/SummaryCards';
+import TransactionTable from '@/components/dashboard/TransactionTable';
+import PurchaseRequestTable from '@/components/dashboard/PurchaseRequestTable';
 
 
 export default function DashboardPage() {

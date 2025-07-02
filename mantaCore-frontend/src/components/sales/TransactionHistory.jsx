@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Pagination from '@/components/pagination';
+import Pagination from '@/components/global/Pagination';
 
 export default function TransactionHistory({ transactions, itemsPerPage }) {
     const [currentPage, setCurrentPage] = useState(1);

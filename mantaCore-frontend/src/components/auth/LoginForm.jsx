@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useRole } from '@/context/rolecontext'
-import Alert from '@/components/alert'
-import Cookies from 'js-cookie'
+import { useRole } from '@/context/RoleContext'
+import Alert from '@/components/global/Alert'
+import { login, getProfile } from '@/libs/api/auth'
 
 export default function LoginForm({ onSwitch }) {
     const router = useRouter()
@@ -16,50 +16,14 @@ export default function LoginForm({ onSwitch }) {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    username,
-                    password,
-                }),
-            })
-
-            const text = await response.text()
-            let data
-
-            try {
-                data = JSON.parse(text)
-            } catch {
-                throw new Error('Response is not valid JSON')
-            }
-
-            if (response.ok) {
-                Cookies.set('auth', data.token,)
-
-                // Ambil data profile
-                const profileRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
-                    headers: {
-                        Authorization: `Bearer ${data.token}`,
-                    },
-                })
-
-                const profile = await profileRes.json()
-
-                setRole(profile.user.role)
-                setAlert({ message: 'Login successful', type: 'success' })
-                console.log(profile)
-
-                router.push(`/${profile.role}/dashboard`)
-            } else {
-                setAlert({ message: data.message || 'Login failed', type: 'error' })
-            }
+            const token = await login(username, password)
+            const profile = await getProfile(token)
+            setAlert({ message: 'Login successful', type: 'success' })
+            setRole(profile.user.role)
+            router.push(`/${profile.user.role}/dashboard`)
         } catch (err) {
-            console.error('Login error:', err)
-            setAlert({ message: 'An error occurred during login', type: 'error' })
+            console.error(err)
+            setAlert({ message: err.message || 'Login failed', type: 'error' })
         }
     }
 

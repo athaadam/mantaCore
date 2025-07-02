@@ -1,4 +1,4 @@
-import InventoryClient from "@/components/inventory/inventoryclient";
+import InventoryClient from "@/components/inventory/InventoryClient";
 import { cookies } from 'next/headers';
 
 export default async function InventoryPage() {

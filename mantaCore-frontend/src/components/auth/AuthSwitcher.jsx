@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
-import LoginForm from './loginform'
-import RegisterForm from './registerform'
+import LoginForm from './LoginForm'
+import RegisterForm from './RegisterForm'
 
 export default function AuthSwitcher() {
   const [isLogin, setIsLogin] = useState(true)

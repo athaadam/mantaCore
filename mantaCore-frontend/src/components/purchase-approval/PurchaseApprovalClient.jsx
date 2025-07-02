@@ -4,7 +4,7 @@ import { useState } from 'react';
 import FilterControls from './FilterControls';
 import ActionButtons from './ActionButtons';
 import PurchaseTable from './PurchaseTable';
-import Pagination from '@/components/pagination';
+import Pagination from '@/components/global/Pagination';
 
 export default function PurchaseApprovalClient() {
     const [filter, setFilter] = useState({ from: '', to: '', category: '', status: '' });

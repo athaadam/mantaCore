@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { getStatusColor } from '@/utils/statuscolor';
-import Pagination from '@/components/pagination';
+import Pagination from '@/components/global/Pagination';
 
 
 export default function PurchaseRequestTable({ requests = [], itemsPerPage = 5 }) {

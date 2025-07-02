@@ -1,25 +1,15 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
-import Action from "@/components/profile/action";
+import Action from "@/components/profile/Action";
+import { getProfile } from "@/libs/api/auth";
+import { formatDate } from "@/utils/formatdate";
 
 export default async function ProfilePage() {
+
     const cookieStore = await cookies();
     const token = cookieStore.get("auth")?.value;
+    const data = await getProfile(token);
 
-    if (!token) {
-        return <div className="text-center mt-10 text-red-500">Unauthorized</div>;
-    }
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-    });
-
-    if (!res.ok) {
-        return <div className="text-center mt-10 text-red-500">Failed to load user data</div>;
-    }
-
-    const data = await res.json();
     const user = {
         name: data.user.username,
         role: data.user.role,
@@ -27,9 +17,10 @@ export default async function ProfilePage() {
         phone: data.user.phone_number || 'N/A',
         username: data.user.username,
         companyName: data.company.companyName,
-        subscriptionUntil: new Date(data.company.subscription_until).toLocaleDateString(),
-        joinedSince: new Date(data.user.created_at).toLocaleDateString(),
+        subscriptionUntil: formatDate(data.company.subscription_until),
+        joinedSince: formatDate(data.user.created_at),
     };
+
     return (
         <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
             <h1 className="text-3xl font-semibold text-gray-800 mb-6">
@@ -67,7 +58,7 @@ export default async function ProfilePage() {
                         <p className="font-semibold text-gray-700">Company Name</p>
                         <p>{user.companyName}</p>
                     </div>
-                     <div>
+                    <div>
                         <p className="font-semibold text-gray-700">Phone Number</p>
                         <p>{user.phone}</p>
                     </div>

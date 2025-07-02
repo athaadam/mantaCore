@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Alert from '@/components/alert'
-
+import Alert from '@/components/global/Alert'
+import { register } from '@/libs/api/auth'
 
 export default function RegisterForm({ onSwitch }) {
     const [alert, setAlert] = useState(null)
@@ -21,60 +21,24 @@ export default function RegisterForm({ onSwitch }) {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault()
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: form.username,
-                    password: form.password,
-                    password_confirmation: form.confirmPassword,
-                    email: form.email,
-                    company: form.company,
-                    phone_number: form.phone,
-                }),
-            });
-
-            const text = await response.text();
-            let data;
-
-            try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error('Response is not valid JSON');
-            }
-
-            if (response.ok) {
-                setAlert({ message: 'Registration successful please login', type: 'success' });
-                setForm({
-                    username: '',
-                    password: '',
-                    confirmPassword: '',
-                    email: '',
-                    company: '',
-                    phone: '',
-                });
-            } else {
-                const errors = data?.errors;
-                if (errors) {
-                    const errorList = Object.values(errors).flat().join('\n');
-                    setAlert({ message: errorList, type: 'error' });
-                } else {
-                    setAlert({ message: data.message || 'Registration failed', type: 'error' });
-                }
-            }
+            await register(form)
+            setAlert({ message: 'Registration successful. Please login.', type: 'success' })
+            setForm({
+                username: '',
+                password: '',
+                confirmPassword: '',
+                email: '',
+                company: '',
+                phone: '',
+            })
         } catch (err) {
-            console.error('Fetch error:', err);
-            setAlert({ message: 'Server/network error.', type: 'error' });
+            console.error('Registration error:', err)
+            setAlert({ message: err.message || 'Something went wrong.', type: 'error' })
         }
-    };
-
-
+    }
 
     return (
         <div className="flex flex-col w-full flex-shrink-0 text-center">

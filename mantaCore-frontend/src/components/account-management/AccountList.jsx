@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Pagination from '../pagination';
+import Pagination from '../global/Pagination';
 
 export default function AccountList({ accounts, itemsPerPage, onDelete, onEdit }) {
     const [currentPage, setCurrentPage] = useState(1);

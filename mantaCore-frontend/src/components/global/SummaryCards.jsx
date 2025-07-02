@@ -1,5 +1,5 @@
 // SummaryCards.jsx
-import SummaryCard from './summarycard';
+import SummaryCard from './SummaryCard';
 import summaryStructure from '@/constants/summarystructure';
 
 export default async function SummaryCards({ data = {}, only = [] }) {

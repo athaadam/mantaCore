@@ -3,8 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useParams, useRouter } from 'next/navigation'
-import { useRole } from '@/context/rolecontext'
+import { useRole } from '@/context/RoleContext'
 import Cookies from 'js-cookie'
+import { logout } from '@/libs/api/auth'
 
 const NAV_ITEMS = [
   { name: 'Dashboard', path: 'dashboard' },
@@ -20,34 +21,19 @@ export default function Sidebar() {
   const pathname = usePathname()
   const { role } = useParams()
   const router = useRouter()
-  const { setRole } = useRole() // ✅ ambil context role
+  const { setRole } = useRole()
 
   const handleLogout = async () => {
     const token = Cookies.get('auth')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        },
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        Cookies.remove('auth')
-        setRole('')
-
-        router.push('/')
-      } else {
-        alert(data.message || 'Logout failed')
-      }
+      await logout(token)
+      Cookies.remove('auth')
+      setRole('')
+      router.push('/')
+      alert('Logout successful')
     } catch (error) {
-      console.error('Logout error:', error)
-      alert('Logout failed due to network/server error.')
+      alert('Logout failed. Please try again.' || error.message)
     }
   }
 

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import NewAccountForm from './newaccountform';
-import AccountList from './accountlist';
-import Alert from '../alert';
+import NewAccountForm from './NewAccountForm';
+import AccountList from './AccountList';
+import Alert from '../global/Alert';
 
 export default function AccountManagementClient({ initialData }) {
     const [accounts, setAccounts] = useState(initialData || []);
