@@ -36,18 +36,15 @@ export default function AccountManagementClient({ initialData }) {
             await deleteAccountById(id, token);
             setAccounts(prev => prev.filter(acc => acc.userID !== id));
             if (editingAccount?.userID === id) setEditingAccount(null);
-            // ✅ Hapus dari array
             const updatedAccounts = accounts.filter(acc => acc.userID !== id);
             setAccounts(updatedAccounts);
 
-            // ✅ Hitung ulang total page
             const newTotalPages = Math.ceil(updatedAccounts.length / itemsPerPage);
             if (currentPage > newTotalPages) {
                 setCurrentPage(newTotalPages || 1);
             }
             setAlert({ message: 'User deleted successfully.', type: 'success' });
         } catch (err) {
-            console.error('❌ Failed to delete user:', err.message);
             setAlert({ message: err.message, type: 'error' });
         }
     };

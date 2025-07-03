@@ -83,7 +83,11 @@ export async function logout(token) {
 
 export async function getProfile(token) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-    })
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+        },
+        cache: 'no-store', 
+    });
     return await res.json()
 }

@@ -20,7 +20,6 @@ export default function Action({ form, setForm, initialForm }) {
             setAlert({ type: 'success', message: result.message });
         } catch (err) {
             setAlert({ type: 'error', message: err.message });
-            console.error('❌ Error changing password:', err);
         } finally {
             setLoading(false);
         }

@@ -20,6 +20,7 @@ export default async function ProfilePage() {
         companyName: data.company.companyName,
         subscriptionUntil: formatDate(data.company.subscription_until),
         joinedSince: formatDate(data.user.created_at),
+        lastUpdated: formatDate(data.user.updated_at),
     };
 
     return (
@@ -68,6 +69,10 @@ export default async function ProfilePage() {
                     <div>
                         <p className="font-semibold text-gray-700">Joined Since</p>
                         <p>{user.joinedSince}</p>
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-700">Last Updated</p>
+                        <p>{user.lastUpdated}</p>
                     </div>
                 </div>
 
