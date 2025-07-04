@@ -1,4 +1,3 @@
-// libs/utils/formatDate.js
 export function formatDate(dateStr) {
     const date = new Date(dateStr);
 
