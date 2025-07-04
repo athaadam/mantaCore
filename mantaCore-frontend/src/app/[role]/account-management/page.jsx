@@ -1,12 +1,12 @@
 import { cookies } from 'next/headers';
-import AccountManagementClient from '@/components/account-management/AccountManagementClient';
+import AccountManagementClient from '@/components/client/AccountManagementClient';
 import { fetchAllUsers } from '@/libs/api/account-management';
 
 export default async function AccountManagementPage() {
 
-    // Ambil token dari cookie
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
+
     try {
         const accounts = await fetchAllUsers(token);
         return (

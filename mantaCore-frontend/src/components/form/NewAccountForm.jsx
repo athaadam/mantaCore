@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Alert from '@/components/global/Alert';
 import { createAccount } from '@/libs/api/account-management';
-import InputField from '@/components/account-management/InputField';
+import InputField from '@/components/form/InputField';
 import { updateAccount } from '@/libs/api/account-management';
 
 const initialFormState = {
@@ -57,7 +57,6 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
         try {
             const token = document.cookie.split('; ').find(row => row.startsWith('auth='))?.split('=')[1];
             if (editingAccount) {
-                // Hilangkan password jika kosong (tidak diubah)
                 const updatePayload = { ...form };
                 if (!updatePayload.password) {
                     delete updatePayload.password;

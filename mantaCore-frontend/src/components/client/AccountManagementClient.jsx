@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import NewAccountForm from './NewAccountForm';
-import AccountList from './AccountList';
+import NewAccountForm from '../form/NewAccountForm';
+import AccountList from '../table/AccountList';
 import Alert from '../global/Alert';
 import Cookies from 'js-cookie';
 import { deleteAccountById } from '@/libs/api/account-management';

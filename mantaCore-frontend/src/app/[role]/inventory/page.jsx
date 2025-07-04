@@ -1,4 +1,4 @@
-import InventoryClient from "@/components/inventory/InventoryClient";
+import InventoryClient from "@/components/client/InventoryClient";
 import { cookies } from 'next/headers';
 
 export default async function InventoryPage() {
@@ -20,18 +20,10 @@ export default async function InventoryPage() {
 
     if (!res.ok) {
         const errorText = await res.text(); // ← penting: baca isi error response
-        console.error('❌ Failed to fetch Items');
-        console.error('Status:', res.status, res.statusText);
-        console.error('Response body:', errorText);
-
         return <div className="text-center mt-10 text-red-500">Failed to load items data</div>;
     }
 
-
-    console.log(res.message);
-
     const itemsData = await res.json();
-    console.log(itemsData);
 
     return (
         <div className="flex-1 px-6 py-8  min-h-screen">

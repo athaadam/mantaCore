@@ -1,8 +1,8 @@
-import TopSales from '@/components/global/TopSales'
-import SummaryCards from '@/components/global/SummaryCards';
-import SalesByCategory from '@/components/sales/SalesByCategory';
-import TransactionFilterRow from '@/components/sales/TransactionFilter';
-import TransactionHistory from '@/components/sales/TransactionHistory';
+import TopSales from '@/components/chart/TopSales'
+import SummaryCards from '@/components/table/SummaryCards';
+import SalesByCategory from '@/components/chart/SalesByCategory';
+import TransactionFilterRow from '@/components/filter/TransactionFilter';
+import TransactionHistory from '@/components/table/TransactionHistory';
 
 
 export default function SalesPage() {

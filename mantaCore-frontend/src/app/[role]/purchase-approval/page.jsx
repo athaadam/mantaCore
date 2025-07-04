@@ -1,6 +1,6 @@
 // ✅ src/app/[role]/purchase-approval/page.js
-import SummaryCards from '@/components/global/SummaryCards';
-import PurchaseApprovalClient from '@/components/purchase-approval/PurchaseApprovalClient';
+import SummaryCards from '@/components/table/SummaryCards';
+import PurchaseApprovalClient from '@/components/client/PurchaseApprovalClient';
 
 export default function PurchaseApprovalPage() {
     const summaryData = {

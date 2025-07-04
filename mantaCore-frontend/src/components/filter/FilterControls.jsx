@@ -1,6 +1,6 @@
 export default function FilterControls({ filter, setFilter, onApply }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-[#f3f1ff] px-4 py-4 rounded-xl mb-6">
+    <div className="flex flex-wrap gap-3 bg-[#f3f1ff] px-4 py-4 rounded-xl mb-6">
       <div className="flex items-center gap-2">
         <label>From:</label>
         <input

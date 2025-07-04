@@ -1,4 +1,3 @@
-// components/form/InputField.jsx
 export default function InputField({ name, type = "text", value, onChange, placeholder, required }) {
     return (
         <input

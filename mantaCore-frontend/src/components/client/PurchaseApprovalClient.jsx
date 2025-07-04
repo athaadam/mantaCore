@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import FilterControls from './FilterControls';
-import ActionButtons from './ActionButtons';
-import PurchaseTable from './PurchaseTable';
+import FilterControls from '../filter/FilterControls';
+import ActionButtons from '../action/ActionButtons';
+import PurchaseTable from '../table/PurchaseTable';
 import Pagination from '@/components/global/Pagination';
 
 export default function PurchaseApprovalClient() {
@@ -33,7 +33,7 @@ export default function PurchaseApprovalClient() {
 
     return (
         <>
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6 justify-between">
                 <FilterControls filter={filter} setFilter={setFilter} onApply={() => console.log('Apply filter')} />
                 <ActionButtons onExport={() => console.log('Export PDF')} />
         </div>

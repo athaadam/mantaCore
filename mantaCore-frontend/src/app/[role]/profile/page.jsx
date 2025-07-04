@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import { getProfile } from "@/libs/api/auth";
 import { formatDate } from "@/utils/formatdate";
-import { ProfileAction, EditAccountAction } from '@/components/profile/Action';
+import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
 
 
 export default async function ProfilePage() {
@@ -10,18 +10,6 @@ export default async function ProfilePage() {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth")?.value;
     const data = await getProfile(token);
-
-    const user = {
-        name: data.user.username,
-        role: data.user.role,
-        email: data.user.email,
-        phone: data.user.phone_number || 'N/A',
-        username: data.user.username,
-        companyName: data.company.companyName,
-        subscriptionUntil: formatDate(data.company.subscription_until),
-        joinedSince: formatDate(data.user.created_at),
-        lastUpdated: formatDate(data.user.updated_at),
-    };
 
     return (
         <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
@@ -41,44 +29,44 @@ export default async function ProfilePage() {
                             className="rounded-full object-cover"
                         />
                         <div>
-                            <h2 className="text-xl font-semibold">{user.name}</h2>
-                            <p className="text-gray-500 capitalize">{user.role}</p>
+                            <h2 className="text-xl font-semibold">{data.user.username}</h2>
+                            <p className="text-gray-500 capitalize">{data.user.role}</p>
                         </div>
                     </div>
-                    <EditAccountAction role={user.role} />
+                    <EditAccountAction role={data.user.role} />
                 </div>
 
                 {/* Details */}
                 <div className="mt-6 space-y-4">
                     <div>
                         <p className="font-semibold text-gray-700">Email</p>
-                        <p>{user.email}</p>
+                        <p>{data.user.email}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Company Name</p>
-                        <p>{user.companyName}</p>
+                        <p>{data.company.companyName}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Phone Number</p>
-                        <p>{user.phone}</p>
+                        <p>{data.user.phone_number}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Subscription Active Until</p>
-                        <p>{user.subscriptionUntil}</p>
+                        <p>{formatDate(data.company.subscription_until)}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Joined Since</p>
-                        <p>{user.joinedSince}</p>
+                        <p>{formatDate(data.user.created_at)}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Last Updated</p>
-                        <p>{user.lastUpdated}</p>
+                        <p>{formatDate(data.user.updated_at)}</p>
                     </div>
                 </div>
 
                 {/* Actions */}
                 <div className="mt-6 flex justify-end gap-2">
-                    <ProfileAction role={user.role} />
+                    <ProfileAction role={data.user.role} />
                 </div>
             </div>
         </div>
