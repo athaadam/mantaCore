@@ -13,7 +13,7 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
     return (
         <div className={`bg-white ${mode === 'simple' ? 'p-8' : 'p-0'} rounded-2xl shadow-lg min-w-[340px] transition-all duration-300`}>
             {mode === 'simple' && (
-                <h3 className="text-2xl text-gray-900 font-bold mb-6 tracking-tight">Transaction History</h3>
+                <h3 className="text-xl text-gray-800 font-semibold mb-4">Transaction History</h3>
             )}
 
             <div className="overflow-x-auto rounded-xl border border-gray-100">
