@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Pagination from '@/components/global/Pagination';
+import Pagination from '@/components/utils/Pagination';
 
 export default function InventoryTable({ items, itemsPerPage, onDelete }) {
   const [currentPage, setCurrentPage] = useState(1);

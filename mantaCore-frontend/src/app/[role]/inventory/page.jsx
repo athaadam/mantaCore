@@ -9,7 +9,6 @@ export default async function InventoryPage() {
         return <div className="text-center mt-10 text-red-500">Unauthorized</div>;
     }
 
-    // Fetch data dari Laravel API dengan Authorization header
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/getAllItems`, {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -20,6 +19,7 @@ export default async function InventoryPage() {
 
     if (!res.ok) {
         const errorText = await res.text(); // ← penting: baca isi error response
+        console.error('Failed to fetch items:', errorText);
         return <div className="text-center mt-10 text-red-500">Failed to load items data</div>;
     }
 

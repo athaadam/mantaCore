@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import NewAccountForm from '../form/NewAccountForm';
 import AccountList from '../table/AccountList';
-import Alert from '../global/Alert';
+import Alert from '../utils/Alert';
 import Cookies from 'js-cookie';
 import { deleteAccountById } from '@/libs/api/account-management';
 

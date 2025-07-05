@@ -1,11 +1,20 @@
+'use client';
 import TopSales from '@/components/chart/TopSales'
 import SummaryCards from '@/components/table/SummaryCards';
 import SalesByCategory from '@/components/chart/SalesByCategory';
-import TransactionFilterRow from '@/components/filter/TransactionFilter';
-import TransactionHistory from '@/components/table/TransactionHistory';
+import TransactionTable from '@/components/table/TransactionTable';
+import FilterControls from '@/components/filter/FilterControls';
+import { useState } from 'react';
 
 
 export default function SalesPage() {
+    const [filter, setFilter] = useState({
+        from: '',
+        to: '',
+        category: '',
+        suitor: '',
+        status: ''
+    });
 
     const summaryData = {
         totalSales: 400000000,
@@ -22,6 +31,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -30,6 +40,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -38,6 +49,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -46,6 +58,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -54,6 +67,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -62,6 +76,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -70,6 +85,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -78,6 +94,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -86,6 +103,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -94,6 +112,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -102,6 +121,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -110,6 +130,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -118,6 +139,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -126,6 +148,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
         {
             date: 'April 1, 2025',
@@ -134,6 +157,7 @@ export default function SalesPage() {
             item: 'Tumbler, Spoon',
             customerId: 'CUST-001',
             amount: 'Rp20.000',
+            suitor: 'John Doe',
         },
     ];
 
@@ -164,11 +188,20 @@ export default function SalesPage() {
                 <h3 className="text-xl text-gray-800 font-semibold">
                     Transaction History
                 </h3>
-                <TransactionFilterRow />
+                <FilterControls
+                    filter={filter}
+                    setFilter={setFilter}
+                    onApply={() => console.log('apply', filter)}
+                    onExport={() => console.log('export')}
+                    showCategory={true}
+                    showSuitor={true}
+                    showStatus={false}
+                />
             </div>
-            <TransactionHistory
+            <TransactionTable
                 transactions={transactions}
-                itemsPerPage={10}
+                itemsPerPage={5}
+                mode="detailed"
             />
         </div>
     )

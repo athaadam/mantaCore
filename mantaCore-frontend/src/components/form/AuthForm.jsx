@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole } from '@/context/RoleContext'
-import Alert from '@/components/global/Alert'
+import Alert from '@/components/utils/Alert'
 import { login, getProfile, register } from '@/libs/api/auth'
 
 export default function AuthForm({ mode = 'login', onSwitch }) {
     const router = useRouter()
     const { setRole } = useRole()
     const [alert, setAlert] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     const [form, setForm] = useState({
         username: '',
@@ -27,6 +28,8 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
+        setAlert(null)
 
         try {
             if (mode === 'login') {
@@ -39,8 +42,8 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                 await register(form)
                 setAlert({ message: 'Registration successful. Please login.', type: 'success' })
                 setForm({
-                    username: '',
-                    password: '',
+                    username: form.username,
+                    password: form.password,
                     confirmPassword: '',
                     email: '',
                     company: '',
@@ -48,7 +51,15 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                 })
             }
         } catch (err) {
-            setAlert({ message: err.message || 'Something went wrong', type: 'error' })
+            let message = 'Something went wrong';
+            if (typeof err.message === 'string') {
+                const lines = err.message.split('\n');
+                message = lines.find(line => line.trim().length > 0) || message;
+            }
+            setAlert({ message: `${message}`, type: 'error' });
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -85,7 +96,7 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
                 />
-
+    
                 {mode === 'register' && (
                     <>
                         <input
@@ -126,9 +137,11 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
 
                 <button
                     type="submit"
-                    className="mt-[20px] self-center w-[30%] p-[10px] bg-[#6A5ACD] text-white rounded-[6px] text-[1.2rem] cursor-pointer transition hover:bg-[#5a4ac5] font-medium"
+                    className={`mt-[20px] self-center w-[30%] p-[10px] text-white rounded-[6px] text-[1.2rem] cursor-pointer transition font-medium
+    ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#6A5ACD] hover:bg-[#5a4ac5]'}`}
+                    disabled={loading}
                 >
-                    {mode === 'login' ? 'Login' : 'Register'}
+                    {loading ? 'Loading...' : mode === 'login' ? 'Login' : 'Register'}
                 </button>
             </form>
 
