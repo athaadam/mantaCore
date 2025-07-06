@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
 import { getProfile } from "@/libs/api/auth";
-import { formatDate } from "@/components/utils/formatdate";
+import { formatDate } from "@/utils/formatdate";
 import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
 
 

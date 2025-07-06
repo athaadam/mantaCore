@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Alert from '@/components/utils/Alert';
+import Alert from '@/utils/Alert';
 import { createAccount } from '@/libs/api/account-management';
 import { updateAccount } from '@/libs/api/account-management';
 

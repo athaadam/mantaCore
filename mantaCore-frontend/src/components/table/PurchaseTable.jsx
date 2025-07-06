@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStatusColor } from '@/components/utils/statuscolor';
-import Pagination from '@/components/utils/Pagination';
+import { getStatusColor } from '@/utils/statuscolor';
+import Pagination from '@/utils/Pagination';
 
 // Format aman untuk server & client
 const formatRupiah = (number) =>

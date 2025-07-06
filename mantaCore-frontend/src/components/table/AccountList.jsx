@@ -1,6 +1,6 @@
 'use client';
 
-import Pagination from '../utils/Pagination';
+import Pagination from '../../utils/Pagination';
 
 export default function AccountList({ accounts, itemsPerPage, currentPage, onPageChange, onDelete, onEdit }) {
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Cookies from 'js-cookie'
-import Alert from '@/components/utils/Alert'
+import Alert from '@/utils/Alert'
 import { editProfile, changePassword } from '@/libs/api/profile'
 import { useParams, useRouter } from 'next/navigation'
 

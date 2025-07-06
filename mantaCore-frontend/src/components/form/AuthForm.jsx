@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole } from '@/context/RoleContext'
-import Alert from '@/components/utils/Alert'
+import Alert from '@/utils/Alert'
 import { login, getProfile, register } from '@/libs/api/auth'
 
 export default function AuthForm({ mode = 'login', onSwitch }) {
