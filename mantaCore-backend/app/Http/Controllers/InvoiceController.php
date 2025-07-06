@@ -237,4 +237,135 @@ class InvoiceController extends Controller
             'invoices' => $invoices,
         ]);
     }
+
+    //filter invoice from date untill
+    public function filterInvoices(Request $request): JsonResponse
+    {
+        $startInput  = $request->input('start') ?? $request->query('start');
+        $endInput    = $request->input('end') ?? $request->query('end');
+        $category    = $request->input('category') ?? $request->query('category');
+        $suitorID    = $request->input('suitor') ?? $request->query('suitor');
+
+        $start = $startInput
+            ? \Carbon\Carbon::parse($startInput)->startOfDay()
+            : now()->subDays(30)->startOfDay();
+
+        $end = $endInput
+            ? \Carbon\Carbon::parse($endInput)->endOfDay()
+            : now()->endOfDay();
+
+        if ($end->lt($start)) {
+            return response()->json([
+                'message' => 'End date must be after or equal to start date'
+            ], 422);
+        }
+
+        $query = Invoice::with(['user', 'company', 'costumer', 'items.item'])
+            ->whereBetween('date', [$start, $end]);
+
+        // 🔍 Filter suitor jika ada
+        if ($suitorID) {
+            $query->where('userID', $suitorID);
+        }
+
+        // 🔍 Filter kategori item jika ada
+        if ($category) {
+            $query->whereHas('items.item', function ($q) use ($category) {
+                $q->where('category', $category);
+            });
+        }
+
+        $invoices = $query->get();
+
+        return response()->json([
+            'message' => 'Filtered invoices fetched successfully',
+            'dateRange' => [
+                'start' => $start->toDateString(),
+                'end'   => $end->toDateString(),
+            ],
+            'filters' => [
+                'category' => $category,
+                'suitorID' => $suitorID,
+            ],
+            'invoices' => $invoices,
+        ]);
+    }
+
+
+    public function salesReport(Request $request): JsonResponse
+    {
+        $user       = $request->user();
+        $companyID  = $user->companyID;
+
+        // Ambil start & end dari JSON body jika ada, jika tidak dari query string, jika tidak default 30 hari terakhir
+        $startInput = $request->input('start') ?? $request->query('start');
+        $endInput   = $request->input('end') ?? $request->query('end');
+
+        $start = $startInput
+            ? \Carbon\Carbon::parse($startInput)->startOfDay()
+            : now()->subDays(30)->startOfDay();
+
+        $end = $endInput
+            ? \Carbon\Carbon::parse($endInput)->endOfDay()
+            : now()->endOfDay();
+
+        /* 1️⃣  Total Sales (sum amount) */
+        $totalSales = Invoice::where('companyID', $companyID)
+            ->whereBetween('created_at', [$start, $end])
+            ->sum('amount');
+
+        /* 2️⃣  Total Invoice (count) */
+        $totalInvoice = Invoice::where('companyID', $companyID)
+            ->whereBetween('created_at', [$start, $end])
+            ->count();
+
+        /* 3️⃣  Product Sold (total quantity terjual) */
+        $productSold = InvoiceItem::whereHas('invoice', function ($q) use ($companyID, $start, $end) {
+                $q->where('companyID', $companyID)
+                ->whereBetween('created_at', [$start, $end]);
+            })->sum('quantity');
+
+        /* 4️⃣  Active Customer (distinct costumerID) */
+        $activeCustomer = Invoice::where('companyID', $companyID)
+            ->whereBetween('created_at', [$start, $end])
+            ->distinct('costumerID')
+            ->count('costumerID');
+
+        /* 5️⃣  Top‑Sales Item (TOP 5) */
+        $topSales = InvoiceItem::selectRaw(
+                        'items.itemID,
+                        items.name,
+                        SUM(invoice_items.quantity) AS totalQuantity,
+                        SUM(invoice_items.subTotal) AS totalSales'
+                    )
+                    ->join('items', 'items.itemID', '=', 'invoice_items.itemID')
+                    ->join('invoices', 'invoices.invoiceID', '=', 'invoice_items.invoiceID')
+                    ->where('invoices.companyID', $companyID)
+                    ->whereBetween('invoices.created_at', [$start, $end])
+                    ->groupBy('items.itemID', 'items.name')
+                    ->orderByDesc('totalSales')
+                    ->limit(5)
+                    ->get();
+
+        /* 6️⃣  Sales by Category (pie chart) */
+        $salesByCategory = InvoiceItem::whereHas('invoice', function ($q) use ($companyID, $start, $end) {
+                                    $q->where('companyID', $companyID)
+                                    ->whereBetween('created_at', [$start, $end]);
+                                })
+                                ->with('item')
+                                ->get()
+                                ->groupBy(fn ($row) => $row->item->category ?? 'Uncategorized')
+                                ->map(fn ($grp) => $grp->sum('subTotal'));
+
+        /* ── RETURN ── */
+        return response()->json([
+            'dateRange'       => ['start' => $start->toDateString(), 'end' => $end->toDateString()],
+            'totalSales'      => $totalSales,
+            'totalInvoice'    => $totalInvoice,
+            'productSold'     => $productSold,
+            'activeCustomer'  => $activeCustomer,
+            'topSales'        => $topSales,
+            'salesByCategory' => $salesByCategory,
+        ]);
+    }
 }
