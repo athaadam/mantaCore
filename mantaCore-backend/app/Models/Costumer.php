@@ -13,8 +13,18 @@ class Costumer extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['username'];
+    protected $fillable = ['username', 'companyID']; // ✅ ditambahkan
 
-    public function invoices() { return $this->hasMany(Invoice::class,'costumerID'); }
+    // Relasi ke invoice
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'costumerID');
+    }
+
+    // ✅ Relasi ke company
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'companyID');
+    }
 }
 

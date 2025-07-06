@@ -122,6 +122,7 @@ class UserController extends Controller
         Item::where('companyID', $companyID)->delete();
         User::where('companyID', $companyID)->delete();
         Company::where('companyID', $companyID)->delete();
+        Costumer::where('companyID', $companyID)->delete();
     }
 
 }

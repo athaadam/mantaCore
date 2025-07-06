@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     PurchaseItemController,
     UserController,
     AccountManage,
+    DashboardController
 };
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,7 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('subscription')->group(function () {
-
+        //dashboard
+        Route::get('/totalPenjualan', [DashboardController::class, 'totalPenjualan']);
+        Route::get('/todayProfitLoss', [DashboardController::class, 'todayProfitLoss']);
+        Route::get('/lifetimeProfitLoss', [DashboardController::class, 'lifetimeProfitLoss']);
+        Route::get('/topSellingItems', [DashboardController::class, 'topSales']);
         //cashier
         Route::middleware('cashier')->group(function () {
             // invoices
