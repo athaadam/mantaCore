@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $totalExpense = $user->purchases()
             ->where('companyID', $user->companyID)
             ->whereDate('date', $today)
-            ->where('status', 'completed')         // contoh
+            ->where('status', 'accepted')         // contoh
             ->sum('amount');
 
         $totalPnL = $totalIncome - $totalExpense;
@@ -57,7 +57,7 @@ class DashboardController extends Controller
 
         $totalExpense = $user->purchases()
             ->where('companyID', $user->companyID)
-            ->where('status', 'completed')
+            ->where('status', 'accepted')
             ->sum('amount');
 
         $totalPnL = $totalIncome - $totalExpense;
