@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Models\Costumer;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -75,7 +76,9 @@ class UserController extends Controller
                 ]);
             }
 
-            $user->delete();
+            //ubah status user menjadi tidak aktif
+            $user->status = 'inactive';
+            $user->save();
             $user->currentAccessToken()?->delete();
 
             return response()->json([
@@ -95,6 +98,8 @@ class UserController extends Controller
     {
         $users = User::where('companyID', $request->user()->companyID)
             ->with('company')
+            //ambil user yang statusnya aktif
+            ->where('status', 'active')
             ->get();
 
         return response()->json($users);

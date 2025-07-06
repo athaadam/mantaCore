@@ -20,6 +20,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
+        //jika status user tidak aktif
+        if ($user->status !== 'active') {
+            return response()->json(['message' => 'User is not active'], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -68,6 +73,7 @@ class AuthController extends Controller
             'phone_number' => $data['phone_number'],
             'companyID'    => $company->companyID,
             'role'         => 'admin',
+            'status'       => 'active', // default status
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

@@ -35,6 +35,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/todayProfitLoss', [DashboardController::class, 'todayProfitLoss']);
         Route::get('/lifetimeProfitLoss', [DashboardController::class, 'lifetimeProfitLoss']);
         Route::get('/topSellingItems', [DashboardController::class, 'topSales']);
+
+        //user
+        Route::post('/editProfile', [UserController::class, 'editProfile']);
+        Route::post('/changePassword', [UserController::class, 'changePassword']);
+        Route::delete('/deleteAccount', [UserController::class, 'deleteAccount']);
         //cashier
         Route::middleware('cashier')->group(function () {
             // invoices
@@ -105,9 +110,6 @@ Route::middleware('auth:sanctum')->group(function () {
             //user controller
             Route::get('/getAllUsers', [UserController::class, 'getAllUsers']);
             Route::get('/getUserByName/{username}', [UserController::class, 'getUserByName']);
-            Route::post('/editProfile', [UserController::class, 'editProfile']);
-            Route::post('/changePassword', [UserController::class, 'changePassword']);
-            Route::delete('/deleteAccount', [UserController::class, 'deleteAccount']);
         });
     });
 });

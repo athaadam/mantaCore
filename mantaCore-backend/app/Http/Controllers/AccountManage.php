@@ -35,6 +35,7 @@ class AccountManage extends Controller
             'email'        => $data['email'],
             'phone_number' => $data['phone_number'],
             'role'         => $data['role'],
+            'status'       => 'active', // default status
         ]);
 
         return response()->json([
@@ -61,7 +62,9 @@ class AccountManage extends Controller
             return response()->json(['message' => 'You cannot delete an admin user'], 403);
         }
 
-        $user->delete();
+        //ubah user status menjadi tidak aktif
+        $user->status = 'inactive';
+        $user->save();
 
         return response()->json(['message' => 'User deleted successfully'], 200);
     }
@@ -78,7 +81,8 @@ class AccountManage extends Controller
             'username'     => 'sometimes|string|unique:users,username,' . $user->userID . ',userID',
             'email'        => 'sometimes|email|unique:users,email,' . $user->userID . ',userID',
             'phone_number' => 'sometimes|string|max:20',
-            'role'         => 'sometimes|string|in:cashier,management',
+            'role'         => 'nullable|string|in:cashier,management',
+            'status'       => 'sometimes|string|in:active,inactive', // Tambahkan validasi status
         ]);
 
         $user->update($data);

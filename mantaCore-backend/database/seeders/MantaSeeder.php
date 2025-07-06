@@ -99,7 +99,7 @@ class MantaSeeder extends Seeder
             $purchaseID = DB::table('purchases')->insertGetId([
                 'userID' => $userID,
                 'companyID' => $companyID,
-                'status' => 'completed',
+                'status' => 'accepted',
                 'date' => $date,
                 'amount' => $subtotal,
                 'created_at' => now(),
