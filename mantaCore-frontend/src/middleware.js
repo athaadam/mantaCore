@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getProfile } from './libs/api/auth'
 
 export async function middleware(request) {
     const token = request.cookies.get('auth')?.value
@@ -30,12 +31,8 @@ export async function middleware(request) {
 
 async function redirectToRoleDashboard(token, request) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-
-        if (!res.ok) throw new Error()
-        const data = await res.json()
+        const data = await getProfile(token)
+        if (!data || !data.user) throw new Error()
         const role = data.user?.role
 
         if (!role) throw new Error()
@@ -49,14 +46,9 @@ async function redirectToRoleDashboard(token, request) {
 
 async function validateRoleAccess(token, roleInPath, request) {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/user`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-
-        if (!res.ok) throw new Error()
-        const data = await res.json()
+        const data = await getProfile(token)
         const role = data.user?.role
-
+        if (!data || !data.user || !role) throw new Error()
         if (!role || role !== roleInPath) {
             return NextResponse.redirect(new URL(`/${role}/dashboard`, request.url))
         }

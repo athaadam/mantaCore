@@ -1,8 +1,7 @@
-import Image from 'next/image'
 import TopSales from '@/components/chart/TopSales'
 import SummaryCards from '@/components/table/SummaryCards';
 import TransactionTable from '@/components/table/TransactionTable';
-import PurchaseRequestTable from '@/components/table/PurchaseRequestTable';
+import PurchaseTable from '@/components/table/PurchaseTable';
 
 
 export default function DashboardPage() {
@@ -89,53 +88,110 @@ export default function DashboardPage() {
   ];
 
   const purchaseRequests = [
+
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pangan',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
-      status: 'Declined',
+      date: '2025-07-05',
+      title: 'Permintaan Laptop',
+      author: 'Admin B',
+      amount: 5500000,
+      status: 'Approved',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Ular',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-06',
+      title: 'Permintaan Printer',
+      author: 'Admin C',
+      amount: 2500000,
       status: 'Pending',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pingin',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-07',
+      title: 'Permintaan Meja',
+      author: 'Admin D',
+      amount: 1200000,
+      status: 'Rejected',
+    },
+    {
+      date: '2025-07-08',
+      title: 'Permintaan Kursi',
+      author: 'Admin E',
+      amount: 800000,
       status: 'Approved',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pingin',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-09',
+      title: 'Permintaan Proyektor',
+      author: 'Admin F',
+      amount: 3500000,
+      status: 'Pending',
+    },
+    {
+      date: '2025-07-10',
+      title: 'Permintaan AC',
+      author: 'Admin G',
+      amount: 4500000,
       status: 'Approved',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pingin',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-11',
+      title: 'Permintaan Kamera',
+      author: 'Admin H',
+      amount: 3000000,
+      status: 'Rejected',
+    },
+    {
+      date: '2025-07-12',
+      title: 'Permintaan Monitor',
+      author: 'Admin I',
+      amount: 2000000,
       status: 'Approved',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pingin',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-13',
+      title: 'Permintaan Keyboard',
+      author: 'Admin J',
+      amount: 400000,
+      status: 'Pending',
+    },
+    {
+      date: '2025-07-14',
+      title: 'Permintaan Mouse',
+      author: 'Admin K',
+      amount: 250000,
       status: 'Approved',
     },
     {
-      date: 'April 1, 2025',
-      title: 'Pembelian bahan baku Pingin',
-      author: 'ADM',
-      amount: 'Rp4.000.000',
+      date: '2025-07-15',
+      title: 'Permintaan Scanner',
+      author: 'Admin L',
+      amount: 1800000,
+      status: 'Rejected',
+    },
+    {
+      date: '2025-07-16',
+      title: 'Permintaan Speaker',
+      author: 'Admin M',
+      amount: 600000,
+      status: 'Approved',
+    },
+    {
+      date: '2025-07-17',
+      title: 'Permintaan Harddisk',
+      author: 'Admin N',
+      amount: 950000,
+      status: 'Pending',
+    },
+    {
+      date: '2025-07-18',
+      title: 'Permintaan UPS',
+      author: 'Admin O',
+      amount: 1200000,
+      status: 'Approved',
+    },
+    {
+      date: '2025-07-19',
+      title: 'Permintaan Kabel LAN',
+      author: 'Admin P',
+      amount: 150000,
       status: 'Approved',
     },
   ];
@@ -166,12 +222,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Purchase Requests */}
-      <div className="bg-white p-6 rounded-xl drop-shadow-lg mt-6 flex-[1.2] flex flex-col w-full h-[300px] min-w-[400px] flex-shrink-0 px-6 py-4">
-        <PurchaseRequestTable
-          requests={purchaseRequests}
-          itemsPerPage={3}
-        />
-      </div>
+      <PurchaseTable data={purchaseRequests} itemsPerPage={5} mode="request" />
     </div>
   )
 }

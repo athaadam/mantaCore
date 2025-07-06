@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Cookies from 'js-cookie'
-import Alert from '@/components/global/Alert'
+import Alert from '@/utils/Alert'
 import { editProfile, changePassword } from '@/libs/api/profile'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -28,7 +28,12 @@ export default function ActionForm({ mode = 'edit', form, setForm, initialForm }
             setForm(initialForm)
             setAlert({ type: 'success', message: result.message })
         } catch (err) {
-            setAlert({ type: 'error', message: err.message || 'Failed to process' })
+            let message = 'Something went wrong';
+            if (typeof err.message === 'string') {
+                const lines = err.message.split('\n');
+                message = lines.find(line => line.trim().length > 0) || message;
+            }
+            setAlert({ type: 'error', message: `${message}` })
         } finally {
             setLoading(false)
         }

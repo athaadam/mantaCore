@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Alert from '@/components/global/Alert';
+import Alert from '@/utils/Alert';
 import { createAccount } from '@/libs/api/account-management';
-import InputField from '@/components/form/InputField';
 import { updateAccount } from '@/libs/api/account-management';
 
 const initialFormState = {
@@ -70,8 +69,12 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
             }
             resetForm();
         } catch (err) {
-            console.error('❌ Error:', err.message);
-            setAlert({ message: err.message || 'Something went wrong', type: 'error' });
+            let message = 'Something went wrong';
+            if (typeof err.message === 'string') {
+                const lines = err.message.split('\n');
+                message = lines.find(line => line.trim().length > 0) || message;
+            }
+            setAlert({ type: 'error', message: `${message}` })
         } finally {
             setLoading(false);
         }
@@ -80,44 +83,49 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 mb-10">
-            <InputField
+            <input
                 name="username"
                 value={form.username}
                 onChange={handleChange}
                 placeholder="Username"
-                required />
-            <InputField
+                required
+                className="flex-1 px-4 py-2 border rounded"
+            />
+            <input
                 name="email"
                 type="email"
                 value={form.email}
                 onChange={handleChange}
                 placeholder="Email"
                 required
+                className="flex-1 px-4 py-2 border rounded"
             />
-            <InputField
+            <input
                 name="phone_number"
                 value={form.phone_number}
                 onChange={handleChange}
                 placeholder="Phone Number"
                 required
+                className="flex-1 px-4 py-2 border rounded"
             />
-            <InputField
+            <input
                 name="password"
                 type="password"
                 value={form.password}
                 onChange={handleChange}
                 placeholder="Password"
                 required={!editingAccount}
+                className="flex-1 px-4 py-2 border rounded"
             />
-            <InputField
+            <input
                 name="password_confirmation"
                 type="password"
                 value={form.password_confirmation}
                 onChange={handleChange}
                 placeholder="Confirm Password"
                 required={!editingAccount}
+                className="flex-1 px-4 py-2 border rounded"
             />
-
             <select
                 name="role"
                 value={form.role}
