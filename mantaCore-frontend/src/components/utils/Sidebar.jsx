@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useParams, useRouter } from 'next/navigation'
-import { useRole } from '@/context/RoleContext'
+import { useRole } from '@/hooks/context/RoleContext'
 import Cookies from 'js-cookie'
 import { logout } from '@/libs/api/auth'
 

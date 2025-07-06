@@ -1,24 +1,29 @@
-'use client';
+import { getStatusColor } from '@/components/utils/statuscolor';
+import Pagination from '../utils/Pagination';
+import useProfile from '@/hooks/context/ProfileContext'
 
-import Pagination from '../../utils/Pagination';
 
 export default function AccountList({ accounts, itemsPerPage, currentPage, onPageChange, onDelete, onEdit }) {
+    const { profile: myProfile } = useProfile()
 
-    const totalPages = Math.ceil(accounts.length / itemsPerPage);
-    const startIdx = (currentPage - 1) * itemsPerPage;
-    const currentData = accounts.slice(startIdx, startIdx + itemsPerPage);
+    const companyName = myProfile?.company?.companyName ?? 'Loading...'
+    const totalPages = Math.ceil(accounts.length / itemsPerPage)
+    const startIdx = (currentPage - 1) * itemsPerPage
+    const currentData = accounts.slice(startIdx, startIdx + itemsPerPage)
 
     if (accounts.length === 0) {
         return (
             <div className="text-center text-gray-500 py-8">
                 No accounts found.
             </div>
-        );
+        )
     }
 
     return (
         <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Account List</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Account List of {companyName}
+            </h2>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-purple-100 rounded-xl shadow">
                     <thead className="bg-gray-100">
@@ -27,6 +32,7 @@ export default function AccountList({ accounts, itemsPerPage, currentPage, onPag
                             <th className="py-3 px-4 text-left">Username</th>
                             <th className="py-3 px-4 text-left">Phone Number</th>
                             <th className="py-3 px-4 text-left">Role</th>
+                            <th className="py-3 px-4 text-left">Status</th>
                             <th className="py-3 px-4 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -38,15 +44,16 @@ export default function AccountList({ accounts, itemsPerPage, currentPage, onPag
                                 <td className="py-2 px-4">{acc.phone_number || '-'}</td>
                                 <td className="py-2 px-4 capitalize font-semibold">
                                     <span
-                                        className={
-                                            acc.role === 'admin'
-                                                ? 'text-purple-600'
-                                                : acc.role === 'cashier'
-                                                    ? 'text-blue-600'
-                                                    : 'text-green-600'
-                                        }
+                                        className={`${getStatusColor(acc.role)} px-2 py-1 rounded-sm text-xs`}
                                     >
                                         {acc.role || '-'}
+                                    </span>
+                                </td>
+                                <td className="py-2 px-4">
+                                    <span
+                                        className={`${getStatusColor(acc.status)} px-2 py-1 rounded-sm text-xs capitalize`}
+                                    >
+                                        {acc.status || '-'}
                                     </span>
                                 </td>
                                 <td className="py-2 px-4">

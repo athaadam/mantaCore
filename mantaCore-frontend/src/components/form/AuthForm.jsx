@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useRole } from '@/context/RoleContext'
-import Alert from '@/utils/Alert'
+import { useRole } from '@/hooks/context/RoleContext'
+import Alert from '@/components/utils/Alert'
 import { login, getProfile, register } from '@/libs/api/auth'
+import { extractErrorMessage } from '@/libs/exceptions'
 
 export default function AuthForm({ mode = 'login', onSwitch }) {
     const router = useRouter()
@@ -15,10 +16,10 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
     const [form, setForm] = useState({
         username: '',
         password: '',
-        confirmPassword: '',
+        password_confirmation: '',
         email: '',
         company: '',
-        phone: '',
+        phone_number: '',
     })
 
     const handleChange = (e) => {
@@ -44,18 +45,14 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                 setForm({
                     username: form.username,
                     password: form.password,
-                    confirmPassword: '',
+                    password_confirmation: '',
                     email: '',
                     company: '',
-                    phone: '',
+                    phone_number: '',
                 })
             }
         } catch (err) {
-            let message = 'Something went wrong';
-            if (typeof err.message === 'string') {
-                const lines = err.message.split('\n');
-                message = lines.find(line => line.trim().length > 0) || message;
-            }
+            const message = extractErrorMessage(err)
             setAlert({ message: `${message}`, type: 'error' });
         }
         finally {
@@ -96,14 +93,14 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                     onChange={handleChange}
                     className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
                 />
-    
+
                 {mode === 'register' && (
                     <>
                         <input
                             type="password"
-                            name="confirmPassword"
+                            name="password_confirmation"
                             placeholder="Confirmation Password"
-                            value={form.confirmPassword}
+                            value={form.password_confirmation}
                             onChange={handleChange}
                             className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
                         />
@@ -125,9 +122,9 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                         />
                         <input
                             type="text"
-                            name="phone"
+                            name="phone_number"
                             placeholder="Phone Number"
-                            value={form.phone}
+                            value={form.phone_number}
                             onChange={handleChange}
                             className="text-base self-center w-[70%] p-[10px] border border-gray-300 rounded-[6px]"
                             pattern='^\+?[0-9\s-]{7,15}$'

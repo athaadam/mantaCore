@@ -3,3 +3,19 @@
 .input-style {
   @apply mt-1 block w-full border border-purple-200 rounded-xl shadow focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition px-4 py-2 bg-purple-50;
 }
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

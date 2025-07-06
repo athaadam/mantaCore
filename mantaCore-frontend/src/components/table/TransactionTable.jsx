@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Pagination from '@/utils/Pagination';
+import Pagination from '@/components/utils/Pagination';
 
 export default function TransactionTable({ transactions = [], itemsPerPage, mode = 'simple' }) {
     const [currentPage, setCurrentPage] = useState(1);

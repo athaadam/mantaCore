@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Cookies from 'js-cookie'
-import Alert from '@/utils/Alert'
+import Alert from '@/components/utils/Alert'
 import { editProfile, changePassword } from '@/libs/api/profile'
 import { useParams, useRouter } from 'next/navigation'
+import { extractErrorMessage } from '@/libs/exceptions'
+import { getToken } from '@/libs/api/auth'
 
 export default function ActionForm({ mode = 'edit', form, setForm, initialForm }) {
     const [loading, setLoading] = useState(false)
@@ -17,7 +19,7 @@ export default function ActionForm({ mode = 'edit', form, setForm, initialForm }
         setLoading(true)
         setAlert(null)
         try {
-            const token = Cookies.get('auth')
+            const token = await getToken();
             let result
             if (mode === 'edit') {
                 result = await editProfile(token, form)
@@ -28,11 +30,7 @@ export default function ActionForm({ mode = 'edit', form, setForm, initialForm }
             setForm(initialForm)
             setAlert({ type: 'success', message: result.message })
         } catch (err) {
-            let message = 'Something went wrong';
-            if (typeof err.message === 'string') {
-                const lines = err.message.split('\n');
-                message = lines.find(line => line.trim().length > 0) || message;
-            }
+            const message = extractErrorMessage(err)
             setAlert({ type: 'error', message: `${message}` })
         } finally {
             setLoading(false)

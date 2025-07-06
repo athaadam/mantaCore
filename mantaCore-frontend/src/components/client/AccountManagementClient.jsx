@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import NewAccountForm from '../form/NewAccountForm';
 import AccountList from '../table/AccountList';
-import Alert from '../../utils/Alert';
+import Alert from '../utils/Alert';
 import Cookies from 'js-cookie';
 import { deleteAccountById } from '@/libs/api/account-management';
+import { getToken } from '@/libs/api/auth';
 
 export default function AccountManagementClient({ initialData }) {
     const [accounts, setAccounts] = useState(initialData || []);
@@ -13,7 +14,7 @@ export default function AccountManagementClient({ initialData }) {
     const [alert, setAlert] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-
+    
 
     const handleAddAccount = (newAccount) => {
         setAccounts(prev => [...prev, newAccount]);
@@ -32,7 +33,7 @@ export default function AccountManagementClient({ initialData }) {
         if (!confirm('Are you sure you want to delete this account?')) return;
 
         try {
-            const token = Cookies.get('auth');
+            const token = await getToken();
             await deleteAccountById(id, token);
             setAccounts(prev => prev.filter(acc => acc.userID !== id));
             if (editingAccount?.userID === id) setEditingAccount(null);

@@ -1,14 +1,19 @@
-// ✅ src/app/[role]/purchase-approval/page.js
 import SummaryCards from '@/components/table/SummaryCards';
 import PurchaseApprovalClient from '@/components/client/PurchaseApprovalClient';
+import { getAllPurchases } from '@/libs/api/purchase-approval';
+import { cookies } from 'next/headers';
 
-export default function PurchaseApprovalPage() {
+export default async function PurchaseApprovalPage() {
+    const token = cookies().get('auth')?.value;
+
     const summaryData = {
         totalRequests: 120,
         approvedRequests: 80,
         pendingRequests: 30,
         rejectedRequests: 10,
     };
+
+    const allData = await getAllPurchases(token);
 
     return (
         <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
@@ -23,7 +28,7 @@ export default function PurchaseApprovalPage() {
             </div>
 
             {/* ✅ Komponen client terpisah */}
-            <PurchaseApprovalClient />
+            <PurchaseApprovalClient allData={allData} />
         </div>
     );
 }

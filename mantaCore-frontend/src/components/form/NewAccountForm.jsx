@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Alert from '@/utils/Alert';
+import Alert from '@/components/utils/Alert';
 import { createAccount } from '@/libs/api/account-management';
 import { updateAccount } from '@/libs/api/account-management';
+import { extractErrorMessage } from '@/libs/exceptions';
+import { getToken } from '@/libs/api/auth';
 
 const initialFormState = {
     username: '',
@@ -54,7 +56,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
         setLoading(true);
 
         try {
-            const token = document.cookie.split('; ').find(row => row.startsWith('auth='))?.split('=')[1];
+            const token = await getToken();
             if (editingAccount) {
                 const updatePayload = { ...form };
                 if (!updatePayload.password) {
@@ -69,11 +71,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
             }
             resetForm();
         } catch (err) {
-            let message = 'Something went wrong';
-            if (typeof err.message === 'string') {
-                const lines = err.message.split('\n');
-                message = lines.find(line => line.trim().length > 0) || message;
-            }
+            const message = extractErrorMessage(err);
             setAlert({ type: 'error', message: `${message}` })
         } finally {
             setLoading(false);
@@ -88,7 +86,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 value={form.username}
                 onChange={handleChange}
                 placeholder="Username"
-                required
+                // required
                 className="flex-1 px-4 py-2 border rounded"
             />
             <input
@@ -97,7 +95,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 value={form.email}
                 onChange={handleChange}
                 placeholder="Email"
-                required
+                // required
                 className="flex-1 px-4 py-2 border rounded"
             />
             <input
@@ -105,7 +103,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 value={form.phone_number}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                required
+                // required
                 className="flex-1 px-4 py-2 border rounded"
             />
             <input
@@ -114,7 +112,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 value={form.password}
                 onChange={handleChange}
                 placeholder="Password"
-                required={!editingAccount}
+                // required={!editingAccount}
                 className="flex-1 px-4 py-2 border rounded"
             />
             <input
@@ -123,14 +121,14 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 value={form.password_confirmation}
                 onChange={handleChange}
                 placeholder="Confirm Password"
-                required={!editingAccount}
+                // required={!editingAccount}
                 className="flex-1 px-4 py-2 border rounded"
             />
             <select
                 name="role"
                 value={form.role}
                 onChange={handleChange}
-                required
+                // required
                 className="flex-1 px-4 py-2 border rounded"
             >
                 <option value="" disabled>Select Role</option>

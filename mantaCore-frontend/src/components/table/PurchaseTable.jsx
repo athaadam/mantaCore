@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getStatusColor } from '@/utils/statuscolor';
-import Pagination from '@/utils/Pagination';
+import { useState } from 'react';
+import { getStatusColor } from '@/components/utils/statuscolor';
+import Pagination from '@/components/utils/Pagination';
 
-// Format aman untuk server & client
-const formatRupiah = (number) =>
-    `Rp ${Number(number).toLocaleString('id-ID', { minimumFractionDigits: 0 })}`;
-
+const formatRupiah = (value) => {
+    const number = Number(value);
+    if (isNaN(number)) return '-';
+    return `Rp ${number.toLocaleString('id-ID')}`;
+};
 export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'purchase' }) {
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -39,12 +40,12 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                         <th className="px-5 py-4 text-left">Invoice ID</th>
                                         <th className="px-5 py-4 text-left">Suitor</th>
                                         <th className="px-5 py-4 text-left">Item</th>
-                                        <th className="px-5 py-4 text-left">Customer ID</th>
+                                        <th className="px-5 py-4 text-left">Quantity</th>
                                     </>
                                 ) : (
                                     <th className="px-5 py-4 text-left">Title</th>
                                 )}
-                                <th className="px-5 py-4 text-left">Author</th>
+                                <th className="px-5 py-4 text-left">Unit Price</th>
                                 <th className="px-5 py-4 text-left">Amount</th>
                                 <th className="px-5 py-4 text-left">Status</th>
                                 {isPurchase && <th className="px-5 py-4 text-left">Action</th>}
@@ -57,27 +58,39 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                         <td className="px-5 py-4 whitespace-nowrap">{item.date}</td>
                                         {isPurchase ? (
                                             <>
-                                                <td className="px-5 py-4">{item.invoiceId}</td>
-                                                <td className="px-5 py-4">{item.suitor}</td>
-                                                <td className="px-5 py-4">{item.item}</td>
-                                                <td className="px-5 py-4">{item.customerId}</td>
+                                                <td className="px-5 py-4">{item.purchaseID}</td>
+                                                <td className="px-5 py-4">{item.user.username}</td>
+                                                <td className="px-5 py-4">
+                                                    {item.items?.length > 0
+                                                        ? item.items.map(i => i.item?.name ?? 'Unknown').join(', ')
+                                                        : '-'}
+                                                </td>
+                                                <td className="px-5 py-4">
+                                                    {item.items?.length > 0
+                                                        ? item.items.reduce((total, i) => total + i.quantity, 0)
+                                                        : 0}
+                                                </td>
                                             </>
                                         ) : (
                                             <td className="px-5 py-4">{item.title}</td>
                                         )}
-                                        <td className="px-5 py-4">{item.author}</td>
+                                        <td className="px-5 py-4 font-semibold text-indigo-700">
+                                            {item.items?.length > 0
+                                                ? item.items.map(i => formatRupiah(i.unitPrice)).join(', ')
+                                                : '-'}
+                                        </td>
                                         <td className="px-5 py-4 font-semibold text-indigo-700">
                                             {formatRupiah(item.amount)}
                                         </td>
                                         <td className="px-5 py-4">
-                                            <span className={`${getStatusColor(item.status)} text-white text-xs font-semibold px-3 py-1 rounded-full shadow`}>
+                                            <span className={`${getStatusColor(item.status)} text-white text-xs font-semibold px-3 py-1 rounded-full shadow capitalize`}>
                                                 {item.status}
                                             </span>
                                         </td>
                                         {isPurchase && (
                                             <td className="px-5 py-4">
                                                 <a
-                                                    href="#"
+                                                    href="{`/{item.purchaseID}`}"
                                                     className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium text-sm transition-colors"
                                                 >
                                                     View Detail

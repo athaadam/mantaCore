@@ -1,14 +1,13 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
 import { getProfile } from "@/libs/api/auth";
-import { formatDate } from "@/utils/formatdate";
+import { formatDate } from "@/components/utils/formatdate";
 import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
 
 
 export default async function ProfilePage() {
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth")?.value;
+    const token = cookies().get('auth')?.value;
     const data = await getProfile(token);
 
     return (
