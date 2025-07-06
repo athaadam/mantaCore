@@ -3,12 +3,8 @@
 import { useState } from 'react';
 import { getStatusColor } from '@/components/utils/statuscolor';
 import Pagination from '@/components/utils/Pagination';
+import { formatRupiah } from '@/components/utils/formatRupiah';
 
-const formatRupiah = (value) => {
-    const number = Number(value);
-    if (isNaN(number)) return '-';
-    return `Rp ${number.toLocaleString('id-ID')}`;
-};
 export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'purchase' }) {
     const [currentPage, setCurrentPage] = useState(1);
 

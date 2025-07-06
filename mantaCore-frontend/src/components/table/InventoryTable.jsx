@@ -3,12 +3,8 @@
 import { useState, useEffect } from 'react';
 import Pagination from '@/components/utils/Pagination';
 import useProfile from '@/hooks/context/ProfileContext';
-
-const formatRupiah = (value) => {
-  const number = Number(value);
-  if (isNaN(number)) return '-';
-  return `Rp ${number.toLocaleString('id-ID')}`;
-};
+import { formatRupiah } from '@/components/utils/formatRupiah';
+import { formatDate } from '../utils/formatdate';
 
 export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, Alert }) {
   const { profile: myProfile, loading } = useProfile()
@@ -37,6 +33,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
           <thead>
             <tr className="bg-gradient-to-r from-purple-100 to-purple-50">
               <th className="py-4 px-5 font-bold text-purple-700 rounded-l-xl">No</th>
+              <th className="py-4 px-5 font-bold text-purple-700">Date</th>
               <th className="py-4 px-5 font-bold text-purple-700">Name</th>
               <th className="py-4 px-5 font-bold text-purple-700">Category</th>
               <th className="py-4 px-5 font-bold text-purple-700">Type</th>
@@ -54,6 +51,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
                   className="bg-white hover:bg-purple-50 transition-colors border-t border-gray-100 rounded-xl shadow-sm"
                 >
                   <td className="py-4 px-5 text-gray-700">{startIdx + idx + 1}</td>
+                  <td className="py-4 px-5 text-gray-600">{formatDate(item.updated_at) || '-'}</td>
                   <td className="py-4 px-5 text-gray-900 font-medium">{item.name}</td>
                   <td className="py-4 px-5 text-gray-600">{item.category}</td>
                   <td className="py-4 px-5 text-gray-600">{item.type}</td>

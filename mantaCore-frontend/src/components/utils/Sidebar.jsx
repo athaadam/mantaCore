@@ -31,9 +31,9 @@ export default function Sidebar() {
       Cookies.remove('auth')
       setRole('')
       router.push('/')
-      alert('Logout successful')
     } catch (error) {
-      alert('Logout failed. Please try again.' || error.message)
+      console.error('Logout failed:', error)
+      alert('Logout failed. Please try again.')
     }
   }
 

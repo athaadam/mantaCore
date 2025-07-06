@@ -31,7 +31,6 @@ export default function AccountManagementClient({ initialData }) {
 
     const handleDeleteAccount = async (id) => {
         if (!confirm('Are you sure you want to delete this account?')) return;
-
         try {
             const token = await getToken();
             await deleteAccountById(id, token);

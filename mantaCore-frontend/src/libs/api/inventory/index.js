@@ -28,6 +28,14 @@ export const updateItem = async (id, form, token) => {
         body: form,
         token,
     });
-    
+
     return data.item || data;
+};
+
+export const deleteItemById = async (id, token) => {
+    return await apiRequest({
+        endpoint: `deleteItem/${id}`,
+        method: 'DELETE',
+        token,
+    });
 };

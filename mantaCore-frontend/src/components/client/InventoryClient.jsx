@@ -5,7 +5,7 @@ import InventoryFilter from '../filter/InventoryFilter';
 import InventoryActions from '../action/InventoryAction';
 import InventoryTable from '../table/InventoryTable';
 import InventoryModal from '../modal/InventoryModal';
-import { createItem, updateItem } from '@/libs/api/inventory';
+import { createItem, updateItem, deleteItemById } from '@/libs/api/inventory';
 import Alert from '../utils/Alert';
 import { getToken } from '@/libs/api/auth';
 import { extractErrorMessage } from '@/libs/exceptions';
@@ -76,11 +76,26 @@ export default function InventoryClient({ initialItems }) {
     };
 
 
-    const handleDelete = (index) => {
-        const updated = [...items];
-        updated.splice(index, 1);
-        setItems(updated);
-        setOriginalItems(updated);
+    const handleDelete = async (index) => {
+        const confirmDelete = confirm('Are you sure you want to delete this item?');
+        if (!confirmDelete) return;
+
+        try {
+            const token = await getToken();
+            const itemId = items[index].itemID;
+
+            await deleteItemById(itemId, token);
+
+            // Jika berhasil, hapus dari state lokal
+            const updated = [...items];
+            updated.splice(index, 1);
+            setItems(updated);
+            setOriginalItems(updated);
+            setAlert({ type: 'success', message: 'Item deleted successfully' });
+        } catch (err) {
+            console.error('❌ Failed to delete item:', err);
+            setAlert({ type: 'error', message: 'Failed to delete item' });
+        }
     };
 
     const handleEditItem = (item) => {
