@@ -3,8 +3,9 @@ import AccountManagementClient from '@/components/client/AccountManagementClient
 import { fetchAllUsers } from '@/libs/api/account-management';
 
 export default async function AccountManagementPage() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
+
     try {
         const accounts = await fetchAllUsers(token);
         return (

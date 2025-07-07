@@ -7,7 +7,8 @@ import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAct
 
 export default async function ProfilePage() {
 
-    const token = cookies().get('auth')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth')?.value;
     const data = await getProfile(token);
 
     return (
@@ -47,7 +48,7 @@ export default async function ProfilePage() {
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Phone Number</p>
-                        <p>{data.user.phone_number}</p>
+                        <p>{data.user.phone_number || '='}</p>
                     </div>
                     <div>
                         <p className="font-semibold text-gray-700">Subscription Active Until</p>

@@ -12,7 +12,7 @@ const defaultColors = [
 export default function SalesByCategory({ report }) {
     const canvasRef = useRef(null);
 
-    const salesByCategory = report?.salesByCategory || {};
+    const salesByCategory = report || {};
     const labels = Object.keys(salesByCategory);
     const data = Object.values(salesByCategory);
     const hasData = labels.length > 0;
