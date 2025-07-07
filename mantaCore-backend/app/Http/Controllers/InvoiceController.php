@@ -253,6 +253,7 @@ class InvoiceController extends Controller
     //filter invoice from date untill
     public function filterInvoices(Request $request): JsonResponse
     {
+        $user = $request->user(); // Ambil user yang sedang login
         $startInput  = $request->input('start') ?? $request->query('start');
         $endInput    = $request->input('end') ?? $request->query('end');
         $category    = $request->input('category') ?? $request->query('category');
@@ -273,6 +274,7 @@ class InvoiceController extends Controller
         }
 
         $query = Invoice::with(['user', 'company', 'costumer', 'items.item'])
+            ->where('companyID', $user->companyID) // Filter hanya company user login
             ->whereBetween('date', [$start, $end]);
 
         // 🔍 Filter suitor jika ada
@@ -323,23 +325,23 @@ class InvoiceController extends Controller
 
         /* 1️⃣  Total Sales (sum amount) */
         $totalSales = Invoice::where('companyID', $companyID)
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('date', [$start, $end])
             ->sum('amount');
 
         /* 2️⃣  Total Invoice (count) */
         $totalInvoice = Invoice::where('companyID', $companyID)
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('date', [$start, $end])
             ->count();
 
         /* 3️⃣  Product Sold (total quantity terjual) */
         $productSold = InvoiceItem::whereHas('invoice', function ($q) use ($companyID, $start, $end) {
                 $q->where('companyID', $companyID)
-                ->whereBetween('created_at', [$start, $end]);
+                ->whereBetween('date', [$start, $end]);
             })->sum('quantity');
 
         /* 4️⃣  Active Customer (distinct costumerID) */
         $activeCustomer = Invoice::where('companyID', $companyID)
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('date', [$start, $end])
             ->distinct('costumerID')
             ->count('costumerID');
 
@@ -353,7 +355,7 @@ class InvoiceController extends Controller
                     ->join('items', 'items.itemID', '=', 'invoice_items.itemID')
                     ->join('invoices', 'invoices.invoiceID', '=', 'invoice_items.invoiceID')
                     ->where('invoices.companyID', $companyID)
-                    ->whereBetween('invoices.created_at', [$start, $end])
+                    ->whereBetween('invoices.date', [$start, $end])
                     ->groupBy('items.itemID', 'items.name')
                     ->orderByDesc('totalSales')
                     ->limit(5)
@@ -362,7 +364,7 @@ class InvoiceController extends Controller
         /* 6️⃣  Sales by Category (pie chart) */
         $salesByCategory = InvoiceItem::whereHas('invoice', function ($q) use ($companyID, $start, $end) {
                                     $q->where('companyID', $companyID)
-                                    ->whereBetween('created_at', [$start, $end]);
+                                    ->whereBetween('date', [$start, $end]);
                                 })
                                 ->with('item')
                                 ->get()

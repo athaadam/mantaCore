@@ -8,17 +8,20 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /** Total penjualan (invoice PAID saja) */
+    //total semua amount dalam invoices
     public function totalPenjualan(Request $request)
-    {
-        $user  = $request->user();
+{
+    $user = $request->user();
 
-        $total = $user->invoices()
-            ->where('companyID', $user->companyID)
-            ->sum('amount');
+    // Total penjualan semua invoice dalam 1 company
+    $totalSales = \App\Models\Invoice::where('companyID', $user->companyID)
+        ->sum('amount');
 
-        return response()->json(['totalPenjualan' => $total]);
-    }
+    return response()->json([
+        'totalSales' => $totalSales,
+    ]);
+}
+    
 
     /** Profit & loss hari ini */
     public function todayProfitLoss(Request $request)
