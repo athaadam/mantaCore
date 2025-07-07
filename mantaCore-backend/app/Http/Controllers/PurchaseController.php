@@ -39,7 +39,6 @@ class PurchaseController extends Controller
         $validated = $request->validate([
             'userID'           => 'required|exists:users,userID',
             'companyID'        => 'required|exists:companies,companyID',
-            'status'           => 'nullable|in:pending,accepted,denied',
             'date'             => 'required|date',
             'amount'           => 'required|numeric|min:0',
             'items'            => 'required|array|min:1',
@@ -57,7 +56,7 @@ class PurchaseController extends Controller
                 $purchase = Purchase::create([
                     'userID'    => $validated['userID'],
                     'companyID' => $validated['companyID'],
-                    'status'    => strtolower($validated['status'] ?? 'pending'),
+                    'status'    => 'pending',
                     'date'      => $validated['date'],
                     'amount'    => $validated['amount'],
                 ]);
@@ -72,12 +71,6 @@ class PurchaseController extends Controller
                         'subTotal'  => $row['subTotal'],
                         'type'      => $row['type'] ?? null,
                     ]);
-
-                    /* tambah stok kalau status accepted  */
-                    if ($purchase->status === 'accepted') {
-                        Item::lockForUpdate()->find($row['itemID'])
-                            ->increment('stock', $row['quantity']);
-                    }
                 }
 
                 return $purchase->load('items.item');
@@ -157,8 +150,10 @@ class PurchaseController extends Controller
                 /* -------- tambahkan stok baru jika status setelah update accepted -------- */
                 if ($newStatus === 'accepted') {
                     foreach ($purchase->items as $d) {
-                        Item::lockForUpdate()->find($d->itemID)
-                            ->increment('stock', $d->quantity);
+                        if (isset($d->type) && strtolower($d->type) === 'sales') {
+                            Item::lockForUpdate()->find($d->itemID)
+                                ->increment('stock', $d->quantity);
+                        }
                     }
                 }
 

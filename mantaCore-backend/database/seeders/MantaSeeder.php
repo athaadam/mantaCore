@@ -47,12 +47,16 @@ class MantaSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+            // Tentukan category secara bergantian
+            $categories = ['General', 'OfficeSupplies', 'Ingredient', 'Merchandise'];
+            $category = $categories[($i - 1) % count($categories)];
+
             DB::table('items')->insert([
                 'companyID' => $companyID,
                 'name' => 'Item ' . $i,
                 'itemPrice' => rand(1000, 50000),
-                'category' => 'General',
-                'type' => 'Unit',
+                'category' => $category,
+                'type' => $i % 2 === 0 ? 'Operational' : 'Sales',
                 'units' => 'pcs',
                 'stock' => rand(50, 200),
                 'created_at' => now(),
