@@ -1,4 +1,4 @@
-import SummaryCards from '@/components/table/SummaryCards';
+import SummaryCards from '@/components/card/SummaryCards';
 import PurchaseApprovalClient from '@/components/client/PurchaseApprovalClient';
 import { getAllPurchases } from '@/libs/api/purchase-approval';
 import { cookies } from 'next/headers';

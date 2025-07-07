@@ -16,6 +16,8 @@ export default async function SalesPage() {
         activeCustomers: report.activeCustomer || 0,
     };
 
+    console.log(transactions)
 
-    return <SalesReportClient summaryData={summaryData} transactions={transactions} report={report} />;
+
+    return <SalesReportClient summaryData={summaryData} transactions={transactions.invoices} report={report} />;
 }

@@ -6,8 +6,8 @@ export const getInvoices = async (token) => {
         method: 'GET',
         token,
     });
-
-    return data.invoices || data;
+    
+    return data;
 }
 
 export const salesReport = async (token) => {

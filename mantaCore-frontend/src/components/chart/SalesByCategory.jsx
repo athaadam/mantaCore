@@ -66,9 +66,7 @@ export default function SalesByCategory({ report }) {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow flex-1 min-w-[340px] min-h-[280px] flex flex-col items-center">
-            <h3 className="text-xl text-gray-800 font-semibold mb-4 self-start">
-                Sales by Category
-            </h3>
+            
 
             {!hasData ? (
                 <div className="flex flex-col items-center justify-center flex-1 text-center text-gray-500 gap-4 w-full">

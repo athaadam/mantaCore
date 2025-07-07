@@ -44,6 +44,8 @@ export default function FilterControls({
           <option>Production</option>
           <option>Finance</option>
           <option>Logistics</option>
+          <option>Logistics</option>
+          <option>Logistics</option>
         </select>
       )}
 
@@ -60,8 +62,6 @@ export default function FilterControls({
           <option>Andi Setiawan</option>
         </select>
       )}
-
-      {/* Status Filter */}
       {showStatus && (
         <select
           value={filter.status}

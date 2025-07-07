@@ -67,7 +67,7 @@ export default function AccountList({ accounts, itemsPerPage, currentPage, onPag
                                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                                         onClick={() => onDelete(acc.userID)}
                                     >
-                                        Delete
+                                        Disable
                                     </button>
                                 </td>
                             </tr>

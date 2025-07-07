@@ -8,10 +8,13 @@ import Cookies from 'js-cookie';
 import { logout } from '@/libs/api/auth';
 
 const NAV_ITEMS = [
-  { name: 'Dashboard', path: 'dashboard' },
-  { name: 'Sales Report', path: 'sales-report' },
+  { name: 'Dashboard', path: 'dashboard', roles: ['admin', 'manager', 'cashier']},
+  { name: 'Invoice', path: 'invoice', roles: ['admin', 'manager', 'cashier']},
+  { name: 'Sales Report', path: 'sales-report', roles: ['admin', 'manager']},
+  { name: 'Purchase Request', path: 'purchase-request' },
   { name: 'Purchase Approval', path: 'purchase-approval' },
   { name: 'Inventory', path: 'inventory' },
+  { name: 'Costumer', path: 'customer' },
   { name: 'Account Management', path: 'account-management' },
   { name: 'Profile', path: 'profile' },
   { name: 'Logout', path: null },
@@ -19,12 +22,15 @@ const NAV_ITEMS = [
 
 const iconMap = {
   'Dashboard': 'dashboard',
+  'Invoice': 'receipt',
   'Sales Report': 'bar_chart',
+  'Purchase Request': 'request_quote',
   'Purchase Approval': 'assignment_turned_in',
   'Inventory': 'inventory_2',
   'Account Management': 'supervisor_account',
   'Profile': 'person',
   'Logout': 'logout',
+  'Costumer': 'people',
 };
 
 
@@ -57,7 +63,7 @@ export default function Sidebar() {
           height={44}
           priority
           className="rounded-lg shadow-md"
-          style={{ width: 'auto', height: 'auto' }} // ✅ tambahkan width juga
+          style={{ width: 'auto', height: 'auto' }}
         />
       </div>
       <nav>
