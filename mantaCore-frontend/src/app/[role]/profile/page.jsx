@@ -21,7 +21,7 @@ export default async function ProfilePage() {
                 <div className="flex items-center justify-between border-b pb-4">
                     <div className="flex items-center gap-4">
                         <Image
-                            src="/user.jpg"
+                            src="/assets/common/user.jpg"
                             alt="User Avatar"
                             width={64}
                             height={64}

@@ -90,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
             Route::get('/filterInvoices', [InvoiceController::class, 'filterInvoices']);
             Route::get('/sales-report', [InvoiceController::class, 'salesReport']);
-            
+
 
             //costumer
             Route::get('/getAllCostumers', [CostumerController::class, 'getAllCostumers']);
@@ -98,7 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
             Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
 
-             //purchases
+            //purchases
             Route::get('/getAllPurchases', [PurchaseController::class, 'getAllPurchases']);
             Route::get('/getPurchase/{id}', [PurchaseController::class, 'getPurchaseById']);
             Route::post('/updatePurchase/{id}', [PurchaseController::class, 'updatePurchase']);

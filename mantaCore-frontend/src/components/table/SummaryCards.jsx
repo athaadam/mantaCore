@@ -1,67 +1,74 @@
 'use client';
 
 import Image from 'next/image';
+import { formatRupiah } from '../utils/formatRupiah';
 
 export default function SummaryCards({ data = {}, only = [] }) {
   const structure = [
     {
       key: 'totalSales',
       title: 'Total Sales',
-      icon: '/sales.png',
+      icon: '/assets/SummaryLogos/sales.png',
+      isCurrency: true,
+    },
+    {
+      key: 'totalPenjualan',
+      title: 'Total Penjualan',
+      icon: '/assets/SummaryLogos/sales.png',
       isCurrency: true,
     },
     {
       key: 'todayPnL',
       title: "Today's Profit & Loss",
-      icon: '/pnl.png',
+      icon: '/assets/SummaryLogos/pnl.png',
       isCurrency: true,
     },
     {
       key: 'lifetimePnL',
       title: 'Lifetime Profit & Loss',
-      icon: '/pnl.png',
+      icon: '/assets/SummaryLogos/pnl.png',
       isCurrency: true,
     },
     {
       key: 'totalInvoice',
       title: 'Total Invoices',
-      icon: '/invoice.svg',
+      icon: '/assets/SummaryLogos/invoice.svg',
       isCurrency: false,
     },
     {
       key: 'productSold',
       title: 'Products Sold',
-      icon: '/purchase.svg',
+      icon: '/assets/SummaryLogos/purchase.svg',
       isCurrency: false,
     },
     {
       key: 'activeCustomers',
       title: 'Active Customers',
-      icon: '/customer.svg',
+      icon: '/assets/SummaryLogos/customer.svg',
       isCurrency: false,
     },
     {
       key: 'totalRequests',
       title: 'Total Requests',
-      icon: '/request.svg',
+      icon: '/assets/SummaryLogos/request.svg',
       isCurrency: false,
     },
     {
       key: 'approvedRequests',
       title: 'Approved Requests',
-      icon: '/approved.svg',
+      icon: '/assets/SummaryLogos/approved.svg',
       isCurrency: false,
     },
     {
       key: 'pendingRequests',
       title: 'Pending Requests',
-      icon: '/pending.svg',
+      icon: '/assets/SummaryLogos/pending.svg',
       isCurrency: false,
     },
     {
       key: 'rejectedRequests',
       title: 'Rejected Requests',
-      icon: '/rejected.svg',
+      icon: '/assets/SummaryLogos/rejected.svg',
       isCurrency: false,
     },
   ];
@@ -71,16 +78,16 @@ export default function SummaryCards({ data = {}, only = [] }) {
     : structure;
 
   return (
-<>
+    <>
       {filtered.map(({ key, title, icon, isCurrency }) => {
         const rawValue = data[key];
         const displayValue =
           rawValue !== undefined
             ? isCurrency
-              ? `Rp${Number(rawValue).toLocaleString()}`
+              ? formatRupiah(rawValue)
               : Number(rawValue).toLocaleString()
             : isCurrency
-              ? 'Rp0'
+              ? formatRupiah(0)
               : '0';
 
         return (

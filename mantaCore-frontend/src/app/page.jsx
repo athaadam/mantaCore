@@ -5,12 +5,12 @@ import AuthForm from '@/components/form/AuthForm'; // Assuming this is the corre
 export default function Page() {
   const [isLogin, setIsLogin] = useState(true);
   return (
-    <div className="flex h-screen w-full font-['Segoe_UI']">
+    <div className="flex h-screen w-full font-['Segoe_UI'] flex-wrap">
       {/* Kiri: Branding */}
       <div
         className="w-[75%] bg-[#6A5ACD] text-white flex flex-col justify-between p-[60px] relative"
         style={{
-          backgroundImage: 'url(/erp.gif)',
+          backgroundImage: 'url(/assets/common/erp.gif)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -21,7 +21,7 @@ export default function Page() {
           Empowering Your<br />Business Workflow
         </h1>
         <div className="absolute left-[40px] bottom-[40px] flex items-center">
-          <img src="/logo.png" alt="MantaCore Logo" className="w-[200px] h-auto block" />
+          <img src="/assets/common/logo.png" alt="MantaCore Logo" className="w-[200px] h-auto block" />
         </div>
       </div>
 

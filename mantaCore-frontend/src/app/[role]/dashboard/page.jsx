@@ -1,228 +1,65 @@
-import TopSales from '@/components/chart/TopSales'
+import TopSales from '@/components/chart/TopSales';
 import SummaryCards from '@/components/table/SummaryCards';
 import TransactionTable from '@/components/table/TransactionTable';
 import PurchaseTable from '@/components/table/PurchaseTable';
+import { getAllPurchases } from '@/libs/api/purchase-approval';
+import { cookies } from 'next/headers';
+import { getInvoices } from '@/libs/api/sales-report';
+import {
+  todayProfitLoss,
+  topSellingItems,
+  totalPenjualan,
+  lifetimeProfitLoss,
+} from '@/libs/api/dashboard';
 
+export default async function DashboardPage() {
+  const token = cookies().get('auth')?.value;
 
-export default function DashboardPage() {
+  const [
+    totalSalesValue,
+    todayProfitLossValue,
+    lifetimeProfitLossValue,
+    transactions,
+    topSells,
+    purchaseRequests,
+  ] = await Promise.all([
+    totalPenjualan(token),
+    todayProfitLoss(token),
+    lifetimeProfitLoss(token),
+    getInvoices(token),
+    topSellingItems(token),
+    getAllPurchases(token),
+  ]);
 
   const summaryData = {
-    totalSales: 400000000,
-    todayPnL: 2000000,
-    lifetimePnL: 2000000,
+    totalPenjualan: totalSalesValue?.totalPenjualan || 0,
+    todayPnL: todayProfitLossValue?.profitLoss || 0,
+    lifetimePnL: lifetimeProfitLossValue?.profitLoss || 0,
   };
 
-  const transactions = [
-    {
-      date: 'April 1, 2025',
-      item: 'Tumbler, Spoon',
-      author: 'AHMD',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'RFF',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'SSS',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-    {
-      date: 'April 1, 2025',
-      item: 'Rice, Carrot, Spoon',
-      author: 'EAR',
-      amount: 'Rp20.000',
-    },
-  ];
-
-  const purchaseRequests = [
-
-    {
-      date: '2025-07-05',
-      title: 'Permintaan Laptop',
-      author: 'Admin B',
-      amount: 5500000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-06',
-      title: 'Permintaan Printer',
-      author: 'Admin C',
-      amount: 2500000,
-      status: 'Pending',
-    },
-    {
-      date: '2025-07-07',
-      title: 'Permintaan Meja',
-      author: 'Admin D',
-      amount: 1200000,
-      status: 'Rejected',
-    },
-    {
-      date: '2025-07-08',
-      title: 'Permintaan Kursi',
-      author: 'Admin E',
-      amount: 800000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-09',
-      title: 'Permintaan Proyektor',
-      author: 'Admin F',
-      amount: 3500000,
-      status: 'Pending',
-    },
-    {
-      date: '2025-07-10',
-      title: 'Permintaan AC',
-      author: 'Admin G',
-      amount: 4500000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-11',
-      title: 'Permintaan Kamera',
-      author: 'Admin H',
-      amount: 3000000,
-      status: 'Rejected',
-    },
-    {
-      date: '2025-07-12',
-      title: 'Permintaan Monitor',
-      author: 'Admin I',
-      amount: 2000000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-13',
-      title: 'Permintaan Keyboard',
-      author: 'Admin J',
-      amount: 400000,
-      status: 'Pending',
-    },
-    {
-      date: '2025-07-14',
-      title: 'Permintaan Mouse',
-      author: 'Admin K',
-      amount: 250000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-15',
-      title: 'Permintaan Scanner',
-      author: 'Admin L',
-      amount: 1800000,
-      status: 'Rejected',
-    },
-    {
-      date: '2025-07-16',
-      title: 'Permintaan Speaker',
-      author: 'Admin M',
-      amount: 600000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-17',
-      title: 'Permintaan Harddisk',
-      author: 'Admin N',
-      amount: 950000,
-      status: 'Pending',
-    },
-    {
-      date: '2025-07-18',
-      title: 'Permintaan UPS',
-      author: 'Admin O',
-      amount: 1200000,
-      status: 'Approved',
-    },
-    {
-      date: '2025-07-19',
-      title: 'Permintaan Kabel LAN',
-      author: 'Admin P',
-      amount: 150000,
-      status: 'Approved',
-    },
-  ];
-
-
   return (
-    <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">
-        Dashboard
-      </h1>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 drop-shadow-lg mb-8 w-full">
-        <SummaryCards
-          data={summaryData}
-          only={['totalSales', 'todayPnL', 'lifetimePnL']}
-        />
+    <div className="flex-1 px-6 py-8 overflow-y-auto">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <p className="text-gray-500 mt-1">Quick summary of today’s activities</p>
       </div>
 
-      {/* Charts & Transactions */}
-      <div className="grid md:grid-cols-2 gap-6 mb-6 drop-shadow-lg items-stretch">
-        <div className="rounded-xl flex-[1.2] min-w-[400px] min-h-[280px] flex flex-col flex-shrink-0">
-          <TopSales />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <SummaryCards data={summaryData} only={['totalPenjualan', 'todayPnL', 'lifetimePnL']} />
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6 mb-10">
+        <div className="rounded-xl bg-white p-6 shadow-md flex flex-col min-h-[320px]">
+          <TopSales report={topSells} />
         </div>
-        <div className="rounded-xl flex-[1.2] min-w-[400px] min-h-[280px] flex flex-col flex-shrink-0">
+        <div className="rounded-xl bg-white p-6 shadow-md flex flex-col min-h-[320px]">
           <TransactionTable transactions={transactions} itemsPerPage={5} />
         </div>
       </div>
 
-      {/* Purchase Requests */}
-      <PurchaseTable data={purchaseRequests} itemsPerPage={5} mode="request" />
+      <div className="rounded-xl bg-white p-6 shadow-md">
+        <PurchaseTable data={purchaseRequests} itemsPerPage={5} mode="request" />
+      </div>
     </div>
-  )
+  );
 }

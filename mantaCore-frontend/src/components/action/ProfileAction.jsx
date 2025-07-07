@@ -8,7 +8,7 @@ export function ProfileAction({ role }) {
         <div className="mt-6 flex justify-end gap-2">
             <button
                 className="bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 transition cursor-pointer rounded-b-lg"
-                onClick={() => router.push(`/${role}/profile/change-password`)}
+                onClick={() => router.push(`profile/change-password`)}
             >
                 Change Password
             </button>
@@ -24,7 +24,7 @@ export function EditAccountAction({ role }) {
     return (
         <button
             className="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition cursor-pointer"
-            onClick={() => router.push(`/${role}/profile/edit-account`)}
+            onClick={() => router.push(`profile/edit-account`)}
         >
             Edit
         </button>

@@ -7,7 +7,8 @@ export async function login(username, password) {
         method: 'POST',
         body: { username, password },
     })
-    Cookies.set('auth', data.token)
+    // Set cookie expires in 5 minutes
+    Cookies.set('auth', data.token, { expires: 5 / (24 * 60) })
     return data.token
 }
 

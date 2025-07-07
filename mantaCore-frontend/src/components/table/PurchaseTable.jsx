@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { getStatusColor } from '@/components/utils/statuscolor';
 import Pagination from '@/components/utils/Pagination';
 import { formatRupiah } from '@/components/utils/formatRupiah';
+import Link from 'next/link';
 
 export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'purchase' }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,14 +35,14 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                 {isPurchase ? (
                                     <>
                                         <th className="px-5 py-4 text-left">Invoice ID</th>
-                                        <th className="px-5 py-4 text-left">Suitor</th>
                                         <th className="px-5 py-4 text-left">Item</th>
                                         <th className="px-5 py-4 text-left">Quantity</th>
+                                        <th className="px-5 py-4 text-left">Unit Price</th>
                                     </>
                                 ) : (
-                                    <th className="px-5 py-4 text-left">Title</th>
+                                    <th className="px-5 py-4 text-left">Category</th>
                                 )}
-                                <th className="px-5 py-4 text-left">Unit Price</th>
+                                <th className="px-5 py-4 text-left">Suitor</th>
                                 <th className="px-5 py-4 text-left">Amount</th>
                                 <th className="px-5 py-4 text-left">Status</th>
                                 {isPurchase && <th className="px-5 py-4 text-left">Action</th>}
@@ -55,7 +56,6 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                         {isPurchase ? (
                                             <>
                                                 <td className="px-5 py-4">{item.purchaseID}</td>
-                                                <td className="px-5 py-4">{item.user.username}</td>
                                                 <td className="px-5 py-4">
                                                     {item.items?.length > 0
                                                         ? item.items.map(i => i.item?.name ?? 'Unknown').join(', ')
@@ -66,15 +66,21 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                                         ? item.items.reduce((total, i) => total + i.quantity, 0)
                                                         : 0}
                                                 </td>
+                                                <td className="px-5 py-4 font-semibold text-indigo-700">
+                                                    {item.items?.length > 0
+                                                        ? item.items.map(i => formatRupiah(i.unitPrice)).join(', ')
+                                                        : '-'}
+                                                </td>
                                             </>
                                         ) : (
-                                            <td className="px-5 py-4">{item.title}</td>
+                                            <td className="px-5 py-4">
+                                                {item.items?.length > 0
+                                                    ? item.items.map(i => i.item?.category ?? 'Unknown').join(', ')
+                                                    : '-'}
+                                            </td>
                                         )}
-                                        <td className="px-5 py-4 font-semibold text-indigo-700">
-                                            {item.items?.length > 0
-                                                ? item.items.map(i => formatRupiah(i.unitPrice)).join(', ')
-                                                : '-'}
-                                        </td>
+                                        <td className="px-5 py-4">{item.user.username}</td>
+
                                         <td className="px-5 py-4 font-semibold text-indigo-700">
                                             {formatRupiah(item.amount)}
                                         </td>
@@ -85,12 +91,12 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                         </td>
                                         {isPurchase && (
                                             <td className="px-5 py-4">
-                                                <a
-                                                    href="{`/{item.purchaseID}`}"
+                                                <Link
+                                                    href={`purchase-approval/${item.purchaseID}`}
                                                     className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium text-sm transition-colors"
                                                 >
                                                     View Detail
-                                                </a>
+                                                </Link>
                                             </td>
                                         )}
                                     </tr>

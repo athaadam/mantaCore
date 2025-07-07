@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Pagination from '@/components/utils/Pagination';
+import { formatRupiah } from '@/components/utils/formatRupiah';
+import Link from 'next/link';
 
 export default function TransactionTable({ transactions = [], itemsPerPage, mode = 'simple' }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -11,7 +13,7 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
     const currentData = transactions.slice(startIdx, startIdx + itemsPerPage);
 
     return (
-        <div className={`bg-white ${mode === 'simple' ? 'p-8' : 'p-0'} rounded-2xl shadow-lg min-w-[340px] transition-all duration-300`}>
+        <div className={`flex flex-col h-full bg-white ${mode === 'simple' ? 'p-8' : 'p-0'} rounded-2xl shadow-lg min-w-[340px]`}>
             {mode === 'simple' && (
                 <h3 className="text-xl text-gray-800 font-semibold mb-4">Transaction History</h3>
             )}
@@ -28,11 +30,10 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                                 </>
                             )}
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Item</th>
-                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Author</th>
+                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Costumer ID</th>
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Amount</th>
                             {mode === 'detailed' && (
                                 <>
-                                    <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Customer ID</th>
                                     <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Action</th>
                                 </>
                             )}
@@ -45,23 +46,26 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                                     <td className="py-3 px-4">{trx.date}</td>
                                     {mode === 'detailed' && (
                                         <>
-                                            <td className="py-3 px-4">{trx.invoiceId}</td>
-                                            <td className="py-3 px-4">{trx.suitor}</td>
+                                            <td className="py-3 px-4">{trx.invoiceID}</td>
+                                            <td className="py-3 px-4">{trx.user?.username}</td>
                                         </>
                                     )}
-                                    <td className="py-3 px-4">{trx.item}</td>
-                                    <td className="py-3 px-4">{trx.author}</td>
-                                    <td className="py-3 px-4 font-semibold text-indigo-600">{trx.amount}</td>
+                                    <td className="py-3 px-4">
+                                        {trx.items?.length > 0
+                                            ? trx.items.map(item => item.item.name).join(', ')
+                                            : 'Unknown Item'}
+                                    </td>
+                                    <td className="py-3 px-4">{trx.costumerID}</td>
+                                    <td className="py-3 px-4 font-semibold text-indigo-600">{formatRupiah(trx.amount)}</td>
                                     {mode === 'detailed' && (
                                         <>
-                                            <td className="py-3 px-4">{trx.customerId}</td>
                                             <td className="py-3 px-4">
-                                                <a
-                                                    href="#"
+                                                <Link
+                                                    href={`sales-report/${trx.invoiceID}`}
                                                     className="inline-block px-3 py-1 rounded-md bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
                                                 >
                                                     View Detail
-                                                </a>
+                                                </Link>
                                             </td>
                                         </>
                                     )}

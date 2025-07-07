@@ -4,7 +4,8 @@ import { fetchAllItems } from "@/libs/api/inventory";
 
 
 export default async function InventoryPage() {
-    const token = await cookies().get('auth')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth')?.value;
 
     let itemsData = [];
     let fetchError = null;
