@@ -13,7 +13,8 @@ import {
 } from '@/libs/api/dashboard';
 
 export default async function DashboardPage() {
-  const token = cookies().get('auth')?.value;
+  const cookieStore = await cookies(); 
+  const token = cookieStore.get('auth')?.value;
 
   const [
     totalSalesValue,
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
     topSellingItems(token),
     getAllPurchases(token),
   ]);
+
 
   const summaryData = {
     totalPenjualan: totalSalesValue?.totalPenjualan || 0,

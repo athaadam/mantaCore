@@ -4,7 +4,8 @@ import { salesReport } from '@/libs/api/sales-report/index';
 import { getInvoices } from '@/libs/api/sales-report';
 
 export default async function SalesPage() {
-    const token = cookies().get('auth')?.value || '';
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth')?.value;
     const transactions = await getInvoices(token);
     const report = await salesReport(token);
 

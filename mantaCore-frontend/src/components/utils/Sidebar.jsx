@@ -50,9 +50,16 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex fixed top-0 left-0 h-full w-[260px] bg-gradient-to-b from-[#6a4cff] to-[#443194] text-white flex-col py-8 px-2 shadow-xl z-40">
       <div className="flex items-center justify-center mb-8">
-        <Image src="/logo.png" alt="MantaCore" width={170} height={44} className="rounded-lg shadow-md" />
+        <Image
+          src="/logo.png"
+          alt="MantaCore"
+          width={170}
+          height={44}
+          priority
+          className="rounded-lg shadow-md"
+          style={{ width: 'auto', height: 'auto' }} // ✅ tambahkan width juga
+        />
       </div>
-
       <nav>
         <ul className="space-y-2">
           {NAV_ITEMS.map(({ name, path }) => {

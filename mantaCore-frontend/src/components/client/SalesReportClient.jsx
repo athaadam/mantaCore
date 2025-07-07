@@ -16,16 +16,16 @@ export default function SalesReportClient({ summaryData, transactions, report })
         status: '',
     });
 
-    
+    console.log(report)
 
     return (
-        <div className="flex-1 px-6 py-8 bg-white overflow-y-auto mx-auto">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+        <div className="flex-1 px-8 py-10 bg-gradient-to-br from-gray-50 to-white min-h-screen overflow-y-auto mx-auto">
+            <h1 className="text-4xl font-bold text-gray-900 mb-8 tracking-tight drop-shadow-sm">
                 Sales Report
             </h1>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 drop-shadow-lg mb-8 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
                 <SummaryCards
                     data={summaryData}
                     only={['totalSales', 'totalInvoice', 'productSold', 'activeCustomers']}
@@ -33,18 +33,20 @@ export default function SalesReportClient({ summaryData, transactions, report })
             </div>
 
             {/* Charts */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6 drop-shadow-lg items-stretch">
-                <div className="rounded-xl flex-[1.2] min-w-[400px] min-h-[280px] flex flex-col flex-shrink-0">
-                    <TopSales report={report}/>
+            <div className="grid md:grid-cols-2 gap-8 mb-10">
+                <div className="rounded-2xl bg-white shadow-lg p-6 flex flex-col min-h-[320px]">
+                    {/* <h2 className="text-lg font-semibold text-gray-700 mb-4">Top Sales</h2> */}
+                    <TopSales report={report.topSales}/>
                 </div>
-                <div className="rounded-xl flex-[1.2] min-w-[400px] min-h-[280px] flex flex-col flex-shrink-0">
-                    <SalesByCategory report={report} />
+                <div className="rounded-2xl bg-white shadow-lg p-6 flex flex-col min-h-[320px]">
+                    {/* <h2 className="text-lg font-semibold text-gray-700 mb-4">Sales by Category</h2> */}
+                    <SalesByCategory report={report.salesByCategory} />
                 </div>
             </div>
 
             {/* Transaction Filter */}
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-6 drop-shadow-lg">
-                <h3 className="text-xl text-gray-800 font-semibold">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
+                <h3 className="text-2xl text-gray-800 font-semibold">
                     Transaction History
                 </h3>
                 <FilterControls
@@ -59,11 +61,13 @@ export default function SalesReportClient({ summaryData, transactions, report })
             </div>
 
             {/* Transaction Table */}
-            <TransactionTable
-                transactions={transactions}
-                itemsPerPage={5}
-                mode="detailed"
-            />
+            <div className="rounded-2xl bg-white shadow-lg p-6">
+                <TransactionTable
+                    transactions={transactions}
+                    itemsPerPage={5}
+                    mode="detailed"
+                />
+            </div>
         </div>
     );
 }

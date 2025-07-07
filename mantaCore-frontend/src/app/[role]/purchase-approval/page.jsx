@@ -4,7 +4,8 @@ import { getAllPurchases } from '@/libs/api/purchase-approval';
 import { cookies } from 'next/headers';
 
 export default async function PurchaseApprovalPage() {
-    const token = cookies().get('auth')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth')?.value;
 
     const summaryData = {
         totalRequests: 120,
