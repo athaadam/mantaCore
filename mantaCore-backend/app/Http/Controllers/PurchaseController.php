@@ -11,17 +11,23 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
-    /* ───── READ ───── */
-    public function getAllPurchases(): JsonResponse
+    //get all purchases yang company id nya sama dengan user yang login
+    public function getAllPurchases(Request $request): JsonResponse
     {
-        return response()->json(
-            Purchase::with(['user', 'company', 'items.item'])->get()
-        );
+        $user = $request->user();
+        $purchases = Purchase::with(['user', 'company', 'items.item'])
+            ->where('companyID', $user->companyID)
+            ->get();   
+        return response()->json($purchases);
     }
 
-    public function getPurchaseById(int $id): JsonResponse
+    public function getPurchaseById(Request $request, int $id): JsonResponse
     {
-        $purchase = Purchase::with(['user','company','items.item'])->find($id);
+        $user = $request->user();
+        $purchase = Purchase::with(['user','company','items.item'])
+            ->where('companyID', $user->companyID)
+            ->find($id);
+
         return $purchase
             ? response()->json($purchase)
             : response()->json(['message'=>'Purchase not found'], 404);

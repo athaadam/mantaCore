@@ -12,16 +12,28 @@ use Illuminate\Http\Response;
 
 class InvoiceController extends Controller
 {
+    //mengambil semua invoices yang memiliki relasi dengan company yang sama dengan user yang login
     /* ───── GET ALL ───── */
-    public function getAllInvoices(): JsonResponse
+    public function getAllInvoices(Request $request): JsonResponse
     {
-        return response()->json(Invoice::all());
+        $user = $request->user();
+        $invoices = Invoice::with(['user', 'company', 'costumer', 'items.item'])
+            ->where('companyID', $user->companyID)
+            ->get();
+        return response()->json([
+            'message' => 'Invoices fetched successfully',
+            'invoices' => $invoices,
+        ]);
     }
+    
 
     /* ───── GET BY ID ───── */
-    public function getInvoiceById(int $id): JsonResponse
+    public function getInvoiceById(Request $request, int $id): JsonResponse
     {
-        $invoice = Invoice::with(['user','company','costumer','items.item'])->find($id);
+        $user = $request->user();
+        $invoice = Invoice::with(['user','company','costumer','items.item'])
+            ->where('companyID', $user->companyID)
+            ->find($id);
 
         if (!$invoice) {
             return response()->json(['message' => 'Invoice not found'], 404);

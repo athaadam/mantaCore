@@ -46,6 +46,14 @@ class AuthController extends Controller
             'phone_number'  => 'required|string|max:20',
         ]);
 
+        //cek apakah user sudah ada
+        $existingUser = User::where('username', $data['username'])->first();
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'Username already exists'
+            ], 409);
+        }
+
         // Cek apakah company sudah ada
         $existingCompany = Company::where('companyName', $data['company'])->first();
         if ($existingCompany) {

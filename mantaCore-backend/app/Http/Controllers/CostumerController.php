@@ -8,17 +8,19 @@ use Illuminate\Http\JsonResponse;
 
 class CostumerController extends Controller
 {
-    // ✅ GET: Semua costumer
-    public function getAllCostumers(): JsonResponse
+    // ✅ GET: Semua costumer yang company id nya sama dengan user yang login
+    public function getAllCostumers(Request $request): JsonResponse
     {
-        $costumers = Costumer::all();
+        $user = $request->user();   
+        $costumers = Costumer::where('companyID', $user->companyID)->get();
         return response()->json($costumers);
     }
 
-    // ✅ GET: Costumer by ID
-    public function getCostumerById(int $id): JsonResponse
+    // ✅ GET: Costumer by ID tapi dicek dlu apakah costumer tersebut ada relasi dengan company yang sama dengan user yang login
+    public function getCostumerById(Request $request, int $id): JsonResponse
     {
-        $costumer = Costumer::find($id);
+        $user = $request->user();
+        $costumer = Costumer::where('companyID', $user->companyID)->find($id);
 
         if (!$costumer) {
             return response()->json(['message' => 'Costumer not found'], 404);
@@ -62,16 +64,4 @@ class CostumerController extends Controller
         ]);
     }
 
-    // ✅ DELETE: Hapus costumer
-    public function deleteCostumer(int $id): JsonResponse
-    {
-        $costumer = Costumer::find($id);
-        if (!$costumer) {
-            return response()->json(['message' => 'Costumer not found'], 404);
-        }
-
-        $costumer->delete();
-
-        return response()->json(['message' => 'Costumer deleted successfully']);
-    }
 }
