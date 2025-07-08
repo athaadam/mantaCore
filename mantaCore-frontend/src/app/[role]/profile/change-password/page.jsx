@@ -1,4 +1,5 @@
 import UserForm from '@/components/form/UserChangesForm'
+import PageBreadcrumb from '@/components/layout/PageBreadCrump'
 
 export default function ChangePasswordPage() {
     return (
@@ -13,20 +14,7 @@ export default function ChangePasswordPage() {
             <div className="relative z-10 p-6 lg:p-8">
                 <div className="max-w-4xl mx-auto space-y-8">
                     {/* Breadcrumb Navigation */}
-                    <nav className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0" />
-                        </svg>
-                        <span>Dashboard</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <span>My Profile</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <span className="text-slate-900 font-medium">Change Password</span>
-                    </nav>
+                    <PageBreadcrumb items={["Dashboard", "Profile", "Change Password"]} />
 
                     {/* Header Section */}
                     <div className="text-center mb-8">
@@ -39,7 +27,7 @@ export default function ChangePasswordPage() {
                             Change Your Password
                         </h1>
                         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            Keep your account secure by updating your password regularly. 
+                            Keep your account secure by updating your password regularly.
                             Choose a strong password that you haven't used before.
                         </p>
                     </div>

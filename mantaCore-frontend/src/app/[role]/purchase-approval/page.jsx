@@ -15,6 +15,5 @@ export default async function PurchaseApprovalPage() {
     };
 
     const allData = await getAllPurchases(token);
-
     return <PurchaseApprovalClient summaryData={summaryData} allData={allData} />;
 }

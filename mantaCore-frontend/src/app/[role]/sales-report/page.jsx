@@ -1,23 +1,31 @@
 import { cookies } from 'next/headers';
 import SalesReportClient from '@/components/client/SalesReportClient';
-import { salesReport } from '@/libs/api/sales-report/index';
-import { getInvoices } from '@/libs/api/sales-report';
+import { filterInvoices, getInvoices, salesReport } from '@/libs/api/sales-report/index';
 
 export default async function SalesPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-    const transactions = await getInvoices(token);
-    const report = await salesReport(token);
 
-    const summaryData = {
-        totalSales: report.totalSales || 0,
-        totalInvoice: report.totalInvoice || 0,
-        productSold: report.productSold,
-        activeCustomers: report.activeCustomer || 0,
-    };
+    try {
+        const transactions = await getInvoices(token);
+        const report = await salesReport(token);
+        const filteredInvoices = await filterInvoices(token);
+        console.log(transactions)
+        const summaryData = {
+            totalSales: report.totalSales || 0,
+            totalInvoice: report.totalInvoice || 0,
+            productSold: report.productSold,
+            activeCustomers: report.activeCustomer || 0,
+        };
 
-    console.log(transactions)
-
-
-    return <SalesReportClient summaryData={summaryData} transactions={transactions.invoices} report={report} />;
+        return <SalesReportClient summaryData={summaryData} transactions={transactions.invoices} report={report} filter={filteredInvoices} />;
+    } catch (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center p-8 bg-red-50 rounded-lg">
+                    <p className="text-red-600 font-medium">Failed to load sales report</p>
+                </div>
+            </div>
+        );
+    }
 }

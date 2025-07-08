@@ -8,16 +8,16 @@ import Cookies from 'js-cookie';
 import { logout } from '@/libs/api/auth';
 
 const NAV_ITEMS = [
-  { name: 'Dashboard', path: 'dashboard', roles: ['admin', 'manager', 'cashier'] },
-  { name: 'Invoice', path: 'invoice', roles: ['admin', 'manager', 'cashier'] },
-  { name: 'Sales Report', path: 'sales-report', roles: ['admin', 'manager'] },
-  { name: 'Purchase Request', path: 'purchase-request' },
-  { name: 'Purchase Approval', path: 'purchase-approval' },
-  { name: 'Inventory', path: 'inventory' },
-  { name: 'Customer', path: 'customer' },
-  { name: 'Account Management', path: 'account-management' },
-  { name: 'Profile', path: 'profile' },
-  { name: 'Logout', path: null },
+  { name: 'Dashboard', path: 'dashboard', roles: ['admin', 'management', 'cashier'] },
+  { name: 'Sales Report', path: 'sales-report', roles: ['admin', 'management'] },
+  { name: 'Invoice', path: 'invoice', roles: ['admin', 'cashier'] },
+  { name: 'Purchase Approval', path: 'purchase-approval', roles: ['admin'] },
+  { name: 'Purchase Request', path: 'purchase-request', roles: ['admin', 'management'] },
+  { name: 'Inventory', path: 'inventory', roles: ['admin', 'management'] },
+  { name: 'Customer', path: 'customer', roles: ['admin', 'cashier'] },
+  { name: 'Account Management', path: 'account-management', roles: ['admin', 'management'] },
+  { name: 'Profile', path: 'profile', roles: ['admin', 'management', 'cashier'] },
+  { name: 'Logout', path: null, roles: ['admin', 'management', 'cashier'] },
 ];
 
 const iconMap = {
@@ -120,7 +120,7 @@ export default function Sidebar() {
             Navigation
           </div>
 
-          {NAV_ITEMS.map(({ name, path }) => {
+          {NAV_ITEMS.filter(item => item.roles.includes(role)).map(({ name, path }) => {
             const href = path ? `/${role}/${path}` : null;
             const isActive = href && pathname.startsWith(href);
 

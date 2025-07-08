@@ -1,12 +1,12 @@
 import { apiRequest } from "../index";
 
-export const getInvoices = async (token) => {
+export const filterInvoices = async (token) => {
     const data = await apiRequest({
         endpoint: 'filterInvoices',
         method: 'GET',
         token,
     });
-    
+
     return data;
 }
 
@@ -18,4 +18,12 @@ export const salesReport = async (token) => {
     });
 
     return data.sales || data;
+}
+
+export const getInvoices = async (token) => {
+    return await apiRequest({
+        endpoint: 'getAllInvoices',
+        method: 'GET',
+        token,
+    });
 }

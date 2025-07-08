@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getStatusColor } from '@/components/utils/statuscolor';
 import Pagination from '@/components/utils/Pagination';
 import { formatRupiah } from '@/components/utils/formatRupiah';
@@ -9,12 +9,17 @@ import Link from 'next/link';
 export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'purchase' }) {
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Reset to first page when data changes (e.g., after filtering)
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [data]);
+
     const totalPages = Math.ceil(data.length / itemsPerPage);
     const startIdx = (currentPage - 1) * itemsPerPage;
     const currentData = data.slice(startIdx, startIdx + itemsPerPage);
 
     const isPurchase = mode === 'purchase';
-
+    console.log('PurchaseTable data:', data);
     return (
         <div className="w-full">
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl transition-all duration-300">
@@ -49,13 +54,14 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                     <>
                                         <th className="px-6 py-5 text-left font-bold">Invoice ID</th>
                                         <th className="px-6 py-5 text-left font-bold">Item</th>
+                                        <th className="px-6 py-5 text-left font-bold">Category</th>
                                         <th className="px-6 py-5 text-left font-bold">Quantity</th>
                                         <th className="px-6 py-5 text-left font-bold">Unit Price</th>
                                     </>
                                 ) : (
                                     <th className="px-6 py-5 text-left font-bold">Category</th>
                                 )}
-                                <th className="px-6 py-5 text-left font-bold">Suitor</th>
+                                <th className="px-6 py-5 text-left font-bold">Author</th>
                                 <th className="px-6 py-5 text-left font-bold">Amount</th>
                                 <th className="px-6 py-5 text-left font-bold">Status</th>
                                 {isPurchase && <th className="px-6 py-5 text-left font-bold">Action</th>}
@@ -73,6 +79,13 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                                     <div className="max-w-xs">
                                                         {item.items?.length > 0
                                                             ? item.items.map(i => i.item?.name ?? 'Unknown').join(', ')
+                                                            : '-'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="max-w-xs">
+                                                        {item.items?.length > 0
+                                                            ? item.items.map(i => i.item?.category ?? 'Uncategorized').join(', ')
                                                             : '-'}
                                                     </div>
                                                 </td>
@@ -124,7 +137,7 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={isPurchase ? 8 : 6} className="text-center py-16 text-slate-400">
+                                    <td colSpan={isPurchase ? 9 : 6} className="text-center py-16 text-slate-400">
                                         <div className="flex flex-col items-center gap-4">
                                             <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-violet-100 rounded-full flex items-center justify-center">
                                                 <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

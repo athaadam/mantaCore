@@ -31,3 +31,11 @@ export const lifetimeProfitLoss = async (token) => {
         token,
     });
 }
+
+export const getInvoices = async (token) => {
+    return await apiRequest({
+        endpoint: 'getAllInvoices',
+        method: 'GET',
+        token,
+    });
+}

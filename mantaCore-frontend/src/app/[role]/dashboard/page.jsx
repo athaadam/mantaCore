@@ -1,7 +1,7 @@
 import AdminDashboardLayout from '@/components/layout/AdminDashboardLayout';
 import { getAllPurchases } from '@/libs/api/purchase-approval';
 import { cookies } from 'next/headers';
-import { getInvoices } from '@/libs/api/sales-report';
+import { getInvoices } from '@/libs/api/dashboard';
 import {
   todayProfitLoss,
   topSellingItems,
@@ -31,6 +31,7 @@ export default async function DashboardPage() {
       topSellingItems(token),
       getAllPurchases(token),
     ]);
+    console.log(transactions)
     const summaryData = {
       totalLifetimeSales: totalSalesValue?.totalSales || 0,
       todayPnL: todayProfitLossValue?.profitLoss || 0,

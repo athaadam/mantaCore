@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { fetchAllItems } from "@/libs/api/inventory";
 import Header3 from "@/components/header/Header3";
 import { getProfile } from "@/libs/api/auth/index";
+import Link from 'next/link';
 
 export default async function InventoryPage() {
     const cookieStore = await cookies();
@@ -15,6 +16,7 @@ export default async function InventoryPage() {
         itemsData = await fetchAllItems(token);
     } catch (error) {
         fetchError = error;
+        console.log(error)
     }
 
     if (fetchError) {
@@ -34,12 +36,12 @@ export default async function InventoryPage() {
                     </div>
                     <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Inventory</h1>
                     <p className="text-slate-600 mb-6">Unable to fetch inventory data. Please check your connection and try again.</p>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    <Link
+                        href="inventory"
+                        className="inline-block px-6 py-3 bg-gradient-to-r from-red-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         Retry
-                    </button>
+                    </Link>
                 </div>
             </div>
         );
@@ -64,7 +66,7 @@ export default async function InventoryPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7" />
                             </svg>
                         }
-                        title="Inventory Management"
+                        title="Inventory Portal"
                         subtitle="Manage your inventory efficiently with our comprehensive stock management system"
                         colorScheme="purple"
                     />

@@ -19,9 +19,9 @@ const SalesFilter = ({ data, onFilterChange }) => {
     return (
         <div className="flex justify-end">
             <div className="bg-white/90 backdrop-blur-xl shadow-xl rounded-2xl px-6 py-4 border border-white/30 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] max-w-md">
-                <div className="flex items-center gap-4">
+                <div className="flex items-end gap-4">
                     {/* Date Range Inputs */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-end gap-3">
                         <div className="text-center">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                                 From

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getProfile } from "@/libs/api/auth";
 import { formatDate } from "@/components/utils/formatdate";
 import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
+import PageBreadcrumb from "@/components/layout/PageBreadCrump";
 
 
 export default async function ProfilePage() {
@@ -22,16 +23,7 @@ export default async function ProfilePage() {
             <div className="relative z-10 p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto space-y-8">
                     {/* Breadcrumb Navigation */}
-                    <nav className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0" />
-                        </svg>
-                        <span>Dashboard</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <span className="text-slate-900 font-medium">My Profile</span>
-                    </nav>
+                    <PageBreadcrumb items={["Dashboard", "Profile"]} />
 
                     {/* Main Profile Card */}
                     <div className="bg-white rounded-3xl shadow-2xl border border-white/20 backdrop-blur-sm overflow-hidden">
@@ -41,7 +33,7 @@ export default async function ProfilePage() {
                             <div className="absolute inset-0 bg-black/10"></div>
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
                             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24"></div>
-                            
+
                             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8">
                                 {/* Avatar Section */}
                                 <div className="relative group">
@@ -70,11 +62,10 @@ export default async function ProfilePage() {
                                                 {data.user.username}
                                             </h1>
                                             <div className="flex items-center gap-3 mb-4">
-                                                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
-                                                    data.user.role === 'admin' ? 'bg-red-500/20 text-red-100 border border-red-400/30' :
-                                                    data.user.role === 'management' ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30' :
-                                                    'bg-green-500/20 text-green-100 border border-green-400/30'
-                                                }`}>
+                                                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${data.user.role === 'admin' ? 'bg-red-500/20 text-red-100 border border-red-400/30' :
+                                                        data.user.role === 'management' ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30' :
+                                                            'bg-green-500/20 text-green-100 border border-green-400/30'
+                                                    }`}>
                                                     {data.user.role === 'admin' && (
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -169,7 +160,7 @@ export default async function ProfilePage() {
                                         </div>
                                         Personal Information
                                     </h3>
-                                    
+
                                     <div className="space-y-4">
                                         <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/50 hover:bg-slate-100 transition-colors">
                                             <div className="flex items-center gap-3">
@@ -207,7 +198,7 @@ export default async function ProfilePage() {
                                         </div>
                                         Account Details
                                     </h3>
-                                    
+
                                     <div className="space-y-4">
                                         <div className="bg-green-50 rounded-xl p-4 border border-green-200/50 hover:bg-green-100 transition-colors">
                                             <div className="flex items-center gap-3">

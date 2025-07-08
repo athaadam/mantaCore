@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import FilterControls from '../filter/FilterControls';
 import PurchaseTable from '../table/PurchaseTable';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
 import SummaryCards from '@/components/card/SummaryCards';
+import { extractCustomers, extractCategories, extractStatuses, extractAuthors, applyFilters } from '@/components/utils/filterUtils';
 
 export default function PurchaseApprovalClient({ summaryData, allData }) {
     const [filter, setFilter] = useState({ 
@@ -13,8 +14,51 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
         to: '', 
         category: '', 
         suitor: '',
+        author: '',
         status: '' 
     });
+    
+    const [appliedFilter, setAppliedFilter] = useState({});
+
+    // Extract unique customers, authors, categories and statuses from purchase data
+    const authors = useMemo(() => extractAuthors(allData || [], true), [allData]);
+    const categories = useMemo(() => extractCategories(allData || []), [allData]);
+    const statuses = useMemo(() => extractStatuses(allData || []), [allData]);
+    
+    // Apply filters to data only when appliedFilter changes
+    const filteredData = useMemo(() => {
+        if (!allData || allData.length === 0) {
+            return [];
+        }
+        return applyFilters(allData, appliedFilter);
+    }, [allData, appliedFilter]);
+
+    const handleApplyFilter = () => {
+        console.log('Filters applied:', filter);
+        console.log('Original data count:', allData?.length || 0);
+        setAppliedFilter({ ...filter });
+        
+        // Add delay to log filtered count after state update
+        setTimeout(() => {
+            console.log('Filtered data count:', filteredData.length);
+        }, 100);
+    };
+
+    const handleClearFilter = () => {
+        const clearedFilter = { from: '', to: '', category: '', suitor: '', author: '', status: '' };
+        setFilter(clearedFilter);
+        setAppliedFilter({});
+        console.log('Filters cleared');
+    };
+
+    const handleExport = () => {
+        console.log('Exporting filtered purchase data:', filteredData);
+        if (filteredData.length === 0) {
+            alert('No data to export. Please adjust your filters.');
+            return;
+        }
+        // Export logic here
+    };
 
     // Purchase approval icon
     const purchaseIcon = (
@@ -60,17 +104,24 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
                         <FilterControls
                             filter={filter}
                             setFilter={setFilter}
-                            onApply={() => console.log('apply', filter)}
-                            onExport={() => console.log('export')}
+                            onApply={handleApplyFilter}
+                            onClear={handleClearFilter}
+                            onExport={handleExport}
+                            authors={authors}
+                            categories={categories}
+                            statuses={statuses}
+                            resultCount={filteredData.length}
+                            totalCount={allData?.length || 0}
                             showCategory={true}
-                            showSuitor={true}
+                            showSuitor={false}
+                            showAuthor={true}
                             showStatus={true}
                         />
                     </div>
                     
                     {/* Purchase Table */}
                     <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
-                        <PurchaseTable data={allData} itemsPerPage={5} mode="purchase" />
+                        <PurchaseTable data={filteredData} itemsPerPage={5} mode="purchase" />
                     </div>
                 </DataCard>
             </div>

@@ -1,12 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Pagination from '@/components/utils/Pagination';
 import { formatRupiah } from '@/components/utils/formatRupiah';
 import Link from 'next/link';
 
 export default function TransactionTable({ transactions = [], itemsPerPage, mode = 'simple' }) {
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset to first page when transactions change (e.g., after filtering)
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [transactions]);
 
     const totalPages = Math.ceil(transactions.length / itemsPerPage);
     const startIdx = (currentPage - 1) * itemsPerPage;
@@ -19,14 +24,15 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                     <thead>
                         <tr className="bg-gray-50">
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Date</th>
+                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Invoice ID</th>
                             {mode === 'detailed' && (
                                 <>
-                                    <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Invoice ID</th>
                                     <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Suitor</th>
+                                    <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Author</th>
                                 </>
                             )}
-                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Item</th>
-                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Customer ID</th>
+                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Items</th>
+                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Category</th>
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Amount</th>
                             {mode === 'detailed' && (
                                 <>
@@ -40,18 +46,23 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                             currentData.map((trx, i) => (
                                 <tr key={i} className="border-b last:border-b-0 hover:bg-indigo-50 transition-colors">
                                     <td className="py-3 px-4">{trx.date}</td>
+                                    <td className="py-3 px-4">#{trx.invoiceID}</td>
                                     {mode === 'detailed' && (
                                         <>
-                                            <td className="py-3 px-4">{trx.invoiceID}</td>
-                                            <td className="py-3 px-4">{trx.user?.username}</td>
+                                            <td className="py-3 px-4">{trx.costumer?.username || 'N/A'}</td>
+                                            <td className="py-3 px-4">{trx.user?.username || 'N/A'}</td>
                                         </>
                                     )}
                                     <td className="py-3 px-4">
                                         {trx.items?.length > 0
-                                            ? trx.items.map(item => item.item.name).join(', ')
-                                            : 'Unknown Item'}
+                                            ? trx.items.map(item => item.item?.name || 'Unknown').join(', ')
+                                            : 'No items'}
                                     </td>
-                                    <td className="py-3 px-4">{trx.costumerID}</td>
+                                    <td className="py-3 px-4">
+                                        {trx.items?.length > 0
+                                            ? trx.items.map(item => item.item?.category || 'Uncategorized').join(', ')
+                                            : 'No category'}
+                                    </td>
                                     <td className="py-3 px-4 font-semibold text-indigo-600">{formatRupiah(trx.amount)}</td>
                                     {mode === 'detailed' && (
                                         <>
@@ -70,7 +81,7 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                         ) : (
                             <tr>
                                 <td
-                                    colSpan={mode === 'detailed' ? 8 : 5}
+                                    colSpan={mode === 'detailed' ? 7 : 5}
                                     className="text-center py-6 text-gray-400 font-medium"
                                 >
                                     No transactions available.
