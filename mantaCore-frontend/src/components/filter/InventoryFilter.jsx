@@ -1,7 +1,7 @@
 export default function InventoryFilter({ categories, onChange }) {
   return (
     <select
-      className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+      className="px-4 py-3 rounded-xl border-2 border-purple-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm text-slate-800 font-medium min-w-[160px]"
       onChange={(e) => onChange(e.target.value)}
     >
       <option value="all">All Categories</option>

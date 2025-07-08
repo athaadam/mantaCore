@@ -2,6 +2,7 @@ import { getAllCustomers } from "@/libs/api/customer";
 import { getProfile } from "@/libs/api/auth";
 import { cookies } from "next/headers";
 import CustomerClient from "@/components/client/CustomerClient";
+import Header3 from "@/components/header/Header3";
 
 const CustomerPage = async () => {
     const cookieStore = await cookies();
@@ -22,22 +23,16 @@ const CustomerPage = async () => {
             <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Page Header */}
-                    <div className="text-center mb-12">
-                        <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-lg mb-6">
+                    <Header3
+                        icon={
                             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 4v6m0 0h-6m6 0l-6-6" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                        </div>
-                        <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-purple-800 to-indigo-800 bg-clip-text text-transparent mb-4 tracking-tight">
-                            Customer Portal
-                        </h1>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                            Streamline your customer relationships with our comprehensive management system
-                        </p>
-                        <div className="mt-6 flex justify-center">
-                            <div className="h-1 w-24 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
-                        </div>
-                    </div>
+                        }
+                        title="Customer Portal"
+                        subtitle="Streamline your customer relationships with our comprehensive management system"
+                        colorScheme="purple"
+                    />
 
                     {/* Main Content */}
                     <div className="w-full">

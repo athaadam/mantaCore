@@ -2,7 +2,7 @@ const CustomerAction = ({ customer, onDelete, onUpdate }) => {
     return (
         <div className="flex items-center gap-2">
             <button
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-violet-50 border border-violet-200 text-violet-700 hover:bg-violet-100 hover:border-violet-300 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-xs"
                 title="Edit customer"
                 onClick={() => onUpdate(customer)}
             >
@@ -12,7 +12,7 @@ const CustomerAction = ({ customer, onDelete, onUpdate }) => {
                 <span className="hidden sm:inline">Edit</span>
             </button>
             <button
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-xs"
                 title="Delete customer"
                 onClick={() => {
                     if (window.confirm('Are you sure you want to delete this customer?')) {

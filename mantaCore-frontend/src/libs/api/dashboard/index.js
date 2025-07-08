@@ -1,31 +1,31 @@
 import { apiRequest } from '@/libs/api/index';
 
-export const totalPenjualan = (token) => {
-    return apiRequest({
+export const totalPenjualan = async (token) => {
+    return await apiRequest({
         endpoint: 'totalPenjualan',
         method: 'GET',
         token,
     });
 }
 
-export const topSellingItems = (token) => {
-    return apiRequest({
+export const topSellingItems = async (token) => {
+    return await apiRequest({
         endpoint: 'topSellingItems',
         method: 'GET',
         token,
     });
 }
 
-export const todayProfitLoss = (token) => {
-    return apiRequest({
+export const todayProfitLoss = async (token) => {
+    return await apiRequest({
         endpoint: 'todayProfitLoss',
         method: 'GET',
         token,
     });
 }
 
-export const lifetimeProfitLoss = (token) => {
-    return apiRequest({
+export const lifetimeProfitLoss = async (token) => {
+    return await apiRequest({
         endpoint: 'lifetimeProfitLoss',
         method: 'GET',
         token,

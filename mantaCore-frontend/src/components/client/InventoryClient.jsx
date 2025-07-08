@@ -2,15 +2,16 @@
 
 import { useState } from 'react';
 import InventoryFilter from '../filter/InventoryFilter';
-import InventoryActions from '../action/InventoryAction';
 import InventoryTable from '../table/InventoryTable';
 import InventoryModal from '../modal/InventoryModal';
 import { createItem, updateItem, deleteItemById } from '@/libs/api/inventory';
 import Alert from '../utils/Alert';
-import { getToken } from '@/libs/api/auth';
 import { extractErrorMessage } from '@/libs/exceptions';
+import Header2 from '@/components/header/Header2';
+import DataCard from '@/components/card/DataCard';
+import Cookies from 'js-cookie';
 
-export default function InventoryClient({ initialItems }) {
+export default function InventoryClient({ initialItems, profile }) {
     const [alert, setAlert] = useState(null);
     const [originalItems, setOriginalItems] = useState(initialItems);
     const [items, setItems] = useState(initialItems);
@@ -37,8 +38,7 @@ export default function InventoryClient({ initialItems }) {
 
     const handleSubmitItem = async (e) => {
         e.preventDefault();
-        const token = await getToken();
-
+        const token = Cookies.get('auth');
         const itemPayload = {
             name: newItem.name,
             category: newItem.category,
@@ -81,12 +81,9 @@ export default function InventoryClient({ initialItems }) {
         if (!confirmDelete) return;
 
         try {
-            const token = await getToken();
+            const token = Cookies.get('auth');
             const itemId = items[index].itemID;
-
             await deleteItemById(itemId, token);
-
-            // Jika berhasil, hapus dari state lokal
             const updated = [...items];
             updated.splice(index, 1);
             setItems(updated);
@@ -109,13 +106,24 @@ export default function InventoryClient({ initialItems }) {
     const itemCategories = [...new Set(originalItems.map(item => item.category))];
 
     return (
-        <>
-            <div className="flex items-center justify-between mb-6">
-                <InventoryFilter categories={itemCategories} onChange={handleFilter} />
-                <InventoryActions onAdd={() => setShowModal(true)} />
-            </div>
+        <div className="space-y-8">
+
+            {/* Header2 Component for Inventory Actions */}
+            <Header2
+                title="Stock Operations"
+                description="Manage inventory for"
+                companyName={profile.company?.companyName || 'N/A'}
+                colorScheme="purple"
+                icon={
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                    </svg>
+                }
+                onAdd={() => setShowModal(true)}
+            />
+            {/* Alert Section */}
             {alert && (
-                <div className="mb-4">
+                <div className="mb-6">
                     <Alert
                         type={alert.type}
                         message={alert.message}
@@ -123,12 +131,44 @@ export default function InventoryClient({ initialItems }) {
                     />
                 </div>
             )}
-            <InventoryTable
-                items={items}
-                onDelete={handleDelete}
-                onEdit={handleEditItem}
-                itemsPerPage={5}
-            />
+
+            {/* Enhanced Inventory Management Section */}
+            <DataCard
+                title="Inventory Overview"
+                subtitle="Monitor stock levels, track items, and manage inventory operations efficiently"
+                icon={
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                }
+                gradient="bg-gradient-to-br from-white via-purple-50 to-indigo-100"
+            >
+                {/* Enhanced Filter Section */}
+                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <label className="text-sm font-semibold text-slate-700">Filter by Category:</label>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-white/30">
+                            <InventoryFilter categories={itemCategories} onChange={handleFilter} />
+                        </div>
+                    </div>
+                    <div className="text-sm text-slate-600 font-medium">
+                        Total Items: <span className="font-bold text-purple-600">{items.length}</span>
+                    </div>
+                </div>
+
+                {/* Inventory Table - Full width, no horizontal scroll */}
+                <div className="w-full">
+                    <InventoryTable
+                        items={items}
+                        onDelete={handleDelete}
+                        onEdit={handleEditItem}
+                        itemsPerPage={5}
+                    />
+                </div>
+            </DataCard>
+
+            {/* Inventory Modal */}
             <InventoryModal
                 isOpen={showModal}
                 onClose={() => {
@@ -141,6 +181,6 @@ export default function InventoryClient({ initialItems }) {
                 item={newItem}
                 onChange={(e) => setNewItem({ ...newItem, [e.target.name]: e.target.value })}
             />
-        </>
+        </div>
     );
 }

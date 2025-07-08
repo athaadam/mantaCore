@@ -1,18 +1,13 @@
 'use client';
 
-import { useState } from "react";
-import { formatDate } from "../utils/formatdate";
-import Pagination from "../utils/Pagination";
-import CustomerAction from "../action/CustomerAction";
-import CustomerModal from "../modal/CustomerModal";
+import React, { useState } from 'react';
+import CustomerAction from '@/components/action/CustomerAction';
+import Pagination from '@/components/utils/Pagination';
+import { formatDate } from '../utils/formatdate';
 
-const CustomerTable = ({ customers: initialCustomers = [], itemsPerPage = 5 }) => {
-    const [modalMode, setModalMode] = useState('add');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [customers, setCustomers] = useState(initialCustomers);
+
+const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) => {
     const [currentPage, setCurrentPage] = useState(1);
-
     const totalPages = Math.ceil(customers.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const visibleCustomers = customers.slice(startIndex, startIndex + itemsPerPage);
@@ -20,101 +15,85 @@ const CustomerTable = ({ customers: initialCustomers = [], itemsPerPage = 5 }) =
     const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
     const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-    const handleDeleteCustomer = (idToDelete) => {
-        const updatedCustomers = customers.filter(c => c.costumerID !== idToDelete);
-        const newTotalPages = Math.ceil(updatedCustomers.length / itemsPerPage);
-        const newCurrentPage = currentPage > newTotalPages ? newTotalPages : currentPage;
-        setCustomers(updatedCustomers);
-        setCurrentPage(newCurrentPage || 1);
-    };
-
-    const handleEditCustomer = (customer) => {
-        setModalMode('edit');
-        setSelectedCustomer(customer);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedCustomer(null);
-    };
-
-    const handleSubmitModal = (newData, mode) => {
-        if (mode === 'edit') {
-            setCustomers(customers.map((c) =>
-                c.costumerID === newData.costumerID ? newData : c
-            ));
-        } else {
-            setCustomers([newData, ...customers]);
-        }
-
-        setIsModalOpen(false);
-    };
-
     return (
         <>
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <div className="px-8 pt-8 pb-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 via-white to-indigo-50">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl">
+                            <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-purple-800 tracking-tight">
+                                Customer Records
+                            </h2>
+                            <p className="text-purple-600 text-sm mt-1">
+                                Manage and track customer relationships
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-6 pb-6">
+                    <table className="w-full table-auto">
                         <thead>
-                            <tr className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
-                                {['No', 'Name', 'Created At', 'Updated At', 'Action'].map((header) => (
-                                    <th
-                                        key={header}
-                                        className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider first:rounded-tl-xl last:rounded-tr-xl"
-                                    >
+                            <tr className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
+                                {['No', 'Customer Name', 'Created', 'Updated', 'Actions'].map((header) => (
+                                    <th key={header} className="px-4 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                                         {header}
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="bg-white/50 backdrop-blur-sm divide-y divide-purple-100">
                             {visibleCustomers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center">
-                                        <div className="flex flex-col items-center gap-3 text-slate-500">
-                                            <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                            </svg>
+                                    <td colSpan={5} className="px-6 py-16 text-center">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center">
+                                                <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
                                             <div>
-                                                <p className="text-lg font-medium text-slate-900">No customers found</p>
-                                                <p className="text-sm">Add your first customer to get started</p>
+                                                <p className="text-lg font-semibold text-slate-600 mb-2">No Customers Found</p>
+                                                <p className="text-sm text-slate-400">Add your first customer to get started with relationship management</p>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
                                 visibleCustomers.map((customer, idx) => (
-                                    <tr
-                                        key={customer.costumerID}
-                                        className="hover:bg-slate-50 transition-colors duration-150"
-                                    >
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-full text-sm font-medium text-slate-700">
+                                    <tr key={customer.costumerID} className="hover:bg-purple-50/70 transition-all duration-200 group">
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <div className="flex items-center justify-center w-7 h-7 bg-purple-100 rounded-full text-xs font-bold text-purple-700">
                                                 {startIndex + idx + 1}
                                             </div>
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                        <td className="px-4 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-violet-100 to-purple-100 rounded-full">
-                                                    <svg className="w-5 h-5 text-violet-600" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-4.418 0-8 2.239-8 5v1a1 1 0 001 1h14a1 1 0 001-1v-1c0-2.761-3.582-5-8-5z" />
+                                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl">
+                                                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                     </svg>
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-medium text-slate-900">{customer.username}</div>
-                                                    <div className="text-xs text-slate-500">Customer</div>
+                                                    <div className="text-sm font-bold text-slate-900">{customer.username}</div>
+                                                    <div className="text-xs text-purple-600 font-medium">Customer</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                        <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
                                             {formatDate(customer.created_at)}
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                        <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
                                             {formatDate(customer.updated_at)}
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                            <CustomerAction customer={customer} onDelete={handleDeleteCustomer} onUpdate={handleEditCustomer} />
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <CustomerAction customer={customer} onDelete={onDelete} onUpdate={onEdit} />
                                         </td>
                                     </tr>
                                 ))
@@ -125,21 +104,15 @@ const CustomerTable = ({ customers: initialCustomers = [], itemsPerPage = 5 }) =
             </div>
 
             {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPrev={handlePrev}
-                    onNext={handleNext}
-                />
+                <div className="mt-6">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPrev={handlePrev}
+                        onNext={handleNext}
+                    />
+                </div>
             )}
-            <CustomerModal
-                mode={modalMode}
-                customer={selectedCustomer}
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onSubmit={handleSubmitModal}
-            />
-
         </>
     );
 };

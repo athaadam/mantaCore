@@ -2,10 +2,12 @@ import Sidebar from "@/components/utils/Sidebar";
 
 export default function MainLayout({ children }) {
   return (
-    <main>
+    <main className="flex">
       <Sidebar />
-      <div className="ml-[240px] flex-1 px-6 py-8 bg-white min-h-screen overflow-y-auto">
-        {children}
+      <div className="flex-1 ml-[280px] min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="w-full h-full overflow-y-auto">
+          {children}
+        </div>
       </div>
     </main>
   );

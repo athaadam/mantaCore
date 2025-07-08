@@ -50,7 +50,7 @@ const CustomerModal = ({ mode = 'add', customer, isOpen, onClose, onSubmit }) =>
                         </svg>
                     </button>
                 </div>
-                
+
                 <div className="p-6">
                     <div>
                         <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
@@ -67,7 +67,7 @@ const CustomerModal = ({ mode = 'add', customer, isOpen, onClose, onSubmit }) =>
                         />
                     </div>
                 </div>
-                
+
                 <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50 rounded-b-2xl">
                     <button
                         onClick={onClose}
