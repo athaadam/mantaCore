@@ -1,91 +1,116 @@
 export default function InventoryForm({ item, onChange, onSubmit, onClose }) {
     return (
-        <form onSubmit={onSubmit} className="space-y-5">
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
-                <input
-                    name="name"
-                    value={item.name}
-                    onChange={onChange}
-                    placeholder="Item Name"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-                    required
-                />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <input
-                    name="category"
-                    value={item.category}
-                    onChange={onChange}
-                    placeholder="Category"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-                    required
-                />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <input
-                    name="type"
-                    value={item.type}
-                    onChange={onChange}
-                    placeholder="Type"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-                    required
-                />
-            </div>
-            <div className="flex gap-4">
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+        <form onSubmit={onSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                        Item Name
+                    </label>
                     <input
+                        id="name"
+                        name="name"
+                        value={item.name}
+                        onChange={onChange}
+                        placeholder="Enter item name"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                        Category
+                    </label>
+                    <input
+                        id="category"
+                        name="category"
+                        value={item.category}
+                        onChange={onChange}
+                        placeholder="Enter category"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label htmlFor="type" className="block text-sm font-medium text-slate-700 mb-2">
+                        Type
+                    </label>
+                    <input
+                        id="type"
+                        name="type"
+                        value={item.type}
+                        onChange={onChange}
+                        placeholder="Enter type"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label htmlFor="stock" className="block text-sm font-medium text-slate-700 mb-2">
+                        Stock Quantity
+                    </label>
+                    <input
+                        id="stock"
                         name="stock"
                         value={item.stock}
                         onChange={onChange}
-                        placeholder="Stock"
+                        placeholder="0"
                         type="number"
                         min="0"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
                         required
                     />
                 </div>
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                
+                <div>
+                    <label htmlFor="units" className="block text-sm font-medium text-slate-700 mb-2">
+                        Unit
+                    </label>
                     <input
+                        id="units"
                         name="units"
                         value={item.units}
                         onChange={onChange}
-                        placeholder="Unit"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                        placeholder="e.g., pcs, kg, liter"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
+                        required
+                    />
+                </div>
+                
+                <div className="sm:col-span-2">
+                    <label htmlFor="itemPrice" className="block text-sm font-medium text-slate-700 mb-2">
+                        Price (Rp)
+                    </label>
+                    <input
+                        id="itemPrice"
+                        name="itemPrice"
+                        value={item.itemPrice}
+                        onChange={onChange}
+                        placeholder="0"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
                         required
                     />
                 </div>
             </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                <input
-                    name="itemPrice"
-                    value={item.itemPrice}
-                    onChange={onChange}
-                    placeholder="Price"
-                    type="number"
-                    min="0"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-                    required
-                />
-            </div>
-            <div className="flex justify-end gap-3 pt-4">
+            
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-slate-200">
                 <button
                     type="button"
                     onClick={onClose}
-                    className="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                    className="w-full sm:w-auto px-6 py-3 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-all duration-200 order-2 sm:order-1"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="bg-purple-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                    className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-violet-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] order-1 sm:order-2"
                 >
-                    Submit
+                    Save Item
                 </button>
             </div>
         </form>

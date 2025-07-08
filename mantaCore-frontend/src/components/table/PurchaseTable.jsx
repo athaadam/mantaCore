@@ -22,7 +22,7 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                 {/* Header Card */}
                 <div className="px-6 pt-6 pb-3 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
                     <h3 className="text-lg font-semibold text-indigo-800 tracking-tight flex items-center gap-2">
-                        {isPurchase ? '📄 Purchase Records' : '🛒 Purchase Requests'}
+                        {isPurchase ? '📄 Purchase Records' : ''}
                     </h3>
                 </div>
 

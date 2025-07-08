@@ -14,10 +14,6 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
 
     return (
         <div className={`flex flex-col h-full bg-white ${mode === 'simple' ? 'p-8' : 'p-0'} rounded-2xl shadow-lg min-w-[340px]`}>
-            {mode === 'simple' && (
-                <h3 className="text-xl text-gray-800 font-semibold mb-4">Transaction History</h3>
-            )}
-
             <div className="overflow-x-auto rounded-xl border border-gray-100">
                 <table className="w-full border-collapse text-sm">
                     <thead>
@@ -30,7 +26,7 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                                 </>
                             )}
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Item</th>
-                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Costumer ID</th>
+                            <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Customer ID</th>
                             <th className="text-left py-3 px-4 border-b font-semibold text-gray-700">Amount</th>
                             {mode === 'detailed' && (
                                 <>
