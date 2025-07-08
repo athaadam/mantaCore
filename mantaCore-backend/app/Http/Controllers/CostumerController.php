@@ -11,7 +11,7 @@ class CostumerController extends Controller
     // ✅ GET: Semua costumer yang company id nya sama dengan user yang login
     public function getAllCostumers(Request $request): JsonResponse
     {
-        $user = $request->user();   
+        $user = $request->user();
         $costumers = Costumer::where('companyID', $user->companyID)->get();
         return response()->json($costumers);
     }
@@ -34,12 +34,13 @@ class CostumerController extends Controller
     {
         $validated = $request->validate([
             'username' => 'required|string|max:255|unique:costumers,username',
+            'companyID' => 'required|integer|exists:companies,companyID',
         ]);
 
         $costumer = Costumer::create($validated);
 
         return response()->json([
-            'message'  => 'Costumer created successfully',
+            'message' => 'Costumer created successfully',
             'costumer' => $costumer,
         ], 201);
     }
@@ -59,7 +60,7 @@ class CostumerController extends Controller
         $costumer->update($validated);
 
         return response()->json([
-            'message'  => 'Costumer updated successfully',
+            'message' => 'Costumer updated successfully',
             'costumer' => $costumer,
         ]);
     }
