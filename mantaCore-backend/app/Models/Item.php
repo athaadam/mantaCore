@@ -10,8 +10,11 @@ class Item extends Model
     use HasFactory;
 
     protected $primaryKey = 'itemID';
+    public $incrementing = false; // <- WAJIB untuk string primary key
+    protected $keyType = 'string'; // <- WAJIB untuk string primary key
 
     protected $fillable = [
+        'itemID',
         'companyID',
         'name',
         'itemPrice',

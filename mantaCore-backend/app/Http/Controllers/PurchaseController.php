@@ -52,24 +52,28 @@ class PurchaseController extends Controller
         try {
             $purchase = DB::transaction(function () use ($validated) {
 
-                /* header */
+                // 🧠 Generate custom ID seperti PR-MANMAN-001
+                $purchaseID = $this->generatePurchaseID($validated['companyID']);
+
+                /* ── simpan header ── */
                 $purchase = Purchase::create([
-                    'userID'    => $validated['userID'],
-                    'companyID' => $validated['companyID'],
-                    'status'    => 'pending',
-                    'date'      => $validated['date'],
-                    'amount'    => $validated['amount'],
+                    'purchaseID' => $purchaseID,
+                    'userID'     => $validated['userID'],
+                    'companyID'  => $validated['companyID'],
+                    'status'     => 'pending',
+                    'date'       => $validated['date'],
+                    'amount'     => $validated['amount'],
                 ]);
 
-                /* detail & optional stok */
+                /* ── simpan tiap item ── */
                 foreach ($validated['items'] as $row) {
                     PurchaseItem::create([
-                        'purchaseID'=> $purchase->purchaseID,
-                        'itemID'    => $row['itemID'],
-                        'quantity'  => $row['quantity'],
-                        'unitPrice' => $row['unitPrice'],
-                        'subTotal'  => $row['subTotal'],
-                        'type'      => $row['type'] ?? null,
+                        'purchaseID' => $purchase->purchaseID,
+                        'itemID'     => $row['itemID'],
+                        'quantity'   => $row['quantity'],
+                        'unitPrice'  => $row['unitPrice'],
+                        'subTotal'   => $row['subTotal'],
+                        'type'       => $row['type'] ?? null,
                     ]);
                 }
 
@@ -89,8 +93,26 @@ class PurchaseController extends Controller
         }
     }
 
+    private function generatePurchaseID(string $companyID): string
+    {
+        $company = \App\Models\Company::find($companyID);
+
+        if (!$company || !$company->companyCode) {
+            throw new \Exception('Company code is required to generate Purchase ID.');
+        }
+
+        $prefix = 'PR-' . strtoupper($company->companyCode) . '-';
+
+        $count = \App\Models\Purchase::where('companyID', $companyID)
+            ->where('purchaseID', 'like', $prefix . '%')
+            ->count() + 1;
+
+        return $prefix . str_pad($count, 3, '0', STR_PAD_LEFT);
+    }
+
+
     /* ───── UPDATE ───── */
-    public function updatePurchase(Request $request, int $id): JsonResponse
+    public function updatePurchase(Request $request, string $id): JsonResponse
     {
         $purchase = Purchase::with('items')->find($id);
         if (!$purchase) {
@@ -105,6 +127,7 @@ class PurchaseController extends Controller
             'items.*.itemID'      => 'required_with:items|exists:items,itemID',
             'items.*.quantity'    => 'required_with:items|integer|min:1',
             'items.*.unitPrice'   => 'required_with:items|numeric|min:0',
+            'items.*.subTotal'    => 'required_with:items|numeric|min:0',
             'items.*.type'        => 'nullable|string|max:255',
         ]);
 
@@ -114,46 +137,50 @@ class PurchaseController extends Controller
                 $oldStatus = strtolower($purchase->status);
                 $newStatus = strtolower($data['status'] ?? $oldStatus);
 
-                /* -------- kembalikan stok lama kalau sebelumnya accepted -------- */
+                // 1. 🧼 Kembalikan stok lama jika status sebelumnya accepted
                 if ($oldStatus === 'accepted') {
-                    foreach ($purchase->items as $d) {
-                        Item::lockForUpdate()->find($d->itemID)
-                            ->decrement('stock', $d->quantity);
+                    foreach ($purchase->items as $oldItem) {
+                        if (isset($oldItem->type) && strtolower($oldItem->type) !== 'sales') {
+                            Item::lockForUpdate()->find($oldItem->itemID)
+                                ->decrement('stock', $oldItem->quantity);
+                        }
                     }
                 }
 
-                /* -------- update header -------- */
+                // 2. 🔄 Update data utama (status, tanggal, jumlah)
                 $purchase->update([
                     'status' => $newStatus,
                     'date'   => $data['date']   ?? $purchase->date,
                     'amount' => $data['amount'] ?? $purchase->amount,
                 ]);
 
-                /* -------- ganti detail bila dikirim -------- */
+                // 3. 🔁 Ganti semua item jika dikirim ulang
                 if (isset($data['items'])) {
                     PurchaseItem::where('purchaseID', $purchase->purchaseID)->delete();
 
                     foreach ($data['items'] as $row) {
                         PurchaseItem::create([
-                            'purchaseID'=> $purchase->purchaseID,
-                            'itemID'    => $row['itemID'],
-                            'quantity'  => $row['quantity'],
-                            'unitPrice' => $row['unitPrice'],
-                            'subTotal'  => $row['quantity'] * $row['unitPrice'],
-                            'type'      => $row['type'] ?? null,
+                            'purchaseID' => $purchase->purchaseID,
+                            'itemID'     => $row['itemID'],
+                            'quantity'   => $row['quantity'],
+                            'unitPrice'  => $row['unitPrice'],
+                            'subTotal'   => $row['subTotal'],
+                            'type'       => $row['type'] ?? null,
                         ]);
                     }
-                    // refresh relation
+
+                    // Refresh items relasi
                     $purchase->load('items');
                 }
 
-                /* -------- tambahkan stok baru jika status setelah update accepted -------- */
+                // 4. ➕ Tambahkan stok baru jika status sekarang accepted
                 if ($newStatus === 'accepted') {
-                    foreach ($purchase->items as $d) {
-                        if (isset($d->type) && strtolower($d->type) === 'sales') {
-                            Item::lockForUpdate()->find($d->itemID)
-                                ->increment('stock', $d->quantity);
+                    foreach ($purchase->items as $newItem) {
+                        if (isset($newItem->type) && strtolower($newItem->type) === 'sales') {
+                            Item::lockForUpdate()->find($newItem->itemID)
+                                ->increment('stock', $newItem->quantity);
                         }
+
                     }
                 }
 
@@ -161,7 +188,7 @@ class PurchaseController extends Controller
             });
 
             return response()->json([
-                'message'  => 'Purchase updated',
+                'message'  => 'Purchase updated successfully',
                 'purchase' => $result,
             ]);
 
@@ -173,8 +200,9 @@ class PurchaseController extends Controller
         }
     }
 
+
     /* ───── DELETE ───── */
-    public function deletePurchase(int $id): JsonResponse
+    public function deletePurchase(string $id): JsonResponse
     {
         $purchase = Purchase::with('items')->find($id);
         if (!$purchase) {

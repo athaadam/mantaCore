@@ -8,7 +8,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('purchase_items', function (Blueprint $table) {
             $table->id('purchaseItemID');
-            $table->foreignId('purchaseID')->constrained('purchases', 'purchaseID')->cascadeOnDelete();
+            $table->string('purchaseID'); // karena PK purchaseID adalah string
+            $table->foreign('purchaseID')->references('purchaseID')->on('purchases')->cascadeOnDelete();
             $table->foreignId('itemID')->constrained('items', 'itemID')->cascadeOnDelete();
             $table->string('type');
             $table->integer('quantity');

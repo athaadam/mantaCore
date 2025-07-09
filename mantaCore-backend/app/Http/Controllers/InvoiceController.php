@@ -53,7 +53,7 @@ class InvoiceController extends Controller
             'companyID'    => 'required|exists:companies,companyID',
             'costumerID'   => 'required|exists:costumers,costumerID',
             'date'         => 'required|date',
-            'amount'       => 'required|numeric',
+            'amount'       => 'required|numeric|min:0',
             'items'                  => 'required|array|min:1',
             'items.*.itemID'         => 'required|exists:items,itemID',
             'items.*.type'           => 'nullable|string|max:255',
@@ -65,8 +65,10 @@ class InvoiceController extends Controller
         try {
             DB::beginTransaction();
 
-            /* ― buat invoice utama ― */
+            $invoiceID = $this->generateInvoiceID($validated['companyID']);
+
             $invoice = Invoice::create([
+                'invoiceID'  => $invoiceID,
                 'userID'     => $validated['userID'],
                 'companyID'  => $validated['companyID'],
                 'costumerID' => $validated['costumerID'],
@@ -74,9 +76,8 @@ class InvoiceController extends Controller
                 'amount'     => $validated['amount'],
             ]);
 
-            /* ― proses tiap item ― */
             foreach ($validated['items'] as $row) {
-                $itm = Item::lockForUpdate()->find($row['itemID']);   // lock dulu
+                $itm = Item::lockForUpdate()->find($row['itemID']);
 
                 if ($itm->stock < $row['quantity']) {
                     DB::rollBack();
@@ -85,11 +86,10 @@ class InvoiceController extends Controller
                     ], 422);
                 }
 
-                /* kurangi stok & simpan detail */
                 $itm->decrement('stock', $row['quantity']);
 
                 InvoiceItem::create([
-                    'invoiceID' => $invoice->invoiceID,
+                    'invoiceID' => $invoiceID,
                     'itemID'    => $row['itemID'],
                     'type'      => $row['type']      ?? null,
                     'quantity'  => $row['quantity'],
@@ -102,7 +102,7 @@ class InvoiceController extends Controller
 
             return response()->json([
                 'message' => 'Invoice and items created successfully',
-                'invoice' => $invoice->load('items'),
+                'invoice' => $invoice->load('items.item'),
             ], 201);
 
         } catch (\Throwable $e) {
@@ -114,8 +114,27 @@ class InvoiceController extends Controller
         }
     }
 
+
+    private function generateInvoiceID(string $companyID): string
+    {
+        $company = \App\Models\Company::find($companyID);
+
+        if (!$company || !$company->companyCode) {
+            throw new \Exception('Company code is required to generate Invoice ID.');
+        }
+
+        $prefix = 'INV-' . strtoupper($company->companyCode) . '-';
+
+        $count = \App\Models\Invoice::where('companyID', $companyID)
+            ->where('invoiceID', 'like', $prefix . '%')
+            ->count() + 1;
+
+        return $prefix . str_pad($count, 3, '0', STR_PAD_LEFT);
+    }
+
+
     /* ───── UPDATE ───── */
-    public function updateInvoice(Request $request, int $id): JsonResponse
+    public function updateInvoice(Request $request, string $id): JsonResponse
     {
         $invoice = Invoice::find($id);
         if (!$invoice) {
@@ -199,7 +218,7 @@ class InvoiceController extends Controller
     }
 
     /* ───── DELETE ───── */
-    public function deleteInvoice(int $id): JsonResponse
+    public function deleteInvoice(string $id): JsonResponse
     {
         $invoice = Invoice::with('items')->find($id);
         if (!$invoice) {
