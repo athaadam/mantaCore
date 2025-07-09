@@ -88,10 +88,11 @@ class MantaSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+            $itemType = DB::table('items')->where('itemID', $itemID)->value('type');
             DB::table('invoice_items')->insert([
                 'invoiceID' => $invoiceID,
                 'itemID' => $itemID,
-                'type' => 'sell',
+                'type' => $itemType,
                 'quantity' => $quantity,
                 'unitPrice' => $price,
                 'subTotal' => $subtotal,
@@ -113,7 +114,7 @@ class MantaSeeder extends Seeder
             DB::table('purchase_items')->insert([
                 'purchaseID' => $purchaseID,
                 'itemID' => $itemID,
-                'type' => 'buy',
+                'type' => $itemType,
                 'quantity' => $quantity,
                 'unitPrice' => $price,
                 'subTotal' => $subtotal,
