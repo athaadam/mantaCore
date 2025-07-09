@@ -210,7 +210,7 @@ const PurchaseFilter = ({
                                     <option value="">All Companies</option>
                                     {companies.map(company => (
                                         <option key={company.companyID} value={company.companyID}>
-                                            {company.name}
+                                            {company.companyName || company.name}
                                         </option>
                                     ))}
                                 </select>

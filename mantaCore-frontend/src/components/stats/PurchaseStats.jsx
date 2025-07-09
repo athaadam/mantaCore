@@ -1,5 +1,7 @@
 'use client';
 
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+
 // Simple SVG icons to replace @heroicons/react/24/outline
 const ShoppingCartIcon = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,7 +55,7 @@ const PurchaseStats = ({ stats, loading = false }) => {
     if (loading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {[...Array(4)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                     <div key={i} className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div className="animate-pulse">
                             <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
@@ -98,6 +100,16 @@ const PurchaseStats = ({ stats, loading = false }) => {
             changeType: 'increase'
         },
         {
+            title: 'Rejected',
+            value: stats?.rejected || 0,
+            icon: XCircleIcon,
+            color: 'from-red-500 to-rose-600',
+            textColor: 'text-red-600',
+            bgColor: 'bg-red-50',
+            change: stats?.rejectedChange || 0,
+            changeType: 'decrease'
+        },
+        {
             title: 'Total Value',
             value: stats?.totalValue || 0,
             icon: CurrencyDollarIcon,
@@ -112,12 +124,7 @@ const PurchaseStats = ({ stats, loading = false }) => {
 
     const formatValue = (value, isAmount = false) => {
         if (isAmount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(value);
+            return formatRupiah(value);
         }
         return new Intl.NumberFormat('en-US').format(value);
     };
@@ -139,7 +146,7 @@ const PurchaseStats = ({ stats, loading = false }) => {
 
     return (
         <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {statCards.map((card, index) => (
                     <div
                         key={index}

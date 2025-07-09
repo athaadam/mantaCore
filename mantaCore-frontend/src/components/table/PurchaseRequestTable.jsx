@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+import { getStatusColor } from '@/libs/utils/colors/statuscolor';
 
 // Simple SVG icons to replace @heroicons/react/24/outline
 const PencilIcon = ({ className }) => (
@@ -46,11 +48,11 @@ const BuildingOfficeIcon = ({ className }) => (
     </svg>
 );
 
-const PurchaseRequestTable = ({ 
-    purchases = [], 
-    loading = false, 
-    currentPage = 1, 
-    totalPages = 1, 
+const PurchaseRequestTable = ({
+    purchases = [],
+    loading = false,
+    currentPage = 1,
+    totalPages = 1,
     onPageChange,
     onEdit,
     onView,
@@ -72,20 +74,20 @@ const PurchaseRequestTable = ({
         return sortDirection === 'asc' ? '↑' : '↓';
     };
 
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'approved':
-                return 'bg-green-100 text-green-800 border-green-200';
-            case 'rejected':
-                return 'bg-red-100 text-red-800 border-red-200';
-            case 'processing':
-                return 'bg-blue-100 text-blue-800 border-blue-200';
-            default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
-        }
-    };
+    // const getStatusColor = (status) => {
+    //     switch (status?.toLowerCase()) {
+    //         case 'pending':
+    //             return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    //         case 'approved':
+    //             return 'bg-green-100 text-green-800 border-green-200';
+    //         case 'rejected':
+    //             return 'bg-red-100 text-red-800 border-red-200';
+    //         case 'processing':
+    //             return 'bg-blue-100 text-blue-800 border-blue-200';
+    //         default:
+    //             return 'bg-gray-100 text-gray-800 border-gray-200';
+    //     }
+    // };
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -96,35 +98,27 @@ const PurchaseRequestTable = ({
         });
     };
 
-    const formatCurrency = (amount) => {
-        if (!amount) return '$0.00';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    };
-
     const sortedPurchases = useMemo(() => {
         // Ensure purchases is an array
         if (!Array.isArray(purchases)) {
             console.log('Purchases is not an array:', purchases);
             return [];
         }
-        
+
         // If no sortField is specified, return original array
         if (!sortField) {
             return [...purchases];
         }
-        
+
         return [...purchases].sort((a, b) => {
             let aValue = a[sortField];
             let bValue = b[sortField];
-            
+
             if (sortField === 'date') {
                 aValue = new Date(aValue);
                 bValue = new Date(bValue);
             }
-            
+
             if (sortDirection === 'asc') {
                 return aValue > bValue ? 1 : -1;
             } else {
@@ -181,7 +175,7 @@ const PurchaseRequestTable = ({
                         {isFiltered ? 'No purchase requests match your filters' : 'No purchase requests yet'}
                     </h3>
                     <p className="text-gray-500 mb-6">
-                        {isFiltered 
+                        {isFiltered
                             ? 'Try adjusting your search criteria or clearing filters to see more results.'
                             : 'Get started by creating your first purchase request.'
                         }
@@ -299,7 +293,7 @@ const PurchaseRequestTable = ({
                                         <BuildingOfficeIcon className="h-5 w-5 text-gray-400 mr-2" />
                                         <div>
                                             <div className="text-sm font-medium text-gray-900">
-                                                {purchase.company?.name || 'Unknown Company'}
+                                                {purchase.company?.companyName || purchase.company?.name || 'Unknown Company'}
                                             </div>
                                             <div className="text-sm text-gray-500">
                                                 {purchase.company?.email || 'No email'}
@@ -321,8 +315,8 @@ const PurchaseRequestTable = ({
                                             <div className="space-y-1">
                                                 {purchase.items.slice(0, 2).map((item, idx) => (
                                                     <div key={idx} className="text-sm">
-                                                        <span className="font-medium">{item.quantity}x</span>{' '}
-                                                        <span className="text-gray-700">{item.item?.name}</span>
+                                                        <span className="font-medium">{item.quantity || 1}x</span>{' '}
+                                                        <span className="text-gray-700">{item.item?.name || item.name || 'Unknown Item'}</span>
                                                     </div>
                                                 ))}
                                                 {purchase.items.length > 2 && (
@@ -338,14 +332,13 @@ const PurchaseRequestTable = ({
                                 </td>
                                 <td className="px-6 py-5 whitespace-nowrap">
                                     <div className="flex items-center">
-                                        <CurrencyDollarIcon className="h-5 w-5 text-gray-400 mr-2" />
                                         <div className="text-sm font-medium text-gray-900">
-                                            {formatCurrency(purchase.amount)}
+                                            {formatRupiah(purchase.amount)}
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-5 whitespace-nowrap">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(purchase.status)}`}>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getStatusColor(purchase.status)}`}>
                                         {purchase.status || 'Unknown'}
                                     </span>
                                 </td>
@@ -427,16 +420,15 @@ const PurchaseRequestTable = ({
                                     } else {
                                         pageNum = currentPage - 2 + i;
                                     }
-                                    
+
                                     return (
                                         <button
                                             key={pageNum}
                                             onClick={() => onPageChange(pageNum)}
-                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                                pageNum === currentPage
+                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pageNum === currentPage
                                                     ? 'z-10 bg-purple-50 border-purple-500 text-purple-600'
                                                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                            }`}
+                                                }`}
                                         >
                                             {pageNum}
                                         </button>

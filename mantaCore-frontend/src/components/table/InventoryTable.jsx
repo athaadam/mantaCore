@@ -26,14 +26,14 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
           <Alert message={Alert.message} type={Alert.type} />
         </div>
       )}
-      
+
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl transition-all duration-300">
         <div className="px-8 pt-8 pb-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 via-white to-indigo-50">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                      d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7" />
               </svg>
             </div>
             <div>
@@ -46,7 +46,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
             </div>
           </div>
         </div>
-        
+
         <div className="px-6 pb-6">
           <table className="w-full table-auto">
             <thead>
@@ -93,13 +93,12 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold shadow-lg ${
-                          item.stock > 10 
-                            ? 'bg-green-100 text-green-800' 
-                            : item.stock > 0 
-                            ? 'bg-yellow-100 text-yellow-800' 
+                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold shadow-lg ${item.stock > 10
+                          ? 'bg-green-100 text-green-800'
+                          : item.stock > 0
+                            ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
-                        }`}>
+                          }`}>
                           {item.stock}
                         </span>
                       </div>
@@ -122,7 +121,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
                         </button>
                         <button
                           onClick={() => {
-                              onDelete(startIdx + idx);
+                            onDelete(startIdx + idx);
                           }}
                           className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-xs"
                         >
@@ -156,7 +155,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
           </table>
         </div>
       </div>
-      
+
       {totalPages > 1 && (
         <Pagination
           currentPage={currentPage}

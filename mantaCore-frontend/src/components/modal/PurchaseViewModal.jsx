@@ -1,5 +1,7 @@
 'use client';
 
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+
 // Simple SVG icons to replace @heroicons/react/24/outline
 const XMarkIcon = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,26 +84,15 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
         });
     };
 
-    const formatCurrency = (amount) => {
-        if (!amount) return '$0.00';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
-    };
-
     const calculateItemTotal = (quantity, unitPrice) => {
         return quantity * unitPrice;
     };
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-sm" onClick={onClose}></div>
-
-                <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-200 transform transition-all duration-200 scale-100 z-10 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
                         <div className="flex items-center space-x-3">
                             <div className="p-2 bg-purple-100 rounded-lg">
                                 <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
@@ -121,181 +112,180 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                         >
                             <XMarkIcon className="w-5 h-5" />
                         </button>
-                    </div>
+                </div>
 
-                    {/* Content */}
-                    <div className="p-6">
-                        {/* Basic Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div className="bg-gray-50 rounded-lg p-4">
-                                <div className="flex items-center space-x-2 mb-3">
-                                    <BuildingOfficeIcon className="w-5 h-5 text-gray-500" />
-                                    <h4 className="font-medium text-gray-900">Company Information</h4>
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="text-sm">
-                                        <span className="font-medium">Name:</span> {purchase.company?.name || 'N/A'}
-                                    </p>
-                                    <p className="text-sm">
-                                        <span className="font-medium">Email:</span> {purchase.company?.email || 'N/A'}
-                                    </p>
-                                    <p className="text-sm">
-                                        <span className="font-medium">Phone:</span> {purchase.company?.phone || 'N/A'}
-                                    </p>
-                                </div>
+                {/* Content */}
+                <div className="p-6">
+                    {/* Basic Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center space-x-2 mb-3">
+                                <BuildingOfficeIcon className="w-5 h-5 text-gray-500" />
+                                <h4 className="font-medium text-gray-900">Company Information</h4>
                             </div>
-
-                            <div className="bg-gray-50 rounded-lg p-4">
-                                <div className="flex items-center space-x-2 mb-3">
-                                    <InformationCircleIcon className="w-5 h-5 text-gray-500" />
-                                    <h4 className="font-medium text-gray-900">Request Details</h4>
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="text-sm">
-                                        <span className="font-medium">Date:</span> {formatDate(purchase.date)}
-                                    </p>
-                                    <p className="text-sm">
-                                        <span className="font-medium">Requested by:</span> {purchase.user?.name || 'N/A'}
-                                    </p>
-                                    <p className="text-sm">
-                                        <span className="font-medium">Status:</span>
-                                        <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(purchase.status)}`}>
-                                            {purchase.status || 'Unknown'}
-                                        </span>
-                                    </p>
-                                </div>
+                            <div className="space-y-2">
+                                <p className="text-sm">
+                                    <span className="font-medium">Name:</span> {purchase.company?.companyName || purchase.company?.name || 'N/A'}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium">Email:</span> {purchase.company?.email || 'N/A'}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium">Phone:</span> {purchase.company?.phone || 'N/A'}
+                                </p>
                             </div>
                         </div>
 
-                        {/* Items Table */}
-                        <div className="mb-8">
-                            <div className="flex items-center space-x-2 mb-4">
-                                <ClipboardDocumentListIcon className="w-5 h-5 text-gray-500" />
-                                <h4 className="font-medium text-gray-900">Purchase Items</h4>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center space-x-2 mb-3">
+                                <InformationCircleIcon className="w-5 h-5 text-gray-500" />
+                                <h4 className="font-medium text-gray-900">Request Details</h4>
                             </div>
-                            
-                            <div className="overflow-x-auto">
-                                <table className="w-full border border-gray-200 rounded-lg">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Item
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Category
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Quantity
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Unit Price
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Total
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {purchase.items && purchase.items.length > 0 ? (
-                                            purchase.items.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td className="px-4 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {item.item?.name || 'Unknown Item'}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">
-                                                            {item.item?.category || 'N/A'}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">
-                                                            {item.quantity}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">
-                                                            {formatCurrency(item.unitPrice)}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {formatCurrency(calculateItemTotal(item.quantity, item.unitPrice))}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
-                                                    No items found
+                            <div className="space-y-2">
+                                <p className="text-sm">
+                                    <span className="font-medium">Date:</span> {formatDate(purchase.date)}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium">Requested by:</span> {purchase.user?.name || 'N/A'}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium">Status:</span>
+                                    <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(purchase.status)}`}>
+                                        {purchase.status || 'Unknown'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Items Table */}
+                    <div className="mb-8">
+                        <div className="flex items-center space-x-2 mb-4">
+                            <ClipboardDocumentListIcon className="w-5 h-5 text-gray-500" />
+                            <h4 className="font-medium text-gray-900">Purchase Items</h4>
+                        </div>
+                        
+                        <div className="overflow-x-auto">
+                            <table className="w-full border border-gray-200 rounded-lg">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Item
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Category
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Quantity
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Unit Price
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {purchase.items && purchase.items.length > 0 ? (
+                                        purchase.items.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {item.item?.name || item.name || 'Unknown Item'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {item.item?.category || item.category || 'N/A'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {item.quantity}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {formatRupiah(item.unitPrice)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {formatRupiah(calculateItemTotal(item.quantity, item.unitPrice))}
+                                                    </div>
                                                 </td>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                                                No items found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Total Summary */}
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <CurrencyDollarIcon className="w-6 h-6 text-purple-600" />
+                                <h4 className="text-lg font-medium text-gray-900">Total Amount</h4>
+                            </div>
+                            <div className="text-2xl font-bold text-purple-600">
+                                {formatRupiah(purchase.amount)}
                             </div>
                         </div>
-
-                        {/* Total Summary */}
-                        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                    <CurrencyDollarIcon className="w-6 h-6 text-purple-600" />
-                                    <h4 className="text-lg font-medium text-gray-900">Total Amount</h4>
-                                </div>
-                                <div className="text-2xl font-bold text-purple-600">
-                                    {formatCurrency(purchase.amount)}
-                                </div>
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span className="font-medium text-gray-700">Items Count:</span>
+                                <span className="ml-2 text-gray-900">
+                                    {purchase.items?.length || 0}
+                                </span>
                             </div>
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                <div>
-                                    <span className="font-medium text-gray-700">Items Count:</span>
-                                    <span className="ml-2 text-gray-900">
-                                        {purchase.items?.length || 0}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="font-medium text-gray-700">Total Quantity:</span>
-                                    <span className="ml-2 text-gray-900">
-                                        {purchase.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="font-medium text-gray-700">Average Price:</span>
-                                    <span className="ml-2 text-gray-900">
-                                        {purchase.items?.length > 0 
-                                            ? formatCurrency(purchase.amount / purchase.items.length) 
-                                            : '$0.00'
-                                        }
-                                    </span>
-                                </div>
+                            <div>
+                                <span className="font-medium text-gray-700">Total Quantity:</span>
+                                <span className="ml-2 text-gray-900">
+                                    {purchase.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+                                </span>
                             </div>
-                        </div>
-
-                        {/* Timestamps */}
-                        <div className="mt-6 pt-6 border-t border-gray-200">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
-                                <div>
-                                    <span className="font-medium">Created:</span> {formatDate(purchase.created_at)}
-                                </div>
-                                <div>
-                                    <span className="font-medium">Last Updated:</span> {formatDate(purchase.updated_at)}
-                                </div>
+                            <div>
+                                <span className="font-medium text-gray-700">Average Price:</span>
+                                <span className="ml-2 text-gray-900">
+                                    {purchase.items?.length > 0 
+                                        ? formatRupiah(purchase.amount / purchase.items.length) 
+                                        : formatRupiah(0)
+                                    }
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                            Close
-                        </button>
+                    {/* Timestamps */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
+                            <div>
+                                <span className="font-medium">Created:</span> {formatDate(purchase.created_at)}
+                            </div>
+                            <div>
+                                <span className="font-medium">Last Updated:</span> {formatDate(purchase.updated_at)}
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

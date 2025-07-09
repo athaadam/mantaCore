@@ -9,8 +9,18 @@ import InvoiceModal from "@/components/modal/InvoiceModal"
 import InvoiceViewModal from "@/components/modal/InvoiceViewModal"
 import ConfirmationModal from "@/components/modal/ConfirmationModal"
 import { useState, useMemo } from "react"
+import { apiHit } from "@/libs/api/fetch";
+import Cookies from "js-cookie";
 
 const Page = () => {
+    const fetchData = async () => {
+        const res = await apiHit('getAllInvoices', Cookies.get('auth'));
+        return res
+    }
+    const response = fetchData();
+    console.log(response);
+
+
     // Sample invoice data - replace with your actual data fetching logic
     const [invoices, setInvoices] = useState([
         {

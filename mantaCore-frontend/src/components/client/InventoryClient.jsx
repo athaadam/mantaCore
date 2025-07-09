@@ -148,7 +148,7 @@ export default function InventoryClient({ initialItems, profile }) {
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="flex items-center gap-4">
                         <label className="text-sm font-semibold text-slate-700">Filter by Category:</label>
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-white/30">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-white/30 relative">
                             <InventoryFilter categories={itemCategories} onChange={handleFilter} />
                         </div>
                     </div>

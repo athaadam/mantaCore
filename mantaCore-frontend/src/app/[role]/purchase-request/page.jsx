@@ -9,7 +9,10 @@ import PurchaseRequestTable from "@/components/table/PurchaseRequestTable";
 import PurchaseModal from "@/components/modal/PurchaseModal";
 import PurchaseViewModal from "@/components/modal/PurchaseViewModal";
 import ConfirmationModal from "@/components/modal/ConfirmationModal";
+import Alert from "@/components/common/Alert";
 import { usePagination } from "@/hooks/usePagination";
+import { apiHit } from '@/libs/api/fetch';
+import Cookies from 'js-cookie';
 
 const Page = () => {
     const [purchases, setPurchases] = useState([]);
@@ -19,14 +22,18 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [filterLoading, setFilterLoading] = useState(false);
     const [stats, setStats] = useState({});
-    
+
+    // User info states
+    const [userInfo, setUserInfo] = useState(null);
+    const [userInfoLoading, setUserInfoLoading] = useState(true);
+
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
-    
+
     // Filter states
     const [filters, setFilters] = useState({
         search: '',
@@ -38,10 +45,21 @@ const Page = () => {
         amountMax: ''
     });
     const [hasActiveFilters, setHasActiveFilters] = useState(false);
-    
+
     // Sorting states
     const [sortField, setSortField] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
+
+    // Alert states
+    const [alert, setAlert] = useState(null);
+
+    const showAlert = (message, type = 'info') => {
+        setAlert({ message, type });
+    };
+
+    const hideAlert = () => {
+        setAlert(null);
+    };
 
     const handleSort = (field) => {
         if (sortField === field) {
@@ -58,161 +76,187 @@ const Page = () => {
         filteredPurchases,
         itemsPerPage
     );
-    
+
     // Safe access to paginated data
     const paginatedData = visibleItems || [];
 
-    // Mock data - Replace with actual API calls
+    // Helper function to calculate total amount from items
+    const calculateTotalAmount = (data) => {
+        if (!data.purchaseItems || data.purchaseItems.length === 0) return 0;
+        return data.purchaseItems.reduce((total, item) => {
+            return total + (parseFloat(item.quantity || 0) * parseFloat(item.unitPrice || 0));
+        }, 0);
+    };
+
+    // Helper function to get current user ID
+    const getCurrentUserID = () => {
+        // First check if userInfo is available in state
+        if (userInfo && userInfo.userID) {
+            return parseInt(userInfo.userID);
+        }
+
+        // Fallback to localStorage
+        try {
+            const storedUserID = localStorage.getItem('userID');
+            if (storedUserID) {
+                return parseInt(storedUserID);
+            }
+
+            // Try from stored userInfo object
+            const storedUserInfo = localStorage.getItem('userInfo');
+            if (storedUserInfo) {
+                const parsed = JSON.parse(storedUserInfo);
+                return parseInt(parsed.userID);
+            }
+        } catch (error) {
+            console.error('Error getting user ID:', error);
+        }
+
+        return null;
+    };
+
+    // API calls - Fetch all required data
     useEffect(() => {
-        fetchPurchases();
-        fetchCompanies();
-        fetchItems();
+        const initializeData = async () => {
+            // Fetch user info first
+            await fetchUserInfo();
+            // Then fetch other data
+            fetchPurchases();
+            fetchItems();
+            fetchCompanies();
+        };
+
+        initializeData();
     }, []);
+
+    const fetchUserInfo = async () => {
+        try {
+            setUserInfoLoading(true);
+            const token = Cookies.get('auth');
+            if (token) {
+                const userResponse = await apiHit('user', token);
+                console.log('=== USER INFO DEBUG ===');
+                console.log('User info response:', userResponse);
+
+                if (userResponse && userResponse.user) {
+                    // Store user info in state
+                    setUserInfo(userResponse.user);
+
+                    // Store user info in localStorage for easy access
+                    localStorage.setItem('userID', userResponse.user.userID);
+                    localStorage.setItem('companyID', userResponse.user.companyID);
+                    localStorage.setItem('userName', userResponse.user.username);
+                    localStorage.setItem('userEmail', userResponse.user.email);
+                    localStorage.setItem('userInfo', JSON.stringify(userResponse.user));
+
+                    console.log('User info stored:', {
+                        userID: userResponse.user.userID,
+                        companyID: userResponse.user.companyID,
+                        username: userResponse.user.username,
+                        email: userResponse.user.email
+                    });
+                } else {
+                    console.warn('No user data received');
+                    setUserInfo(null);
+                }
+            } else {
+                console.warn('No auth token found');
+                setUserInfo(null);
+            }
+        } catch (error) {
+            console.error('Error fetching user info:', error);
+            showAlert('Could not load user information. Some features may not work properly.', 'warning');
+            setUserInfo(null);
+        } finally {
+            setUserInfoLoading(false);
+        }
+    };
 
     const fetchPurchases = async () => {
         setLoading(true);
         try {
-            // Mock API call with more data
-            const mockPurchases = [
-                {
-                    purchaseID: 1,
-                    userID: 1,
-                    companyID: 1,
-                    status: 'pending',
-                    date: '2025-07-05',
-                    amount: 1500.00,
-                    user: { name: 'John Doe' },
-                    company: { name: 'ABC Corp', email: 'contact@abc.com' },
-                    items: [
-                        {
-                            itemID: 1,
-                            quantity: 2,
-                            unitPrice: 250.00,
-                            item: { name: 'Laptop', category: 'Electronics' }
+            const token = Cookies.get('auth');
+            const response = await apiHit('getAllPurchases', token);
+
+            console.log('=== RAW API RESPONSE ===');
+            console.log('Full response:', response);
+            console.log('Response type:', typeof response);
+            console.log('Is response array?', Array.isArray(response));
+
+            // Response is directly an array, not response.data
+            if (response && Array.isArray(response)) {
+                console.log('First item in response:', response[0]);
+
+                // Map API response to component structure
+                const purchasesData = response.map(purchase => {
+                    console.log('Processing purchase:', purchase);
+                    return {
+                        purchaseID: purchase.purchaseID,
+                        userID: purchase.userID,
+                        companyID: purchase.companyID,
+                        status: purchase.status,
+                        date: purchase.date,
+                        amount: parseFloat(purchase.amount),
+                        user: {
+                            userID: purchase.user?.userID,
+                            name: purchase.user?.username || 'Unknown User',
+                            email: purchase.user?.email
                         },
-                        {
-                            itemID: 2,
-                            quantity: 1,
-                            unitPrice: 1000.00,
-                            item: { name: 'Monitor', category: 'Electronics' }
-                        }
-                    ],
-                    created_at: '2025-07-05T10:00:00Z',
-                    updated_at: '2025-07-05T10:00:00Z'
-                },
-                {
-                    purchaseID: 2,
-                    userID: 2,
-                    companyID: 2,
-                    status: 'approved',
-                    date: '2025-07-04',
-                    amount: 800.00,
-                    user: { name: 'Jane Smith' },
-                    company: { name: 'XYZ Ltd', email: 'info@xyz.com' },
-                    items: [
-                        {
-                            itemID: 3,
-                            quantity: 4,
-                            unitPrice: 200.00,
-                            item: { name: 'Office Chair', category: 'Furniture' }
-                        }
-                    ],
-                    created_at: '2025-07-04T09:30:00Z',
-                    updated_at: '2025-07-04T14:20:00Z'
-                },
-                {
-                    purchaseID: 3,
-                    userID: 1,
-                    companyID: 3,
-                    status: 'processing',
-                    date: '2025-07-03',
-                    amount: 2200.00,
-                    user: { name: 'Mike Johnson' },
-                    company: { name: 'Tech Solutions', email: 'hello@techsol.com' },
-                    items: [
-                        {
-                            itemID: 4,
-                            quantity: 2,
-                            unitPrice: 600.00,
-                            item: { name: 'Desk', category: 'Furniture' }
+                        company: {
+                            companyID: purchase.company?.companyID,
+                            name: purchase.company?.companyName || 'Unknown Company',
+                            companyName: purchase.company?.companyName || 'Unknown Company',
+                            email: purchase.company?.email || ''
                         },
-                        {
-                            itemID: 5,
-                            quantity: 1,
-                            unitPrice: 1000.00,
-                            item: { name: 'Printer', category: 'Electronics' }
-                        }
-                    ],
-                    created_at: '2025-07-03T11:15:00Z',
-                    updated_at: '2025-07-03T11:15:00Z'
-                },
-                {
-                    purchaseID: 4,
-                    userID: 2,
-                    companyID: 1,
-                    status: 'rejected',
-                    date: '2025-07-02',
-                    amount: 350.00,
-                    user: { name: 'Sarah Wilson' },
-                    company: { name: 'ABC Corp', email: 'contact@abc.com' },
-                    items: [
-                        {
-                            itemID: 1,
-                            quantity: 1,
-                            unitPrice: 350.00,
-                            item: { name: 'Tablet', category: 'Electronics' }
-                        }
-                    ],
-                    created_at: '2025-07-02T14:30:00Z',
-                    updated_at: '2025-07-02T16:45:00Z'
-                },
-                {
-                    purchaseID: 5,
-                    userID: 1,
-                    companyID: 2,
-                    status: 'pending',
-                    date: '2025-07-08',
-                    amount: 750.00,
-                    user: { name: 'David Brown' },
-                    company: { name: 'XYZ Ltd', email: 'info@xyz.com' },
-                    items: [
-                        {
-                            itemID: 3,
-                            quantity: 3,
-                            unitPrice: 250.00,
-                            item: { name: 'Office Chair', category: 'Furniture' }
-                        }
-                    ],
-                    created_at: '2025-07-08T09:00:00Z',
-                    updated_at: '2025-07-08T09:00:00Z'
+                        items: purchase.items || [],
+                        created_at: purchase.created_at,
+                        updated_at: purchase.updated_at
+                    };
+                });
+
+                console.log('=== PROCESSED DATA ===');
+                console.log('Processed purchasesData:', purchasesData);
+                console.log('First processed item:', purchasesData[0]);
+
+                setPurchases(purchasesData);
+                setFilteredPurchases(purchasesData);
+
+                // Calculate stats
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                const calculatedStats = {
+                    total: purchasesData.length,
+                    pending: purchasesData.filter(p => p.status === 'pending').length,
+                    approved: purchasesData.filter(p => p.status === 'accepted' || p.status === 'approved').length,
+                    rejected: purchasesData.filter(p => p.status === 'rejected').length,
+                    processing: purchasesData.filter(p => p.status === 'processing').length,
+                    totalValue: purchasesData.reduce((sum, p) => sum + p.amount, 0),
+                    activeCompanies: new Set(purchasesData.map(p => p.companyID)).size,
+                    avgRequestValue: purchasesData.length > 0 ? purchasesData.reduce((sum, p) => sum + p.amount, 0) / purchasesData.length : 0,
+                    thisMonth: purchasesData.filter(p => {
+                        const purchaseDate = new Date(p.date);
+                        return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
+                    }).length,
+                    // Additional stats for PurchaseStats component
+                    totalChange: 0, // You can calculate this based on previous period data
+                    pendingChange: 0,
+                    approvedChange: 0,
+                    rejectedChange: 0,
+                    valueChange: 0
+                };
+                setStats(calculatedStats);
+
+                // Show success message only if there are purchases
+                if (purchasesData.length > 0) {
+                    showAlert(`${purchasesData.length} purchase requests loaded successfully!`, 'success');
                 }
-            ];
-            
-            setPurchases(mockPurchases);
-            setFilteredPurchases(mockPurchases);
-            
-            // Calculate stats with current month being July 2025
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            
-            const mockStats = {
-                total: mockPurchases.length,
-                pending: mockPurchases.filter(p => p.status === 'pending').length,
-                approved: mockPurchases.filter(p => p.status === 'approved').length,
-                rejected: mockPurchases.filter(p => p.status === 'rejected').length,
-                processing: mockPurchases.filter(p => p.status === 'processing').length,
-                totalValue: mockPurchases.reduce((sum, p) => sum + p.amount, 0),
-                activeCompanies: new Set(mockPurchases.map(p => p.companyID)).size,
-                avgRequestValue: mockPurchases.reduce((sum, p) => sum + p.amount, 0) / mockPurchases.length,
-                thisMonth: mockPurchases.filter(p => {
-                    const purchaseDate = new Date(p.date);
-                    return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
-                }).length
-            };
-            setStats(mockStats);
-            
+            }
         } catch (error) {
             console.error('Error fetching purchases:', error);
+            setPurchases([]);
+            setFilteredPurchases([]);
+            showAlert('Error loading purchase requests. Please refresh the page.', 'error');
         } finally {
             setLoading(false);
         }
@@ -220,47 +264,79 @@ const Page = () => {
 
     const fetchCompanies = async () => {
         try {
-            // Mock API call
-            const mockCompanies = [
-                { companyID: 1, name: 'ABC Corp', email: 'contact@abc.com' },
-                { companyID: 2, name: 'XYZ Ltd', email: 'info@xyz.com' },
-                { companyID: 3, name: 'Tech Solutions', email: 'hello@techsol.com' }
-            ];
-            setCompanies(mockCompanies);
+            const token = Cookies.get('auth');
+            // Extract unique companies from purchases or get from a dedicated endpoint
+            const response = await apiHit('getAllPurchases', token);
+
+            console.log('=== COMPANIES DEBUG ===');
+            console.log('Companies response:', response);
+
+            if (response && Array.isArray(response)) {
+                const uniqueCompanies = response.reduce((acc, purchase) => {
+                    console.log('Purchase for company extraction:', purchase);
+                    if (purchase.company && !acc.find(c => c.companyID === purchase.company.companyID)) {
+                        acc.push({
+                            companyID: purchase.company.companyID,
+                            companyName: purchase.company.companyName, // Ensure proper property name
+                            name: purchase.company.companyName, // For backward compatibility
+                            email: purchase.company.email
+                        });
+                    }
+                    return acc;
+                }, []);
+                console.log('Unique companies extracted:', uniqueCompanies);
+                setCompanies(uniqueCompanies);
+            }
         } catch (error) {
             console.error('Error fetching companies:', error);
+            setCompanies([]);
+            showAlert('Error loading companies data.', 'warning');
         }
     };
 
     const fetchItems = async () => {
         try {
-            // Mock API call with more items
-            const mockItems = [
-                { itemID: 1, name: 'Laptop', category: 'Electronics', price: 1200.00 },
-                { itemID: 2, name: 'Monitor', category: 'Electronics', price: 300.00 },
-                { itemID: 3, name: 'Office Chair', category: 'Furniture', price: 250.00 },
-                { itemID: 4, name: 'Desk', category: 'Furniture', price: 600.00 },
-                { itemID: 5, name: 'Printer', category: 'Electronics', price: 400.00 },
-                { itemID: 6, name: 'Tablet', category: 'Electronics', price: 350.00 },
-                { itemID: 7, name: 'Keyboard', category: 'Electronics', price: 80.00 },
-                { itemID: 8, name: 'Mouse', category: 'Electronics', price: 45.00 },
-                { itemID: 9, name: 'Bookshelf', category: 'Furniture', price: 180.00 },
-                { itemID: 10, name: 'File Cabinet', category: 'Furniture', price: 220.00 }
-            ];
-            setItems(mockItems);
+            const token = Cookies.get('auth');
+            const response = await apiHit('getAllItems', token);
+
+            console.log('=== ITEMS DEBUG ===');
+            console.log('Items response:', response);
+            console.log('Items response type:', typeof response);
+
+            if (response && Array.isArray(response)) {
+                // Map API response to component structure
+                const itemsData = response.map(item => {
+                    console.log('Processing item:', item);
+                    return {
+                        itemID: item.itemID,
+                        itemName: item.name, // API uses 'name' not 'itemName'
+                        name: item.name, // For compatibility with modal component
+                        category: item.category || 'General',
+                        price: parseFloat(item.itemPrice || 0), // API uses 'itemPrice' not 'price'
+                        unitPrice: parseFloat(item.itemPrice || 0), // For purchase items
+                        description: item.description || '',
+                        stock: item.stock || 0
+                    };
+                });
+                console.log('Processed items:', itemsData);
+                setItems(itemsData);
+            }
         } catch (error) {
             console.error('Error fetching items:', error);
+            setItems([]);
+            showAlert('Error loading items data.', 'warning');
         }
     };
 
+    // Filter purchases based on applied filters
     const handleFilter = async (newFilters) => {
         setFilterLoading(true);
         setFilters(newFilters);
-        
+
         try {
             // Apply filters
             let filtered = [...purchases];
-            
+
             if (newFilters.search) {
                 filtered = filtered.filter(purchase =>
                     purchase.purchaseID.toString().includes(newFilters.search.toLowerCase()) ||
@@ -268,36 +344,37 @@ const Page = () => {
                     purchase.user?.name.toLowerCase().includes(newFilters.search.toLowerCase())
                 );
             }
-            
+
             if (newFilters.status) {
                 filtered = filtered.filter(purchase => purchase.status === newFilters.status);
             }
-            
+
             if (newFilters.companyID) {
                 filtered = filtered.filter(purchase => purchase.companyID === parseInt(newFilters.companyID));
             }
-            
+
             if (newFilters.dateFrom) {
                 filtered = filtered.filter(purchase => new Date(purchase.date) >= new Date(newFilters.dateFrom));
             }
-            
+
             if (newFilters.dateTo) {
                 filtered = filtered.filter(purchase => new Date(purchase.date) <= new Date(newFilters.dateTo));
             }
-            
+
             if (newFilters.amountMin) {
                 filtered = filtered.filter(purchase => purchase.amount >= parseFloat(newFilters.amountMin));
             }
-            
+
             if (newFilters.amountMax) {
                 filtered = filtered.filter(purchase => purchase.amount <= parseFloat(newFilters.amountMax));
             }
-            
+
             setFilteredPurchases(filtered);
             setHasActiveFilters(Object.values(newFilters).some(value => value !== ''));
-            
+
         } catch (error) {
             console.error('Error filtering purchases:', error);
+            showAlert('Error applying filters. Please try again.', 'warning');
         } finally {
             setFilterLoading(false);
         }
@@ -318,8 +395,16 @@ const Page = () => {
         setHasActiveFilters(false);
     };
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         console.log('Add New button clicked'); // Debug log
+        // Check if user ID is available
+        const user = await apiHit('user', Cookies.get('auth'));
+        const userID = user.user.userID
+        if (!userID) {
+            showAlert('User information is not available. Please refresh the page and try again.', 'error');
+            return;
+        }
+
         setSelectedPurchase(null);
         setIsModalOpen(true);
     };
@@ -342,40 +427,82 @@ const Page = () => {
     const handleSubmit = async (formData) => {
         setModalLoading(true);
         try {
+            const token = Cookies.get('auth');
+
+            // Get userID - use the helper function
+            const user = await apiHit('user', token);
+            const userID = user.user.userID
+            console.log('=== SUBMIT DEBUG ===');
+            console.log('UserID for submission:', userID);
+            console.log('FormData received:', formData);
+
+            // Prepare data for API with required fields
+            const apiData = {
+                userID: userID, // Add required userID
+                companyID: parseInt(formData.companyID),
+                date: formData.date,
+                amount: parseFloat(formData.amount || calculateTotalAmount(formData)),
+                status: formData.status || 'pending',
+                items: formData.items || formData.purchaseItems?.map(item => ({
+                    itemID: parseInt(item.itemID),
+                    quantity: parseInt(item.quantity),
+                    unitPrice: parseFloat(item.unitPrice),
+                    subTotal: parseFloat(item.quantity) * parseFloat(item.unitPrice), // Add required subTotal
+                    type: item.type || 'purchase'
+                })) || []
+            };
+
+            console.log('API Data being sent:', apiData);
+
+            let response;
+
             if (selectedPurchase) {
                 // Update existing purchase
-                const updatedPurchases = purchases.map(p =>
-                    p.purchaseID === selectedPurchase.purchaseID
-                        ? { ...p, ...formData, updated_at: new Date().toISOString() }
-                        : p
-                );
-                setPurchases(updatedPurchases);
-                setFilteredPurchases(updatedPurchases);
+                response = await apiHit(`updatePurchase/${selectedPurchase.purchaseID}`, token, 'POST', apiData);
+                console.log('Update response:', response);
             } else {
                 // Create new purchase
-                const newPurchase = {
-                    ...formData,
-                    purchaseID: Math.max(...purchases.map(p => p.purchaseID)) + 1,
-                    userID: 1, // Mock user ID
-                    user: { name: 'Current User' },
-                    company: companies.find(c => c.companyID === parseInt(formData.companyID)),
-                    items: formData.purchaseItems.map(item => ({
-                        ...item,
-                        item: items.find(i => i.itemID === parseInt(item.itemID))
-                    })),
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
-                
-                const updatedPurchases = [...purchases, newPurchase];
-                setPurchases(updatedPurchases);
-                setFilteredPurchases(updatedPurchases);
+                response = await apiHit('createPurchase', token, 'POST', apiData);
+                console.log('Create response:', response);
             }
-            
-            setIsModalOpen(false);
-            setSelectedPurchase(null);
+
+            // Check if response indicates success - more robust checking
+            const isSuccess = response && (
+                response.success === true ||
+                response.status === 'success' ||
+                response.message?.includes('successfully') ||
+                response.message?.includes('created') ||
+                response.message?.includes('updated') ||
+                (response.purchaseID && !response.error) || // New purchase has ID
+                (!response.error && response !== null) // No error and not null
+            );
+
+            if (isSuccess) {
+                // Success - close modal and refresh data
+                setIsModalOpen(false);
+                setSelectedPurchase(null);
+                await fetchPurchases(); // Refresh data
+
+                // Show success alert
+                showAlert(
+                    selectedPurchase ? 'Purchase request updated successfully!' : 'Purchase request created successfully!',
+                    'success'
+                );
+            } else {
+                // Handle API error
+                const errorMessage = response?.message || response?.error || 'Failed to save purchase request';
+                throw new Error(errorMessage);
+            }
+
         } catch (error) {
             console.error('Error saving purchase:', error);
+
+            // Show error alert
+            let errorMessage = 'Error saving purchase. Please try again.';
+            if (error.message && error.message !== 'Error saving purchase. Please try again.') {
+                errorMessage = error.message;
+            }
+            showAlert(errorMessage, 'error');
         } finally {
             setModalLoading(false);
         }
@@ -383,19 +510,38 @@ const Page = () => {
 
     const handleConfirmDelete = async () => {
         try {
-            const updatedPurchases = purchases.filter(p => p.purchaseID !== selectedPurchase.purchaseID);
-            setPurchases(updatedPurchases);
-            setFilteredPurchases(updatedPurchases);
-            
-            setIsDeleteModalOpen(false);
-            setSelectedPurchase(null);
+            const token = Cookies.get('auth');
+            const response = await apiHit(`deletePurchase/${selectedPurchase.purchaseID}`, token, 'DELETE');
+
+            if (response && response.success) {
+                await fetchPurchases(); // Refresh data
+                setIsDeleteModalOpen(false);
+                setSelectedPurchase(null);
+
+                // Show success alert
+                showAlert('Purchase request deleted successfully!', 'success');
+            } else {
+                showAlert('Error deleting purchase. Please try again.', 'error');
+            }
         } catch (error) {
             console.error('Error deleting purchase:', error);
+            showAlert('Error deleting purchase. Please try again.', 'error');
         }
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+            {/* Alert Container */}
+            {alert && (
+                <div className="fixed top-4 right-4 z-[10000] max-w-md">
+                    <Alert
+                        message={alert.message}
+                        type={alert.type}
+                        onClose={hideAlert}
+                    />
+                </div>
+            )}
+
             {/* Background Decoration */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
@@ -432,6 +578,16 @@ const Page = () => {
                         onAdd={handleCreate}
                     />
 
+                    {/* User Info Loading Indicator */}
+                    {userInfoLoading && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div className="flex items-center">
+                                <div className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mr-3"></div>
+                                <p className="text-yellow-800 text-sm">Loading user information... Purchase creation will be available once loading is complete.</p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Main Content */}
                     <div className="w-full space-y-8">
                         {/* Stats */}
@@ -462,30 +618,60 @@ const Page = () => {
                             hasActiveFilters={hasActiveFilters}
                             isFiltered={hasActiveFilters}
                         />
-                        
-                        {/* Debug Info */}
-                        <div className="text-sm text-gray-500 mt-2">
-                            Debug: filteredPurchases.length = {filteredPurchases?.length || 0}, 
-                            paginatedData.length = {paginatedData?.length || 0}, 
-                            purchases.length = {purchases?.length || 0}
-                        </div>
+
+                        {/* Debug Info
+                        <div className="bg-gray-100 p-4 rounded-lg mt-4">
+                            <h3 className="font-bold text-gray-800 mb-2">Debug Information:</h3>
+                            <div className="text-sm text-gray-600 space-y-2">
+                                <p><strong>Raw purchases.length:</strong> {purchases?.length || 0}</p>
+                                <p><strong>Filtered purchases.length:</strong> {filteredPurchases?.length || 0}</p>
+                                <p><strong>Paginated data.length:</strong> {paginatedData?.length || 0}</p>
+
+                                {purchases?.length > 0 && (
+                                    <div className="mt-4">
+                                        <p><strong>First purchase raw data:</strong></p>
+                                        <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto max-h-40">
+                                            {JSON.stringify(purchases[0], null, 2)}
+                                        </pre>
+                                    </div>
+                                )}
+
+                                {companies?.length > 0 && (
+                                    <div className="mt-4">
+                                        <p><strong>First company data:</strong></p>
+                                        <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto max-h-40">
+                                            {JSON.stringify(companies[0], null, 2)}
+                                        </pre>
+                                    </div>
+                                )}
+
+                                {items?.length > 0 && (
+                                    <div className="mt-4">
+                                        <p><strong>First item data:</strong></p>
+                                        <pre className="bg-gray-50 p-2 rounded text-xs overflow-auto max-h-40">
+                                            {JSON.stringify(items[0], null, 2)}
+                                        </pre>
+                                    </div>
+                                )}
+                            </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
 
             {/* Modals */}
-            {console.log('Modal states:', { isModalOpen, selectedPurchase })}
             <PurchaseModal
                 isOpen={isModalOpen}
                 onClose={() => {
-                    console.log('Closing modal');
                     setIsModalOpen(false);
+                    setSelectedPurchase(null);
                 }}
                 onSubmit={handleSubmit}
                 purchase={selectedPurchase}
                 companies={companies}
                 items={items}
                 loading={modalLoading}
+                userInfoLoading={userInfoLoading}
             />
 
             <PurchaseViewModal
