@@ -1,19 +1,19 @@
 import InventoryClient from "@/components/client/InventoryClient";
 import { cookies } from 'next/headers';
-import { fetchAllItems } from "@/libs/api/inventory";
 import Header3 from "@/components/header/Header3";
-import { getProfile } from "@/libs/api/auth/index";
 import Link from 'next/link';
+import { apiHit } from "@/libs/api/fetch";
 
 export default async function InventoryPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-    const profile = await getProfile(token);
+    const profile = await apiHit('user', token);
+
     let itemsData = [];
     let fetchError = null;
 
     try {
-        itemsData = await fetchAllItems(token);
+        itemsData = await apiHit('getAllItems', token);
     } catch (error) {
         fetchError = error;
         console.log(error)

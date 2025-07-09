@@ -1,6 +1,5 @@
-import SummaryCards from '@/components/card/SummaryCards';
 import PurchaseApprovalClient from '@/components/client/PurchaseApprovalClient';
-import { getAllPurchases } from '@/libs/api/purchase-approval';
+import { apiHit } from '@/libs/api/fetch';
 import { cookies } from 'next/headers';
 
 export default async function PurchaseApprovalPage() {
@@ -14,6 +13,7 @@ export default async function PurchaseApprovalPage() {
         rejectedRequests: 10,
     };
 
-    const allData = await getAllPurchases(token);
+    const allData = await apiHit('getAllPurchases', token);
+
     return <PurchaseApprovalClient summaryData={summaryData} allData={allData} />;
 }

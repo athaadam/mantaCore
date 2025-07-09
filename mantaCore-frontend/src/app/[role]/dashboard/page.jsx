@@ -1,19 +1,11 @@
 import AdminDashboardLayout from '@/components/layout/AdminDashboardLayout';
-import { getAllPurchases } from '@/libs/api/purchase-approval';
 import { cookies } from 'next/headers';
-import { getInvoices } from '@/libs/api/dashboard';
-import {
-  todayProfitLoss,
-  topSellingItems,
-  totalPenjualan,
-  lifetimeProfitLoss,
-} from '@/libs/api/dashboard';
-import { getProfile } from '@/libs/api/auth';
+import { apiHit } from '@/libs/api/fetch';
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth')?.value;
-  const profile = await getProfile(token);
+  const token = cookies().get('auth')?.value;
+
+  const profile = await apiHit('user', token);
 
   if (profile.user.role === 'admin') {
     const [
@@ -24,25 +16,29 @@ export default async function DashboardPage() {
       topSells,
       purchaseRequests,
     ] = await Promise.all([
-      totalPenjualan(token),
-      todayProfitLoss(token),
-      lifetimeProfitLoss(token),
-      getInvoices(token),
-      topSellingItems(token),
-      getAllPurchases(token),
+      apiHit('totalPenjualan', token),
+      apiHit('todayProfitLoss', token),
+      apiHit('lifetimeProfitLoss', token),
+      apiHit('getAllInvoices', token),
+      apiHit('topSellingItems', token),
+      apiHit('getAllPurchases', token),
     ]);
-    console.log(transactions)
+
     const summaryData = {
       totalLifetimeSales: totalSalesValue?.totalSales || 0,
       todayPnL: todayProfitLossValue?.profitLoss || 0,
       lifetimePnL: lifetimeProfitLossValue?.profitLoss || 0,
     };
+
     const data = {
       summaryData,
       transactions,
       topSells,
       purchaseRequests,
     };
+
     return <AdminDashboardLayout data={data} />;
   }
+
+  return null;
 }

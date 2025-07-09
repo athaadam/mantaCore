@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Pagination from '@/components/utils/Pagination';
-import { formatRupiah } from '@/components/utils/formatRupiah';
+import Pagination from '@/components/common/Pagination';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 import Link from 'next/link';
 
 export default function TransactionTable({ transactions = [], itemsPerPage, mode = 'simple' }) {

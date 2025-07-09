@@ -1,38 +1,24 @@
-export async function apiRequest({ endpoint, method = 'GET', body = null, token = null }) {
-    const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    }
+import { handleApiError } from "../exceptions";
 
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-    }
+export async function apiRequest({ endpoint, token, method = 'GET', body = null, skipAuth = false }) {
+    const baseUrl = typeof window === 'undefined'
+        ? process.env.NEXT_PUBLIC_SITE_URL
+        : '';
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_API}/${endpoint}`, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : null,
+    const res = await fetch(`${baseUrl}/api/proxy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint, method, body, skipAuth, token }),
         cache: 'no-store',
-    })
+    });
 
-    const text = await res.text()
-    let data
-
-    try {
-        data = JSON.parse(text)
-    } catch {
-        throw new Error('Response is not valid JSON')
-    }
+    const data = await res.json().catch(() => {
+        throw new Error('Response is not valid JSON');
+    });
 
     if (!res.ok) {
-        const errors = data?.errors
-        if (errors) {
-            const errorList = Object.values(errors).flat().join('\n')
-            throw new Error(errorList)
-        } else {
-            throw new Error(data.message || 'Request failed')
-        }
+        handleApiError(data);
     }
 
-    return data
+    return data;
 }

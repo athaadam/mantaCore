@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Pagination from '@/components/utils/Pagination';
-import { formatRupiah } from '@/components/utils/formatRupiah';
-import { formatDate } from '../utils/formatdate';
+import Pagination from '@/components/common/Pagination';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+import { formatDate } from '../../libs/utils/formats/formatdate';
 
 export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, Alert }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,9 +122,7 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
                         </button>
                         <button
                           onClick={() => {
-                            if (window.confirm('Are you sure you want to delete this item?')) {
                               onDelete(startIdx + idx);
-                            }
                           }}
                           className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-xs"
                         >

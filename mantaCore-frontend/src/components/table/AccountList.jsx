@@ -1,5 +1,5 @@
-import { getStatusColor } from '@/components/utils/statuscolor';
-import Pagination from '../utils/Pagination';
+import { getStatusColor } from '@/libs/utils/colors/statuscolor';
+import Pagination from '../common/Pagination';
 import useProfile from '@/hooks/context/ProfileContext'
 
 
@@ -123,7 +123,7 @@ export default function AccountList({ accounts, itemsPerPage, currentPage, onPag
                                 <td className="py-4 px-4">
                                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${getStatusColor(acc.status)}`}>
                                         <div className={`w-2 h-2 rounded-full ${acc.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                        <span className="capitalize">{acc.status || 'Unknown'}</span>
+                                        <span className="capitalize">{acc.status || 'active'}</span>
                                     </span>
                                 </td>
                                 

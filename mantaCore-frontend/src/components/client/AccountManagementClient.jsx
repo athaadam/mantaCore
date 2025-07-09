@@ -1,15 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import Alert from '../utils/Alert';
+import Alert from '../common/Alert';
 import Cookies from 'js-cookie';
-import { deleteAccountById } from '@/libs/api/account-management';
-import { getToken } from '@/libs/api/auth';
-
-// Import komponen baru
 import StatsGrid from '../card/StatsGrid';
-import AccountFormSection from '../form/AccountFormSection';
+import AccountFormSection from '../section/AccountFormSection';
 import AccountListSection from '../table/AccountListSection';
+import { apiHit } from '@/libs/api/fetch';
 
 export default function AccountManagementClient({ initialData }) {
     const [accounts, setAccounts] = useState(initialData || []);
@@ -17,7 +14,7 @@ export default function AccountManagementClient({ initialData }) {
     const [alert, setAlert] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    
+
 
     const handleAddAccount = (newAccount) => {
         setAccounts(prev => [...prev, newAccount]);
@@ -35,18 +32,16 @@ export default function AccountManagementClient({ initialData }) {
     const handleDeleteAccount = async (id) => {
         if (!confirm('Are you sure you want to delete this account?')) return;
         try {
-            const token = await getToken();
-            await deleteAccountById(id, token);
+            const res = await apiHit(`deleteUser/${id}`, Cookies.get('auth'), 'DELETE');
             setAccounts(prev => prev.filter(acc => acc.userID !== id));
             if (editingAccount?.userID === id) setEditingAccount(null);
             const updatedAccounts = accounts.filter(acc => acc.userID !== id);
             setAccounts(updatedAccounts);
-
             const newTotalPages = Math.ceil(updatedAccounts.length / itemsPerPage);
             if (currentPage > newTotalPages) {
                 setCurrentPage(newTotalPages || 1);
             }
-            setAlert({ message: 'User deleted successfully.', type: 'success' });
+            setAlert({ message: res.message, type: 'success' });
         } catch (err) {
             setAlert({ message: err.message, type: 'error' });
         }

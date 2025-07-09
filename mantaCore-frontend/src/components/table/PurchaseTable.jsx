@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStatusColor } from '@/components/utils/statuscolor';
-import Pagination from '@/components/utils/Pagination';
-import { formatRupiah } from '@/components/utils/formatRupiah';
+import { getStatusColor } from '@/libs/utils/colors/statuscolor';
+import Pagination from '@/components/common/Pagination';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 import Link from 'next/link';
 
 export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'purchase' }) {
@@ -29,8 +29,8 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                     <div className="flex items-center gap-3">
                         <div className="p-3 bg-gradient-to-br from-purple-100 to-violet-100 rounded-2xl">
                             <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
                         <div>

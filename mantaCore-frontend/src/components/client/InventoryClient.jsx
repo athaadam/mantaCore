@@ -4,12 +4,12 @@ import { useState } from 'react';
 import InventoryFilter from '../filter/InventoryFilter';
 import InventoryTable from '../table/InventoryTable';
 import InventoryModal from '../modal/InventoryModal';
-import { createItem, updateItem, deleteItemById } from '@/libs/api/inventory';
-import Alert from '../utils/Alert';
+import Alert from '../common/Alert';
 import { extractErrorMessage } from '@/libs/exceptions';
 import Header2 from '@/components/header/Header2';
 import DataCard from '@/components/card/DataCard';
 import Cookies from 'js-cookie';
+import { apiHit } from '@/libs/api/fetch';
 
 export default function InventoryClient({ initialItems, profile }) {
     const [alert, setAlert] = useState(null);
@@ -50,15 +50,15 @@ export default function InventoryClient({ initialItems, profile }) {
 
         try {
             if (modalMode === 'add') {
-                const createdItem = await createItem(itemPayload, token);
-                const updated = [...originalItems, createdItem];
+                const createdItem = await apiHit('createItem', token, 'POST', itemPayload);
+                const updated = [...originalItems, createdItem.item];
                 setOriginalItems(updated);
                 setItems(updated);
                 setAlert({ message: 'Item added successfully', type: 'success' });
             } else if (modalMode === 'edit') {
-                const updatedItem = await updateItem(selectedItemIndex, itemPayload, token);
+                const updatedItem = await apiHit(`updateItem/${selectedItemIndex}`, token, 'POST', itemPayload);
                 const updated = originalItems.map(item =>
-                    item.itemID === selectedItemIndex ? updatedItem : item
+                    item.itemID === selectedItemIndex ? updatedItem.item : item
                 );
                 setOriginalItems(updated);
                 setItems(updated);
@@ -83,7 +83,7 @@ export default function InventoryClient({ initialItems, profile }) {
         try {
             const token = Cookies.get('auth');
             const itemId = items[index].itemID;
-            await deleteItemById(itemId, token);
+            await apiHit(`deleteItem/${itemId}`, token, 'DELETE');
             const updated = [...items];
             updated.splice(index, 1);
             setItems(updated);

@@ -3,16 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole } from '@/hooks/context/RoleContext'
-import Alert from '@/components/utils/Alert'
-import { login, getProfile, register } from '@/libs/api/auth'
+import Alert from '@/components/common/Alert'
 import { extractErrorMessage } from '@/libs/exceptions'
+import { apiHit } from '@/libs/api/fetch'
+import Cookies from 'js-cookie'
 
 export default function AuthForm({ mode = 'login', onSwitch }) {
     const router = useRouter()
     const { setRole } = useRole()
     const [alert, setAlert] = useState(null)
     const [loading, setLoading] = useState(false)
-
     const [form, setForm] = useState({
         username: '',
         password: '',
@@ -31,34 +31,52 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
         e.preventDefault()
         setLoading(true)
         setAlert(null)
-
         try {
             if (mode === 'login') {
-                const token = await login(form.username, form.password)
-                const profile = await getProfile(token)
-                setAlert({ message: 'Login successful', type: 'success' })
-                setRole(profile.user.role)
-                router.push(`/${profile.user.role}/dashboard`)
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: form.username,
+                        password: form.password,
+                    })
+                })
+
+                const result = await res.json()
+
+                if (res.ok) {
+                    setAlert({ message: 'Login successful', type: 'success' })
+                    setRole(result.user.role)
+                    setTimeout(() => {
+                        router.push(`/${result.user.role}/dashboard`)
+                    }, 1500)
+                } else {
+                    throw new Error(result.message || 'Login failed')
+                }
+
             } else {
-                await register(form)
+                await apiHit('register', null, 'POST', form, true)
                 setAlert({ message: 'Registration successful. Please login.', type: 'success' })
-                setForm({
+                setForm(prev => ({
                     username: form.username,
                     password: form.password,
                     password_confirmation: '',
                     email: '',
                     company: '',
                     phone_number: '',
-                })
+                }))
+                setTimeout(() => {
+                    onSwitch?.()
+                }, 2000)
             }
         } catch (err) {
             const message = extractErrorMessage(err)
-            setAlert({ message: `${message}`, type: 'error' });
-        }
-        finally {
+            setAlert({ message, type: 'error' })
+        } finally {
             setLoading(false)
         }
     }
+
 
     return (
         <div className="w-full">
@@ -101,7 +119,7 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                     </div>
-                    
+
                     <div className="group">
                         <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
                             Password
@@ -121,95 +139,94 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                         </div>
                     </div>
 
-                {mode === 'register' && (
-                    <>
-                        <div className="group">
-                            <label htmlFor="password_confirmation" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
-                                Confirm Password
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm your password"
-                                    value={form.password_confirmation}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
-                                    required
-                                />
-                                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                    {mode === 'register' && (
+                        <>
+                            <div className="group">
+                                <label htmlFor="password_confirmation" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
+                                    Confirm Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="password_confirmation"
+                                        type="password"
+                                        name="password_confirmation"
+                                        placeholder="Confirm your password"
+                                        value={form.password_confirmation}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
+                                        required
+                                    />
+                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="group">
-                            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="Enter your email"
-                                    value={form.email}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
-                                    required
-                                />
-                                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+
+                            <div className="group">
+                                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
+                                    Email Address
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="Enter your email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
+                                        required
+                                    />
+                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="group">
-                            <label htmlFor="company" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
-                                Company Name
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="company"
-                                    type="text"
-                                    name="company"
-                                    placeholder="Enter your company name"
-                                    value={form.company}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
-                                    required
-                                />
-                                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+
+                            <div className="group">
+                                <label htmlFor="company" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
+                                    Company Name
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="company"
+                                        type="text"
+                                        name="company"
+                                        placeholder="Enter your company name"
+                                        value={form.company}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
+                                        required
+                                    />
+                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="group">
-                            <label htmlFor="phone_number" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
-                                Phone Number
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="phone_number"
-                                    type="text"
-                                    name="phone_number"
-                                    placeholder="Enter your phone number"
-                                    value={form.phone_number}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
-                                    pattern='^\+?[0-9\s-]{7,15}$'
-                                    required
-                                />
-                                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+
+                            <div className="group">
+                                <label htmlFor="phone_number" className="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-violet-600 transition-colors">
+                                    Phone Number
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="phone_number"
+                                        type="text"
+                                        name="phone_number"
+                                        placeholder="Enter your phone number"
+                                        value={form.phone_number}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:bg-white transition-all duration-300 outline-none hover:border-slate-300"
+                                        pattern='^\+?[0-9\s-]{7,15}$'
+                                        required
+                                    />
+                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                                </div>
                             </div>
-                        </div>
-                    </>
-                )}
+                        </>
+                    )}
                 </div>
 
                 <button
                     type="submit"
-                    className={`relative w-full py-3.5 px-4 rounded-xl font-semibold text-white transition-all duration-300 text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-6 overflow-hidden group ${
-                        loading 
-                            ? 'bg-slate-400 cursor-not-allowed' 
-                            : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-[0.98]'
-                    }`}
+                    className={`relative w-full py-3.5 px-4 rounded-xl font-semibold text-white transition-all duration-300 text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-6 overflow-hidden group ${loading
+                        ? 'bg-slate-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-[0.98]'
+                        }`}
                     disabled={loading}
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">
@@ -248,7 +265,7 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                         Forgot your password?
                     </button>
                 )}
-                
+
                 <p className="text-sm text-slate-600">
                     {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
                     <button

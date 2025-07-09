@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getProfile, getToken } from '@/libs/api/auth'
+import Cookies from 'js-cookie'
+import { apiHit } from '@/libs/api/fetch'
 
 export default function useProfile() {
     const [profile, setProfile] = useState(null)
@@ -8,8 +9,7 @@ export default function useProfile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = await getToken()
-                const data = await getProfile(token)
+                const data = await apiHit('user', Cookies.get('auth'))
                 setProfile(data)
             } catch (err) {
                 console.error(err)

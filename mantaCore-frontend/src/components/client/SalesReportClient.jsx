@@ -8,7 +8,7 @@ import TransactionTable from '@/components/table/TransactionTable';
 import FilterControls from '@/components/filter/FilterControls';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
-import { extractCustomers, extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/components/utils/filterUtils';
+import { extractCustomers, extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/libs/utils/filters/filterUtils';
 
 export default function SalesReportClient({ summaryData, transactions, report }) {
     const [filter, setFilter] = useState({

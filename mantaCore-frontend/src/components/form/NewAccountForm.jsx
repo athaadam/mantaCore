@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Alert from '@/components/utils/Alert';
-import { createAccount } from '@/libs/api/account-management';
-import { updateAccount } from '@/libs/api/account-management';
+import Alert from '@/components/common/Alert';
 import { extractErrorMessage } from '@/libs/exceptions';
-import { getToken } from '@/libs/api/auth';
+import { apiHit } from '@/libs/api/fetch';
+import Cookies from 'js-cookie';
 
 const initialFormState = {
     username: '',
@@ -56,18 +55,18 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
         setLoading(true);
 
         try {
-            const token = await getToken();
             if (editingAccount) {
                 const updatePayload = { ...form };
                 if (!updatePayload.password) {
                     delete updatePayload.password;
                     delete updatePayload.password_confirmation;
                 }
-                const updated = await updateAccount(editingAccount.userID, updatePayload, token);
-                onUpdate(updated);
+                const updated = await apiHit(`updateUser/${editingAccount.userID}`, Cookies.get('auth'), 'POST', updatePayload);
+                onUpdate(updated.user);
             } else {
-                const newUser = await createAccount(form, token);
-                onAdd(newUser);
+                const newUser = await apiHit('addUser', Cookies.get('auth'), 'POST', form);
+                console.log('New user created:', newUser);
+                onAdd(newUser.user);
             }
             resetForm();
         } catch (err) {
@@ -206,13 +205,12 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                 <button
                     type="submit"
                     disabled={loading || (editingAccount?.role === 'admin')}
-                    className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        editingAccount?.role === 'admin'
-                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                            : loading
+                    className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${editingAccount?.role === 'admin'
+                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        : loading
                             ? 'bg-violet-400 text-white cursor-wait'
                             : 'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700 hover:shadow-lg transform hover:-translate-y-0.5'
-                    }`}
+                        }`}
                 >
                     {loading && (
                         <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -233,10 +231,10 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                     {editingAccount?.role === 'admin'
                         ? 'Admin Account Locked'
                         : loading
-                        ? 'Processing...'
-                        : editingAccount
-                        ? 'Update Account'
-                        : 'Create Account'}
+                            ? 'Processing...'
+                            : editingAccount
+                                ? 'Update Account'
+                                : 'Create Account'}
                 </button>
 
                 {editingAccount && (

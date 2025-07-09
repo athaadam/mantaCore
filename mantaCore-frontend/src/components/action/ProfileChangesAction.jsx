@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import Cookies from 'js-cookie'
-import Alert from '@/components/utils/Alert'
-import { editProfile, changePassword } from '@/libs/api/profile'
+import Alert from '@/components/common/Alert'
 import { useParams, useRouter } from 'next/navigation'
 import { extractErrorMessage } from '@/libs/exceptions'
-import { getToken } from '@/libs/api/auth'
+import { apiHit } from '@/libs/api/fetch'
+import Cookies from 'js-cookie'
 
 export default function ActionForm({ mode = 'edit', form, setForm, initialForm }) {
     const [loading, setLoading] = useState(false)
@@ -19,12 +18,11 @@ export default function ActionForm({ mode = 'edit', form, setForm, initialForm }
         setLoading(true)
         setAlert(null)
         try {
-            const token = await getToken();
             let result
             if (mode === 'edit') {
-                result = await editProfile(token, form)
+                result = await apiHit('editProfile', Cookies.get('auth'), 'POST', form)
             } else if (mode === 'password') {
-                result = await changePassword(token, form)
+                result = await apiHit('changePassword', Cookies.get('auth'), 'POST', form)
             }
 
             setForm(initialForm)
@@ -70,21 +68,20 @@ export default function ActionForm({ mode = 'edit', form, setForm, initialForm }
                     </svg>
                     <span className="relative z-10">Go Back</span>
                 </button>
-                
+
                 <button
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading}
-                    className={`group relative flex-1 inline-flex items-center justify-center gap-3 px-8 py-4 font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
-                        loading
-                            ? 'bg-gradient-to-r from-slate-400 to-slate-500 text-white cursor-not-allowed'
-                            : mode === 'edit'
+                    className={`group relative flex-1 inline-flex items-center justify-center gap-3 px-8 py-4 font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${loading
+                        ? 'bg-gradient-to-r from-slate-400 to-slate-500 text-white cursor-not-allowed'
+                        : mode === 'edit'
                             ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700'
                             : 'bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700'
-                    }`}
+                        }`}
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-                    
+
                     {loading ? (
                         <>
                             <svg className="w-5 h-5 animate-spin relative z-10" fill="none" viewBox="0 0 24 24">

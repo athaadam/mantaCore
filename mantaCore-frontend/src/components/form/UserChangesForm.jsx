@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
 import ActionForm from '@/components/action/ProfileChangesAction'
-import { getProfile } from '@/libs/api/auth'
+import { apiHit } from '@/libs/api/fetch'
 
 export default function UserForm({ mode = 'edit' }) {
     const [form, setForm] = useState({})
@@ -27,8 +27,7 @@ export default function UserForm({ mode = 'edit' }) {
             setLoading(true)
             try {
                 if (mode === 'edit') {
-                    const token = Cookies.get('auth')
-                    const data = await getProfile(token)
+                    const data = await apiHit('user', Cookies.get('auth'))
                     setForm({
                         username: data.user.username || '',
                         email: data.user.email || '',
@@ -57,7 +56,7 @@ export default function UserForm({ mode = 'edit' }) {
             <div className="py-16 flex flex-col items-center justify-center">
                 <div className="relative">
                     <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-pink-600 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+                    <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-pink-600 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
                 </div>
                 <div className="mt-6 text-center">
                     <h3 className="text-lg font-semibold text-slate-700 mb-2">Loading Profile Data</h3>
@@ -77,7 +76,7 @@ export default function UserForm({ mode = 'edit' }) {
                             <h3 className="text-xl font-bold text-slate-800 mb-2">Personal Information</h3>
                             <p className="text-sm text-slate-600">Update your basic profile details</p>
                         </div>
-                        
+
                         <div className="space-y-6">
                             <FormGroup
                                 label="Username"
@@ -138,7 +137,7 @@ export default function UserForm({ mode = 'edit' }) {
                             <h3 className="text-xl font-bold text-slate-800 mb-2">Security Update</h3>
                             <p className="text-sm text-slate-600">Change your account password for better security</p>
                         </div>
-                        
+
                         <div className="space-y-6">
                             <FormGroup
                                 label="Current Password"
@@ -234,7 +233,7 @@ function FormGroup({
                 {label}
                 {required && <span className="text-red-500">*</span>}
             </label>
-            
+
             <div className="relative group">
                 <input
                     id={name}
@@ -244,16 +243,15 @@ function FormGroup({
                     onChange={onChange}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className={`w-full px-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl transition-all duration-300 focus:outline-none focus:bg-white placeholder-slate-400 ${
-                        isFocused 
-                            ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-lg' 
-                            : 'hover:border-slate-300 group-hover:shadow-md'
-                    } ${isPasswordField ? 'pr-12' : ''}`}
+                    className={`w-full px-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl transition-all duration-300 focus:outline-none focus:bg-white placeholder-slate-400 ${isFocused
+                        ? 'border-indigo-500 ring-4 ring-indigo-100 shadow-lg'
+                        : 'hover:border-slate-300 group-hover:shadow-md'
+                        } ${isPasswordField ? 'pr-12' : ''}`}
                     placeholder={placeholder}
                     required={required}
                     autoComplete={autoComplete}
                 />
-                
+
                 {isPasswordField && (
                     <button
                         type="button"
@@ -272,13 +270,12 @@ function FormGroup({
                         )}
                     </button>
                 )}
-                
+
                 {/* Focus indicator */}
-                <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ${
-                    isFocused ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-                }`}></div>
+                <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ${isFocused ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+                    }`}></div>
             </div>
-            
+
             {description && (
                 <p className="text-xs text-slate-500 flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

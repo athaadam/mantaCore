@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getProfile } from './libs/api/auth'
 
 export async function middleware(request) {
     const token = request.cookies.get('auth')?.value
@@ -9,18 +8,15 @@ export async function middleware(request) {
     const isAPI = path.startsWith('/api')
     const roleInPath = path.split('/')[1]
 
-    // Tidak punya token & bukan root atau API → redirect ke login
     if (!token && !isRoot && !isAPI) {
         return NextResponse.redirect(new URL('/', request.url))
     }
 
-    // Punya token & berada di halaman root → redirect ke dashboard
     if (token && isRoot) {
         const redirect = await redirectToRoleDashboard(token, request)
         if (redirect) return redirect
     }
 
-    // Punya token & role di path → validasi akses role
     if (token && !isAPI && roleInPath) {
         const redirect = await validateRoleAccess(token, roleInPath, request)
         if (redirect) return redirect
@@ -31,11 +27,16 @@ export async function middleware(request) {
 
 async function redirectToRoleDashboard(token, request) {
     try {
-        const data = await getProfile(token)
-        if (!data || !data.user) throw new Error()
+        const res = await fetch(`${process.env.BASE_URL_BACKEND}/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json'
+            }
+        })
+        const data = await res.json()
         const role = data.user?.role
-
         if (!role) throw new Error()
+
         return NextResponse.redirect(new URL(`/${role}/dashboard`, request.url))
     } catch {
         const res = NextResponse.redirect(new URL('/', request.url))
@@ -46,9 +47,14 @@ async function redirectToRoleDashboard(token, request) {
 
 async function validateRoleAccess(token, roleInPath, request) {
     try {
-        const data = await getProfile(token)
+        const res = await fetch(`${process.env.BASE_URL_BACKEND}/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json'
+            }
+        })
+        const data = await res.json()
         const role = data.user?.role
-        if (!data || !data.user || !role) throw new Error()
         if (!role || role !== roleInPath) {
             return NextResponse.redirect(new URL(`/${role}/dashboard`, request.url))
         }

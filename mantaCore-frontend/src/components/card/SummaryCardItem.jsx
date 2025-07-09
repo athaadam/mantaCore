@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { formatRupiah } from '../utils/formatRupiah';
+import { formatRupiah } from '../../libs/utils/formats/formatRupiah';
 
 export default function SummaryCardItem({ title, icon, value, isCurrency, index = 0 }) {
     const displayValue = isCurrency

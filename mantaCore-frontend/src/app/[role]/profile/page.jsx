@@ -1,16 +1,16 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
-import { getProfile } from "@/libs/api/auth";
-import { formatDate } from "@/components/utils/formatdate";
+import { formatDate } from "@/libs/utils/formats/formatdate";
 import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
 import PageBreadcrumb from "@/components/layout/PageBreadCrump";
+import { apiHit } from "@/libs/api/fetch";
 
 
 export default async function ProfilePage() {
 
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-    const data = await getProfile(token);
+    const data = await apiHit('user', token);
 
     return (
         <div className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen overflow-y-auto">
@@ -63,8 +63,8 @@ export default async function ProfilePage() {
                                             </h1>
                                             <div className="flex items-center gap-3 mb-4">
                                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${data.user.role === 'admin' ? 'bg-red-500/20 text-red-100 border border-red-400/30' :
-                                                        data.user.role === 'management' ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30' :
-                                                            'bg-green-500/20 text-green-100 border border-green-400/30'
+                                                    data.user.role === 'management' ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30' :
+                                                        'bg-green-500/20 text-green-100 border border-green-400/30'
                                                     }`}>
                                                     {data.user.role === 'admin' && (
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

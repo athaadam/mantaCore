@@ -1,14 +1,14 @@
-import Sidebar from "@/components/utils/Sidebar";
+import Sidebar from "@/components/common/Sidebar";
+import { SidebarProvider } from "@/hooks/context/SidebarContext";
+import MainContent from "@/components/layout/MainContent";
 
 export default function MainLayout({ children }) {
   return (
-    <main className="flex">
-      <Sidebar />
-      <div className="flex-1 ml-[280px] min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <div className="w-full h-full overflow-y-auto">
-          {children}
-        </div>
-      </div>
-    </main>
+    <SidebarProvider>
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <Sidebar />
+        <MainContent>{children}</MainContent>
+      </main>
+    </SidebarProvider>
   );
 }

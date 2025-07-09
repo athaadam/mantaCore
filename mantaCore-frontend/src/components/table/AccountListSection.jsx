@@ -1,7 +1,7 @@
 'use client';
 
-import SectionWrapper from '../layout/SectionWrapper';
-import CountBadge from '../utils/CountBadge';
+import SectionWrapper from '../section/SectionWrapper';
+import CountBadge from '../common/CountBadge';
 import AccountList from '../table/AccountList';
 
 export default function AccountListSection({ 

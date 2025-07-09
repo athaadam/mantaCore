@@ -2,16 +2,15 @@ import PageBreadcrumb from "@/components/layout/PageBreadCrump";
 import Header4 from "@/components/Header/Header4";
 import QuickActions from "@/components/Action/QuickActions";
 import AccountManagementClient from "@/components/client/AccountManagementClient";
-import { fetchAllUsers } from "@/libs/api/account-management";
 import { cookies } from "next/headers";
+import { apiHit } from "@/libs/api/fetch";
 
 export default async function AccountManagementPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-    
-    try {
-        const accounts = await fetchAllUsers(token);
 
+    try {
+        const accounts = await apiHit('getAllUsers', token);
         return (
             <div className="flex-1 p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen overflow-y-auto">
                 <div className="max-w-7xl mx-auto space-y-8">

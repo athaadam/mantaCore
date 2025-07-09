@@ -1,14 +1,13 @@
-import { getAllCustomers } from "@/libs/api/customer";
-import { getProfile } from "@/libs/api/auth";
 import { cookies } from "next/headers";
 import CustomerClient from "@/components/client/CustomerClient";
 import Header3 from "@/components/header/Header3";
+import { apiHit } from "@/libs/api/fetch";
 
 const CustomerPage = async () => {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-    const profile = await getProfile(token);
-    const api = await getAllCustomers(token);
+    const profile = await apiHit('user', token);
+    const api = await apiHit('getAllCostumers', token);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">

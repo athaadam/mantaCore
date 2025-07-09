@@ -2,7 +2,7 @@
 
 import { Chart } from "chart.js/auto";
 import { useEffect, useRef } from "react";
-import { formatRupiah } from "@/components/utils/formatRupiah";
+import { formatRupiah } from "@/libs/utils/formats/formatRupiah";
 
 export default function TopSales({ report }) {
     const canvasRef = useRef(null);

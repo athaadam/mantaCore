@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import CustomerAction from '@/components/action/CustomerAction';
-import Pagination from '@/components/utils/Pagination';
-import { formatDate } from '../utils/formatdate';
+import Pagination from '@/components/common/Pagination';
+import { formatDate } from '../../libs/utils/formats/formatdate';
 
 
 const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) => {

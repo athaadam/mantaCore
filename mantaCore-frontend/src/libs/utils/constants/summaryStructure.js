@@ -1,4 +1,3 @@
-// src/constants/summaryStructure.js
 export const summaryStructure = [
     { key: 'totalSales', title: 'Total Sales', icon: '/assets/SummaryLogos/Sales.png', isCurrency: true },
     { key: 'totalLifetimeSales', title: 'Total Lifetime Sales', icon: '/assets/SummaryLogos/Sales.png', isCurrency: true },

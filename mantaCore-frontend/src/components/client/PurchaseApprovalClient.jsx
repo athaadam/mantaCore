@@ -6,25 +6,25 @@ import PurchaseTable from '../table/PurchaseTable';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
 import SummaryCards from '@/components/card/SummaryCards';
-import { extractCustomers, extractCategories, extractStatuses, extractAuthors, applyFilters } from '@/components/utils/filterUtils';
+import { extractCategories, extractStatuses, extractAuthors, applyFilters } from '@/libs/utils/filters/filterUtils';
 
 export default function PurchaseApprovalClient({ summaryData, allData }) {
-    const [filter, setFilter] = useState({ 
-        from: '', 
-        to: '', 
-        category: '', 
+    const [filter, setFilter] = useState({
+        from: '',
+        to: '',
+        category: '',
         suitor: '',
         author: '',
-        status: '' 
+        status: ''
     });
-    
+
     const [appliedFilter, setAppliedFilter] = useState({});
 
     // Extract unique customers, authors, categories and statuses from purchase data
     const authors = useMemo(() => extractAuthors(allData || [], true), [allData]);
     const categories = useMemo(() => extractCategories(allData || []), [allData]);
     const statuses = useMemo(() => extractStatuses(allData || []), [allData]);
-    
+
     // Apply filters to data only when appliedFilter changes
     const filteredData = useMemo(() => {
         if (!allData || allData.length === 0) {
@@ -34,13 +34,8 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
     }, [allData, appliedFilter]);
 
     const handleApplyFilter = () => {
-        console.log('Filters applied:', filter);
-        console.log('Original data count:', allData?.length || 0);
         setAppliedFilter({ ...filter });
-        
-        // Add delay to log filtered count after state update
         setTimeout(() => {
-            console.log('Filtered data count:', filteredData.length);
         }, 100);
     };
 
@@ -48,7 +43,6 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
         const clearedFilter = { from: '', to: '', category: '', suitor: '', author: '', status: '' };
         setFilter(clearedFilter);
         setAppliedFilter({});
-        console.log('Filters cleared');
     };
 
     const handleExport = () => {
@@ -58,20 +52,21 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
             return;
         }
         // Export logic here
+
     };
 
     // Purchase approval icon
     const purchaseIcon = (
         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
     );
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-violet-50">
             {/* Modern Header Component */}
-            <Header 
+            <Header
                 icon={purchaseIcon}
                 title="Purchase Approval"
                 subtitle="Streamlined approval workflow for purchase requests and procurement management"
@@ -88,13 +83,13 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
                 </div>
 
                 {/* Enhanced Purchase Approval Table Section */}
-                <DataCard 
+                <DataCard
                     title="Purchase Request Management"
                     subtitle="Review, approve, and track all purchase requests with advanced filtering capabilities"
                     icon={
                         <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>
                     }
                     gradient="bg-gradient-to-br from-white via-purple-50 to-violet-100"
@@ -118,7 +113,7 @@ export default function PurchaseApprovalClient({ summaryData, allData }) {
                             showStatus={true}
                         />
                     </div>
-                    
+
                     {/* Purchase Table */}
                     <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
                         <PurchaseTable data={filteredData} itemsPerPage={5} mode="purchase" />

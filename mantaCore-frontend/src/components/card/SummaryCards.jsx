@@ -1,7 +1,7 @@
 'use client';
 
 import SummaryCardItem from './SummaryCardItem';
-import { summaryStructure } from '../utils/summaryStructure';
+import { summaryStructure } from '../../libs/utils/constants/summaryStructure';
 
 export default function SummaryCards({ data = {}, only = [] }) {
   const filteredStructure = only.length

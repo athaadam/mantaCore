@@ -2,7 +2,7 @@
 
 import { Chart } from "chart.js/auto";
 import { useEffect, useRef } from "react";
-import { formatRupiah } from "@/components/utils/formatRupiah";
+import { formatRupiah } from "@/libs/utils/formats/formatRupiah";
 
 const defaultColors = [
     "#9B59B6", "#85C1E9", "#BB8FCE", "#82E0AA", "#F7DC6F",

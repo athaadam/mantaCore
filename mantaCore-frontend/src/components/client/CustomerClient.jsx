@@ -3,12 +3,12 @@
 import { useState } from "react";
 import CustomerTable from "@/components/table/CustomerTable";
 import CustomerModal from "@/components/modal/CustomerModal";
-import { createCustomer, updateCustomerById } from "@/libs/api/customer";
-import { getToken } from "@/libs/api/auth";
 import { extractErrorMessage } from "@/libs/exceptions";
-import Alert from "../utils/Alert";
+import Alert from "../common/Alert";
 import Header2 from "@/components/header/Header2";
 import DataCard from "@/components/card/DataCard";
+import { apiHit } from "@/libs/api/fetch";
+import Cookies from "js-cookie";
 
 
 export default function CustomerClient({ initialCustomers, profile }) {
@@ -31,12 +31,11 @@ export default function CustomerClient({ initialCustomers, profile }) {
     const handleSubmitModal = async (newData, mode) => {
         if (mode === 'edit') {
             try {
-                const token = await getToken();
-                const data = await updateCustomerById(newData.costumerID, newData, token);
+                const token = Cookies.get('auth');
+                const data = await apiHit(`updateCostumer/${selectedCustomer.costumerID}`, token, 'POST', newData);
                 setCustomers(prev =>
-                    prev.map(c => (c.costumerID === data.costumerID ? data : c))
+                    prev.map(c => (c.costumerID === data.costumer.costumerID ? data.costumer : c))
                 );
-                console.log('Customer updated:', data);
                 setAlert({ type: 'success', message: 'Customer updated successfully!' });
             } catch (error) {
                 const message = extractErrorMessage(error);
@@ -44,13 +43,13 @@ export default function CustomerClient({ initialCustomers, profile }) {
             }
         } else {
             try {
-                const token = await getToken();
+                const token = Cookies.get('auth');
                 const dataToSend = {
                     username: newData.username,
                     companyID: profile.company.companyID,
                 };
-                const data = await createCustomer(dataToSend, token);
-                setCustomers(prev => [data, ...prev]);
+                const data = await apiHit('createCostumer', token, 'POST', dataToSend);
+                setCustomers(prev => [data.costumer, ...prev]);
                 setAlert({ type: 'success', message: 'Customer added successfully!' });
             } catch (error) {
                 const message = extractErrorMessage(error);

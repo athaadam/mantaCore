@@ -5,7 +5,6 @@ import AuthForm from '@/components/form/AuthForm';
 export default function Page() {
   const [isLogin, setIsLogin] = useState(true);
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -39,7 +38,7 @@ export default function Page() {
         </div>
 
         {/* Overlay Background Image */}
-        <div 
+        <div
           className="absolute inset-0 opacity-20 bg-blend-overlay"
           style={{
             backgroundImage: 'url(/assets/common/erp.gif)',
@@ -57,7 +56,7 @@ export default function Page() {
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium">Trusted by 1000+ businesses</span>
             </div>
-            
+
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 <span className="block">Empowering</span>
@@ -66,7 +65,7 @@ export default function Page() {
                 </span>
                 <span className="block">Workflow</span>
               </h1>
-              
+
               <p className="text-lg sm:text-xl text-white/80 max-w-md leading-relaxed">
                 Streamline operations, boost productivity, and accelerate growth with our comprehensive business management platform.
               </p>
@@ -95,10 +94,10 @@ export default function Page() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <img 
-                  src="/assets/common/logo.png" 
-                  alt="MantaCore Logo" 
-                  className="w-32 sm:w-40 lg:w-48 h-auto filter drop-shadow-lg" 
+                <img
+                  src="/assets/common/logo.png"
+                  alt="MantaCore Logo"
+                  className="w-32 sm:w-40 lg:w-48 h-auto filter drop-shadow-lg"
                 />
                 <div className="absolute -inset-4 bg-white/10 rounded-full blur-xl"></div>
               </div>
@@ -107,7 +106,7 @@ export default function Page() {
                 <div className="text-sm text-white/70">Business Management Suite</div>
               </div>
             </div>
-            
+
             {/* Stats */}
             <div className="hidden lg:flex flex-col text-right space-y-2">
               <div className="text-3xl font-bold">99.9%</div>
@@ -126,28 +125,26 @@ export default function Page() {
       <div className="flex-1 lg:w-2/5 min-h-screen lg:min-h-0 flex items-center justify-center p-4 lg:p-8 relative">
         {/* Glassmorphism Background */}
         <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
-        
+
         {/* Form Container */}
         <div className="relative z-10 w-full max-w-md">
           {/* Mode Switch Pills */}
           <div className="mb-8 flex bg-white/60 backdrop-blur-sm rounded-2xl p-2 border border-white/30 shadow-lg">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                isLogin 
-                  ? 'bg-white text-violet-600 shadow-md transform scale-[1.02]' 
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${isLogin
+                  ? 'bg-white text-violet-600 shadow-md transform scale-[1.02]'
                   : 'text-slate-600 hover:text-violet-600'
-              }`}
+                }`}
             >
               Sign In
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                !isLogin 
-                  ? 'bg-white text-violet-600 shadow-md transform scale-[1.02]' 
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${!isLogin
+                  ? 'bg-white text-violet-600 shadow-md transform scale-[1.02]'
                   : 'text-slate-600 hover:text-violet-600'
-              }`}
+                }`}
             >
               Sign Up
             </button>
@@ -177,7 +174,7 @@ export default function Page() {
                 <span>24/7 Support</span>
               </div>
             </div>
-            
+
             <p className="text-xs text-slate-400 max-w-xs mx-auto">
               By continuing, you agree to our Terms of Service and Privacy Policy.
             </p>
