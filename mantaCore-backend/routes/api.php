@@ -76,6 +76,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
             Route::post('/updateUser/{userID}', [AccountManage::class, 'updateUser']);
 
+            //user management
+            Route::get('/getAllUsers', [UserController::class, 'getAllUsers']);
+            Route::get('/getUserByName/{username}', [UserController::class, 'getUserByName']);
+
         });
 
         //admin
@@ -85,10 +89,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/todayProfitLoss', [DashboardController::class, 'todayProfitLoss']);
             Route::get('/lifetimeProfitLoss', [DashboardController::class, 'lifetimeProfitLoss']);
             Route::get('/topSellingItems', [DashboardController::class, 'topSales']);
+        });
+
+        Route::middleware('role.management')->group(function () {
             
-            //user controller
-            Route::get('/getAllUsers', [UserController::class, 'getAllUsers']);
-            Route::get('/getUserByName/{username}', [UserController::class, 'getUserByName']);
+        }); 
+
+        Route::middleware('role.cashier')->group(function () {
+            
         });
     });
 });

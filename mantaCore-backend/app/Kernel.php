@@ -49,5 +49,7 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\CheckisAdmin::class,
         'cashier' => \App\Http\Middleware\CheckisCashier::class,
         'management' => \App\Http\Middleware\CheckisManagement::class,
+        'role.management' => \App\Http\Middleware\checkRoleManaegment::class,
+        'role.cashier' => \App\Http\Middleware\checkRoleCashier::class
     ];
 }
