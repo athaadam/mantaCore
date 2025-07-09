@@ -21,7 +21,7 @@ class PurchaseController extends Controller
         return response()->json($purchases);
     }
 
-    public function getPurchaseById(Request $request, int $id): JsonResponse
+    public function getPurchaseById(Request $request, string $id): JsonResponse
     {
         $user = $request->user();
         $purchase = Purchase::with(['user','company','items.item'])
