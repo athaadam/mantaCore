@@ -16,8 +16,8 @@ class CheckisManagement
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if (!$user || $user->role !== 'management') {
-            return response()->json(['message' => 'Access denied. Management only.'], 403);
+        if (!$user || !in_array($user->role, ['management', 'admin'])) {
+            return response()->json(['message' => 'Access denied. Cashiers or admins only.'], 403);
         }
         return $next($request);
     }
