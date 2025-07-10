@@ -90,13 +90,13 @@ const PurchaseStats = ({ stats, loading = false }) => {
             changeType: 'neutral'
         },
         {
-            title: 'Approved',
-            value: stats?.approved || 0,
+            title: 'Accepted',
+            value: stats?.accepted || 0,
             icon: CheckCircleIcon,
             color: 'from-green-500 to-emerald-600',
             textColor: 'text-green-600',
             bgColor: 'bg-green-50',
-            change: stats?.approvedChange || 0,
+            change: stats?.acceptedChange || 0,
             changeType: 'increase'
         },
         {

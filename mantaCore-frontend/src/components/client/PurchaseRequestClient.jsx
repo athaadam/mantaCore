@@ -12,6 +12,7 @@ import ConfirmationModal from "../modal/ConfirmationModal";
 import Alert from "../common/Alert";
 import { apiHit } from "@/libs/api/fetch";
 import Cookies from 'js-cookie';
+import { ScrollText } from "lucide-react";
 
 const PurchaseRequestClient = ({ api }) => {
     const [purchaseRequests, setPurchaseRequests] = useState(Array.isArray(api?.purchases) ? api.purchases : []);
@@ -23,8 +24,9 @@ const PurchaseRequestClient = ({ api }) => {
     const [selectedPurchase, setSelectedPurchase] = useState(null);
     const [filter, setFilter] = useState([]);
     const [stats, setStats] = useState({
-        totalAmount: 0, totalRequests: 0, pendingRequests: 0, approvedRequests: 0,
-        denied: 0, total: 0, pending: 0, approved: 0, totalValue: 0
+        totalAmount: 0, totalRequests: 0, pendingRequests: 0, acceptedRequests: 0,
+        denied: 0, total: 0, pending: 0, accepted: 0, totalValue: 0, activeCompanies: 0, avgRequestValue: 0,
+        thisMonth: 0
     });
     const [items, setItems] = useState(Array.isArray(api?.items) ? api.items : []);
     const [alert, setAlert] = useState(null);
@@ -47,8 +49,11 @@ const PurchaseRequestClient = ({ api }) => {
             denied: 0,
             total: 0,
             pending: 0,
-            approved: 0,
-            totalValue: 0
+            accepted: 0,
+            totalValue: 0,
+            activeCompanies: 0,
+            avgRequestValue: 0,
+            thisMonth: 0
         };
 
         // Parse amounts as numbers and handle any potential NaN values
@@ -59,20 +64,39 @@ const PurchaseRequestClient = ({ api }) => {
 
         const totalRequests = purchases.length;
         const pendingRequests = purchases.filter(purchase => purchase.status === 'pending').length;
-        const approvedRequests = purchases.filter(purchase => purchase.status === 'approved').length;
+        const acceptedRequests = purchases.filter(purchase => purchase.status === 'accepted').length;
         const deniedRequests = purchases.filter(purchase => purchase.status === 'denied').length;
+
+        // Calculate unique companies
+        const uniqueCompanyIds = [...new Set(purchases.map(purchase => purchase.companyID))];
+        const activeCompanies = uniqueCompanyIds.length;
+
+        // Calculate average request value
+        const avgRequestValue = totalRequests > 0 ? totalAmount / totalRequests : 0;
+
+        // Calculate this month's requests
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        const thisMonth = purchases.filter(purchase => {
+            const purchaseDate = new Date(purchase.created_at || purchase.updated_at);
+            return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
+        }).length;
 
         return {
             totalAmount,
             totalRequests,
             pendingRequests,
-            approvedRequests,
+            acceptedRequests,
             // For compatibility with PurchaseStats component
             denied: deniedRequests,
             total: totalRequests,
             pending: pendingRequests,
-            approved: approvedRequests,
-            totalValue: totalAmount
+            accepted: acceptedRequests,
+            totalValue: totalAmount,
+            activeCompanies,
+            avgRequestValue,
+            thisMonth
         };
     };
 
@@ -84,21 +108,21 @@ const PurchaseRequestClient = ({ api }) => {
         try {
             setIsSubmitting(true);
             const token = Cookies.get('auth');
-            
+
             // Ensure we have necessary IDs
             if (!user.userID) {
                 throw new Error("User information not available. Please try again or refresh the page.");
             }
-            
+
             if (!company.companyID) {
                 throw new Error("Company information not available. Please try again or refresh the page.");
             }
-            
+
             // Validate purchase items
             if (!Array.isArray(formData.purchaseItems) || formData.purchaseItems.length === 0) {
                 throw new Error("Please add at least one item to the purchase request.");
             }
-            
+
             // Prepare purchase data with user and company info
             const purchaseData = {
                 ...formData,
@@ -115,33 +139,33 @@ const PurchaseRequestClient = ({ api }) => {
             };
 
             let response;
-            
+
             if (selectedPurchase) {
                 // Update existing purchase
                 response = await apiHit(`updatePurchase/${selectedPurchase.purchaseID}`, token, 'POST', purchaseData);
-                
+
                 // Update the local state with the updated purchase
-                setPurchaseRequests(prev => 
+                setPurchaseRequests(prev =>
                     prev.map(p => p.purchaseID === selectedPurchase.purchaseID ? (response.purchase || response) : p)
                 );
             } else {
                 // Create new purchase
                 response = await apiHit('createPurchase', token, 'POST', purchaseData);
-                
+
                 // Add the new purchase to local state
                 const newPurchase = response.purchase || response;
                 if (newPurchase) {
                     setPurchaseRequests(prev => [...prev, newPurchase]);
                 }
             }
-            
+
             // Recalculate stats after successful operation
             setStats(calculateStats(
-                selectedPurchase ? 
-                    purchaseRequests.map(p => p.purchaseID === selectedPurchase.purchaseID ? (response.purchase || response) : p) : 
+                selectedPurchase ?
+                    purchaseRequests.map(p => p.purchaseID === selectedPurchase.purchaseID ? (response.purchase || response) : p) :
                     [...purchaseRequests, (response.purchase || response)]
             ));
-            
+
             // Use API message or default success message
             showAlert(response.message || (selectedPurchase ? "Purchase updated successfully" : "Purchase created successfully"), "success");
             setShowModal(false);
@@ -181,10 +205,10 @@ const PurchaseRequestClient = ({ api }) => {
             setIsSubmitting(true);
             const token = Cookies.get('auth');
             const response = await apiHit(`deletePurchase/${selectedPurchase.purchaseID}`, token, 'DELETE');
-            
+
             // Remove from local state
             setPurchaseRequests(prev => prev.filter(p => p.purchaseID !== selectedPurchase.purchaseID));
-            
+
             // Use API message or default
             showAlert(response.message || "Purchase request deleted successfully!", "success");
             setShowConfirmationModal(false);
@@ -202,9 +226,9 @@ const PurchaseRequestClient = ({ api }) => {
     };
 
     // Filter purchases based on filter state
-    const filteredPurchases = Array.isArray(purchaseRequests) 
-        ? (filter.length === 0 
-            ? purchaseRequests 
+    const filteredPurchases = Array.isArray(purchaseRequests)
+        ? (filter.length === 0
+            ? purchaseRequests
             : purchaseRequests.filter(purchase => filter.includes(purchase.status)))
         : [];
 
@@ -212,12 +236,10 @@ const PurchaseRequestClient = ({ api }) => {
         <>
             <Header2
                 icon={
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M8 11v4a4 4 0 008 0v-4m-8 0h8" />
-                    </svg>
+                    <ScrollText color="#ffffff" absoluteStrokeWidth />
                 }
                 title="Purchase Request Portal"
-                subtitle="Manage your purchase requests efficiently and effectively"
+                description="Manage your purchase requests efficiently and effectively"
                 colorScheme="purple"
                 onAdd={() => {
                     setSelectedPurchase(null);
