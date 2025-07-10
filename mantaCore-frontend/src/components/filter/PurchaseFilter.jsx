@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // Simple SVG icons to replace @heroicons/react/24/outline
 const MagnifyingGlassIcon = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,255 +63,61 @@ const CogIcon = ({ className }) => (
     </svg>
 );
 
-const PurchaseFilter = ({ 
-    onFilter, 
-    onClear, 
-    hasActiveFilters, 
-    companies = [],
-    loading = false 
+const PurchaseFilter = ({
+    onFilterChange,
+    activeFilters = [],
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [filters, setFilters] = useState({
-        search: '',
-        status: '',
-        companyID: '',
-        dateFrom: '',
-        dateTo: '',
-        amountMin: '',
-        amountMax: ''
-    });
-
+    // Use predefined status options for consistency
     const statusOptions = [
-        { value: 'pending', label: 'Pending', icon: ClockIcon, color: 'text-yellow-600' },
-        { value: 'approved', label: 'Approved', icon: CheckCircleIcon, color: 'text-green-600' },
-        { value: 'rejected', label: 'Rejected', icon: XCircleIcon, color: 'text-red-600' },
-        { value: 'processing', label: 'Processing', icon: CogIcon, color: 'text-blue-600' }
+        { value: 'pending', label: 'Pending', icon: ClockIcon, color: 'bg-yellow-50 text-yellow-600 border-yellow-200' },
+        { value: 'accepted', label: 'Accepted', icon: CheckCircleIcon, color: 'bg-green-50 text-green-600 border-green-200' },
+        { value: 'denied', label: 'Denied', icon: XCircleIcon, color: 'bg-red-50 text-red-600 border-red-200' },
     ];
 
-    const handleInputChange = (key, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [key]: value
-        }));
+    // Toggle status filter - use memoization to avoid re-renders
+    const handleToggleStatus = (status) => {
+        const updatedFilters = activeFilters.includes(status)
+            ? activeFilters.filter(s => s !== status)
+            : [...activeFilters, status];
+            
+        onFilterChange(updatedFilters);
     };
 
-    const handleApplyFilters = () => {
-        onFilter(filters);
-        setIsOpen(false);
-    };
-
+    // Clear all filters
     const handleClearFilters = () => {
-        const clearedFilters = {
-            search: '',
-            status: '',
-            companyID: '',
-            dateFrom: '',
-            dateTo: '',
-            amountMin: '',
-            amountMax: ''
-        };
-        setFilters(clearedFilters);
-        onClear();
-        setIsOpen(false);
-    };
-
-    const getActiveFilterCount = () => {
-        return Object.values(filters).filter(value => value !== '').length;
+        onFilterChange([]);
     };
 
     return (
-        <div className="relative">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Search & Filter</h3>
-                        <p className="text-sm text-gray-500">Find purchase requests quickly</p>
-                    </div>
+        <div className="mb-6">
+            <div className="flex flex-wrap items-center gap-2">
+                {/* Status Filter Pills */}
+                {statusOptions.map(status => (
                     <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="relative inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        key={status.value}
+                        onClick={() => handleToggleStatus(status.value)}
+                        className={`inline-flex items-center px-3 py-2 rounded-full border transition-all ${activeFilters.includes(status.value)
+                                ? `${status.color}`
+                                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                            }`}
                     >
-                        <FunnelIcon className="h-4 w-4" />
-                        <span>Filters</span>
-                        {getActiveFilterCount() > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {getActiveFilterCount()}
-                            </span>
-                        )}
+                        <status.icon className={`w-4 h-4 mr-2 ${activeFilters.includes(status.value) ? '' : 'text-gray-400'
+                            }`} />
+                        <span className="text-sm font-medium">
+                            {status.label}
+                        </span>
                     </button>
-                </div>
+                ))}
 
-                {/* Search Bar */}
-                <div className="relative mb-4">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Search by request ID, company name, or user..."
-                        className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                        value={filters.search}
-                        onChange={(e) => handleInputChange('search', e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleApplyFilters()}
-                    />
-                </div>
-
-                {/* Active Filters Display */}
-                {hasActiveFilters && (
-                    <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-purple-700">Active Filters:</span>
-                                <span className="text-sm text-purple-600">{getActiveFilterCount()} filter(s) applied</span>
-                            </div>
-                            <button
-                                onClick={handleClearFilters}
-                                className="text-sm text-purple-700 hover:text-purple-900 font-medium"
-                            >
-                                Clear All
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Advanced Filters Panel */}
-                {isOpen && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {/* Status Filter */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Status
-                                </label>
-                                <select
-                                    value={filters.status}
-                                    onChange={(e) => handleInputChange('status', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                >
-                                    <option value="">All Statuses</option>
-                                    {statusOptions.map(status => (
-                                        <option key={status.value} value={status.value}>
-                                            {status.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Company Filter */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Company
-                                </label>
-                                <select
-                                    value={filters.companyID}
-                                    onChange={(e) => handleInputChange('companyID', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                >
-                                    <option value="">All Companies</option>
-                                    {companies.map(company => (
-                                        <option key={company.companyID} value={company.companyID}>
-                                            {company.companyName || company.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Date From */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Date From
-                                </label>
-                                <input
-                                    type="date"
-                                    value={filters.dateFrom}
-                                    onChange={(e) => handleInputChange('dateFrom', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                />
-                            </div>
-
-                            {/* Date To */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Date To
-                                </label>
-                                <input
-                                    type="date"
-                                    value={filters.dateTo}
-                                    onChange={(e) => handleInputChange('dateTo', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                />
-                            </div>
-
-                            {/* Amount Min */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Min Amount
-                                </label>
-                                <input
-                                    type="number"
-                                    placeholder="0.00"
-                                    value={filters.amountMin}
-                                    onChange={(e) => handleInputChange('amountMin', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                />
-                            </div>
-
-                            {/* Amount Max */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Max Amount
-                                </label>
-                                <input
-                                    type="number"
-                                    placeholder="0.00"
-                                    value={filters.amountMax}
-                                    onChange={(e) => handleInputChange('amountMax', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Filter Actions */}
-                        <div className="flex items-center justify-between mt-6">
-                            <button
-                                onClick={handleClearFilters}
-                                className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-                            >
-                                <XMarkIcon className="h-4 w-4" />
-                                Clear Filters
-                            </button>
-                            <button
-                                onClick={handleApplyFilters}
-                                disabled={loading}
-                                className="inline-flex items-center gap-2 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                            >
-                                {loading ? (
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <FunnelIcon className="h-4 w-4" />
-                                )}
-                                Apply Filters
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Quick Apply Button for Search */}
-                {!isOpen && (
-                    <div className="flex justify-end">
-                        <button
-                            onClick={handleApplyFilters}
-                            disabled={loading}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            ) : (
-                                <MagnifyingGlassIcon className="h-4 w-4" />
-                            )}
-                            Search
-                        </button>
-                    </div>
+                {/* Clear Filters Button (only show if filters are active) */}
+                {activeFilters.length > 0 && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="inline-flex items-center px-3 py-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <XMarkIcon className="w-4 h-4 mr-1.5 text-gray-500" />
+                        <span className="text-sm">Clear Filters</span>
+                    </button>
                 )}
             </div>
         </div>

@@ -100,8 +100,8 @@ const PurchaseStats = ({ stats, loading = false }) => {
             changeType: 'increase'
         },
         {
-            title: 'Rejected',
-            value: stats?.rejected || 0,
+            title: 'Denied',
+            value: stats?.denied || 0,
             icon: XCircleIcon,
             color: 'from-red-500 to-rose-600',
             textColor: 'text-red-600',
@@ -162,7 +162,7 @@ const PurchaseStats = ({ stats, loading = false }) => {
                                 </div>
                             )}
                         </div>
-                        
+
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-gray-600">{card.title}</p>
                             <p className="text-2xl font-bold text-gray-900">

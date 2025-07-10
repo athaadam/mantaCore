@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+import { Banknote } from 'lucide-react';
 // Simple SVG icons to replace @heroicons/react/24/outline
 const XMarkIcon = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
+
+const MoneyIcon = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="" />
     </svg>
 );
 
@@ -81,26 +88,27 @@ const PurchaseModal = ({
             // Edit mode
             setFormData({
                 companyID: purchase.companyID || '',
-                date: purchase.date || '',
-                status: purchase.status || '',
+                date: purchase.date ? new Date(purchase.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                status: purchase.status || 'pending',
                 purchaseItems: purchase.items?.map(item => ({
-                    itemID: item.itemID,
-                    quantity: item.quantity,
-                    unitPrice: item.unitPrice,
+                    itemID: item.itemID || item.item?.itemID || '',
+                    quantity: parseInt(item.quantity) || 1,
+                    itemPrice: parseFloat(item.itemPrice || item.unitPrice || 0),
                     type: item.type || 'purchase'
                 })) || []
             });
         } else {
-            // Add mode
+            // Add mode - company ID comes from the user profile
             setFormData({
-                companyID: '',
+                // We won't need this in the UI as it's automatically set in the client component
+                companyID: companies.companyID || '',
                 date: new Date().toISOString().split('T')[0],
                 status: 'pending',
                 purchaseItems: []
             });
         }
         setErrors({});
-    }, [purchase, isOpen]);
+    }, [purchase, isOpen, companies]);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -124,7 +132,7 @@ const PurchaseModal = ({
                 {
                     itemID: '',
                     quantity: 1,
-                    unitPrice: 0,
+                    itemPrice: 0,
                     type: 'purchase'
                 }
             ]
@@ -145,11 +153,11 @@ const PurchaseModal = ({
                 if (i === index) {
                     const updatedItem = { ...item, [field]: value };
 
-                    // Auto-fill unit price when item is selected
+                    // Auto-fill item price when item is selected
                     if (field === 'itemID' && value) {
                         const selectedItem = items.find(item => item.itemID === parseInt(value));
                         if (selectedItem) {
-                            updatedItem.unitPrice = selectedItem.price || selectedItem.unitPrice || 0;
+                            updatedItem.itemPrice = selectedItem.itemPrice || selectedItem.price || 0;
                         }
                     }
 
@@ -160,59 +168,53 @@ const PurchaseModal = ({
         }));
     };
 
-    const calculateTotal = () => {
-        return formData.purchaseItems.reduce((total, item) => {
-            return total + (item.quantity * item.unitPrice);
-        }, 0);
-    };
+    const calculateTotal = () => formData.purchaseItems.reduce(
+        (total, item) => total + (item.quantity * (item.itemPrice || 0)), 0
+    );
 
-    const validateForm = () => {
-        const newErrors = {};
+    // const validateForm = () => {
+    //     const newErrors = {};
 
-        if (!formData.companyID) {
-            newErrors.companyID = 'Company is required';
-        }
-        if (!formData.date) {
-            newErrors.date = 'Date is required';
-        }
-        if (formData.purchaseItems.length === 0) {
-            newErrors.purchaseItems = 'At least one item is required';
-        }
+    //     if (!formData.date) {
+    //         newErrors.date = 'Date is required';
+    //     }
+    //     if (formData.purchaseItems.length === 0) {
+    //         newErrors.purchaseItems = 'At least one item is required';
+    //     }
 
-        formData.purchaseItems.forEach((item, index) => {
-            if (!item.itemID) {
-                newErrors[`item_${index}`] = 'Item is required';
-            }
-            if (!item.quantity || item.quantity <= 0) {
-                newErrors[`quantity_${index}`] = 'Quantity must be greater than 0';
-            }
-            if (!item.unitPrice || item.unitPrice <= 0) {
-                newErrors[`unitPrice_${index}`] = 'Unit price must be greater than 0';
-            }
-        });
+    //     formData.purchaseItems.forEach((item, index) => {
+    //         if (!item.itemID) {
+    //             newErrors[`item_${index}`] = 'Item is required';
+    //         }
+    //         if (!item.quantity || item.quantity <= 0) {
+    //             newErrors[`quantity_${index}`] = 'Quantity must be greater than 0';
+    //         }
+    //         if (!item.itemPrice || item.itemPrice <= 0) {
+    //             newErrors[`itemPrice_${index}`] = 'Item price must be greater than 0';
+    //         }
+    //     });
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    //     setErrors(newErrors);
+    //     return Object.keys(newErrors).length === 0;
+    // };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            const submitData = {
-                ...formData,
-                amount: calculateTotal(),
-                // Ensure purchaseItems have all required fields
-                purchaseItems: formData.purchaseItems.map(item => ({
-                    itemID: parseInt(item.itemID),
-                    quantity: parseInt(item.quantity),
-                    unitPrice: parseFloat(item.unitPrice),
-                    subTotal: parseFloat(item.quantity) * parseFloat(item.unitPrice),
-                    type: item.type || 'purchase'
-                }))
-            };
-            console.log('Modal submitting data:', submitData);
-            onSubmit(submitData);
-        }
+        
+        // Prepare data and submit
+        onSubmit({
+            ...formData,
+            companyID: parseInt(formData.companyID),
+            amount: calculateTotal(),
+            purchaseItems: formData.purchaseItems.map(item => ({
+                itemID: parseInt(item.itemID),
+                quantity: parseInt(item.quantity),
+                itemPrice: parseFloat(item.itemPrice),
+                unitPrice: parseFloat(item.itemPrice),
+                subTotal: parseFloat(item.quantity) * parseFloat(item.itemPrice),
+                type: item.type || 'purchase'
+            }))
+        });
     };
 
     const getSelectedItem = (itemID) => {
@@ -250,28 +252,19 @@ const PurchaseModal = ({
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        {/* Company Selection */}
+                        {/* Company Display (Read-only) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 <BuildingOfficeIcon className="w-4 h-4 inline mr-1" />
-                                Company *
+                                Company
                             </label>
-                            <select
-                                value={formData.companyID}
-                                onChange={(e) => handleInputChange('companyID', e.target.value)}
-                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors.companyID ? 'border-red-500' : 'border-gray-300'
-                                    }`}
-                            >
-                                <option value="">Select a company</option>
-                                {companies.map(company => (
-                                    <option key={company.companyID} value={company.companyID}>
-                                        {company.companyName || company.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.companyID && (
-                                <p className="mt-1 text-sm text-red-600">{errors.companyID}</p>
-                            )}
+                            <div className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg text-gray-700">
+                                {companies && typeof companies === 'object' && (companies.companyName || companies.name) ?
+                                    (companies.companyName || companies.name) :
+                                    'Your Company'}
+                            </div>
+                            {/* Hidden input to ensure companyID is included in form data */}
+                            <input type="hidden" value={formData.companyID} />
                         </div>
 
                         {/* Date */}
@@ -299,21 +292,21 @@ const PurchaseModal = ({
                                 Status
                             </label>
                             <select
-                                value={formData.status}
+                                value={formData.status || 'pending'}
                                 onChange={(e) => handleInputChange('status', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             >
                                 <option value="pending">Pending</option>
                                 <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="processing">Processing</option>
+                                <option value="denied">Denied</option>
+                                {/* <option value="processing">Processing</option> */}
                             </select>
                         </div>
 
                         {/* Total Amount Display */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                <CurrencyDollarIcon className="w-4 h-4 inline mr-1" />
+                                <Banknote className="w-4 h-4 inline mr-1" />
                                 Total Amount
                             </label>
                             <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
@@ -387,22 +380,22 @@ const PurchaseModal = ({
                                             )}
                                         </div>
 
-                                        {/* Unit Price */}
+                                        {/* Item Price */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Unit Price *
+                                                Item Price *
                                             </label>
                                             <input
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                value={item.unitPrice}
-                                                onChange={(e) => updatePurchaseItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`unitPrice_${index}`] ? 'border-red-500' : 'border-gray-300'
+                                                value={item.itemPrice}
+                                                onChange={(e) => updatePurchaseItem(index, 'itemPrice', parseFloat(e.target.value) || 0)}
+                                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`itemPrice_${index}`] ? 'border-red-500' : 'border-gray-300'
                                                     }`}
                                             />
-                                            {errors[`unitPrice_${index}`] && (
-                                                <p className="mt-1 text-sm text-red-600">{errors[`unitPrice_${index}`]}</p>
+                                            {errors[`itemPrice_${index}`] && (
+                                                <p className="mt-1 text-sm text-red-600">{errors[`itemPrice_${index}`]}</p>
                                             )}
                                         </div>
                                     </div>
@@ -410,7 +403,7 @@ const PurchaseModal = ({
                                     {/* Subtotal and Remove Button */}
                                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                                         <div className="text-sm text-gray-600">
-                                            Subtotal: <span className="font-semibold">{formatRupiah(item.quantity * item.unitPrice)}</span>
+                                            Subtotal: <span className="font-semibold">{formatRupiah(item.quantity * item.itemPrice)}</span>
                                         </div>
                                         <button
                                             type="button"

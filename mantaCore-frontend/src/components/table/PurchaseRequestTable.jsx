@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 import { getStatusColor } from '@/libs/utils/colors/statuscolor';
+import Pagination from '../common/Pagination';
+import { formatDate } from '@/libs/utils/formats/formatdate';
 
 // Simple SVG icons to replace @heroicons/react/24/outline
 const PencilIcon = ({ className }) => (
@@ -50,106 +52,33 @@ const BuildingOfficeIcon = ({ className }) => (
 
 const PurchaseRequestTable = ({
     purchases = [],
-    loading = false,
-    currentPage = 1,
-    totalPages = 1,
-    onPageChange,
+    itemsPerPage = 10,
     onEdit,
     onView,
     onDelete,
-    onSort,
-    sortField = '',
-    sortDirection = 'asc',
     isFiltered = false,
     hasActiveFilters = false
 }) => {
-    const handleSort = (field) => {
-        if (onSort) {
-            onSort(field);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Ensure purchases is always an array
+    const purchasesList = Array.isArray(purchases) ? purchases : [];
+    const totalPages = Math.ceil(purchasesList.length / itemsPerPage);
+    const startIdx = Math.max((currentPage - 1) * itemsPerPage, 0);
+    const currentData = purchasesList.slice(startIdx, startIdx + itemsPerPage);
+
+
+
+
+    useEffect(() => {
+        const pages = Math.ceil(purchasesList.length / itemsPerPage);
+        if (currentPage > pages) {
+            setCurrentPage(1);
         }
-    };
+    }, [purchasesList.length, itemsPerPage, currentPage]);
 
-    const getSortIcon = (field) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? '↑' : '↓';
-    };
-
-    // const getStatusColor = (status) => {
-    //     switch (status?.toLowerCase()) {
-    //         case 'pending':
-    //             return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    //         case 'approved':
-    //             return 'bg-green-100 text-green-800 border-green-200';
-    //         case 'rejected':
-    //             return 'bg-red-100 text-red-800 border-red-200';
-    //         case 'processing':
-    //             return 'bg-blue-100 text-blue-800 border-blue-200';
-    //         default:
-    //             return 'bg-gray-100 text-gray-800 border-gray-200';
-    //     }
-    // };
-
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    };
-
-    const sortedPurchases = useMemo(() => {
-        // Ensure purchases is an array
-        if (!Array.isArray(purchases)) {
-            console.log('Purchases is not an array:', purchases);
-            return [];
-        }
-
-        // If no sortField is specified, return original array
-        if (!sortField) {
-            return [...purchases];
-        }
-
-        return [...purchases].sort((a, b) => {
-            let aValue = a[sortField];
-            let bValue = b[sortField];
-
-            if (sortField === 'date') {
-                aValue = new Date(aValue);
-                bValue = new Date(bValue);
-            }
-
-            if (sortDirection === 'asc') {
-                return aValue > bValue ? 1 : -1;
-            } else {
-                return aValue < bValue ? 1 : -1;
-            }
-        });
-    }, [purchases, sortField, sortDirection]);
-
-    console.log('PurchaseRequestTable - purchases:', purchases);
-    console.log('PurchaseRequestTable - sortedPurchases:', sortedPurchases);
-
-    if (loading) {
-        return (
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden">
-                <div className="px-8 pt-8 pb-6">
-                    <div className="animate-pulse">
-                        <div className="space-y-4">
-                            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                            <div className="space-y-2">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="h-12 bg-gray-100 rounded"></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (!Array.isArray(purchases) || purchases.length === 0) {
+    if (!Array.isArray(purchases) || purchasesList.length === 0) {
         return (
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden">
                 <div className="px-8 pt-8 pb-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 via-white to-violet-50">
@@ -172,7 +101,7 @@ const PurchaseRequestTable = ({
                         <ShoppingCartIcon className="w-12 h-12 text-purple-600" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        {isFiltered ? 'No purchase requests match your filters' : 'No purchase requests yet'}
+                        {isFiltered ? 'No purchase requests match your filters' : 'You have no purchase requests yet'}
                     </h3>
                     <p className="text-gray-500 mb-6">
                         {isFiltered
@@ -206,7 +135,7 @@ const PurchaseRequestTable = ({
                             Purchase Requests
                         </h3>
                         <p className="text-purple-600 text-sm mt-1">
-                            {purchases.length} request{purchases.length !== 1 ? 's' : ''} found
+                            {purchasesList.length} request{purchasesList.length !== 1 ? 's' : ''} found
                         </p>
                     </div>
                 </div>
@@ -217,57 +146,17 @@ const PurchaseRequestTable = ({
                 <table className="min-w-full text-sm text-slate-700">
                     <thead className="bg-gradient-to-r from-purple-50 to-violet-50 text-xs text-slate-700 uppercase tracking-wider font-semibold">
                         <tr>
-                            <th className="px-6 py-5 text-left font-bold">
-                                <button
-                                    onClick={() => handleSort('purchaseID')}
-                                    className="flex items-center space-x-1 hover:text-purple-700 transition-colors"
-                                >
-                                    <span>Request ID</span>
-                                    <span className="text-purple-400">{getSortIcon('purchaseID')}</span>
-                                </button>
-                            </th>
-                            <th className="px-6 py-5 text-left font-bold">
-                                <button
-                                    onClick={() => handleSort('company')}
-                                    className="flex items-center space-x-1 hover:text-purple-700 transition-colors"
-                                >
-                                    <span>Company</span>
-                                    <span className="text-purple-400">{getSortIcon('company')}</span>
-                                </button>
-                            </th>
-                            <th className="px-6 py-5 text-left font-bold">
-                                <button
-                                    onClick={() => handleSort('date')}
-                                    className="flex items-center space-x-1 hover:text-purple-700 transition-colors"
-                                >
-                                    <span>Date</span>
-                                    <span className="text-purple-400">{getSortIcon('date')}</span>
-                                </button>
-                            </th>
+                            <th className="px-6 py-5 text-left font-bold">Request ID</th>
+                            <th className="px-6 py-5 text-left font-bold">Company</th>
+                            <th className="px-6 py-5 text-left font-bold">Date</th>
                             <th className="px-6 py-5 text-left font-bold">Items</th>
-                            <th className="px-6 py-5 text-left font-bold">
-                                <button
-                                    onClick={() => handleSort('amount')}
-                                    className="flex items-center space-x-1 hover:text-purple-700 transition-colors"
-                                >
-                                    <span>Amount</span>
-                                    <span className="text-purple-400">{getSortIcon('amount')}</span>
-                                </button>
-                            </th>
-                            <th className="px-6 py-5 text-left font-bold">
-                                <button
-                                    onClick={() => handleSort('status')}
-                                    className="flex items-center space-x-1 hover:text-purple-700 transition-colors"
-                                >
-                                    <span>Status</span>
-                                    <span className="text-purple-400">{getSortIcon('status')}</span>
-                                </button>
-                            </th>
+                            <th className="px-6 py-5 text-left font-bold">Amount</th>
+                            <th className="px-6 py-5 text-left font-bold">Status</th>
                             <th className="px-6 py-5 text-left font-bold">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white/50 backdrop-blur-sm">
-                        {sortedPurchases.map((purchase) => (
+                        {currentData.map((purchase) => (
                             <tr key={purchase.purchaseID} className="hover:bg-purple-50/70 transition-all duration-200 border-b border-purple-100 last:border-b-0 group">
                                 <td className="px-6 py-5 whitespace-nowrap">
                                     <div className="flex items-center">
@@ -283,7 +172,7 @@ const PurchaseRequestTable = ({
                                                 Request #{purchase.purchaseID}
                                             </div>
                                             <div className="text-sm text-gray-500">
-                                                {purchase.user?.name || 'Unknown User'}
+                                                {purchase.user?.username || 'Unknown User'}
                                             </div>
                                         </div>
                                     </div>
@@ -305,7 +194,7 @@ const PurchaseRequestTable = ({
                                     <div className="flex items-center">
                                         <CalendarDaysIcon className="h-5 w-5 text-gray-400 mr-2" />
                                         <div className="text-sm text-gray-900">
-                                            {formatDate(purchase.date)}
+                                            {formatDate(purchase.updated_at)}
                                         </div>
                                     </div>
                                 </td>
@@ -372,83 +261,13 @@ const PurchaseRequestTable = ({
                     </tbody>
                 </table>
             </div>
-
             {/* Enhanced Pagination */}
-            {totalPages > 1 && (
-                <div className="px-8 py-6 bg-gradient-to-r from-white via-purple-50 to-violet-50 border-t border-purple-100 flex justify-between items-center rounded-b-3xl">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                        <button
-                            onClick={() => onPageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            onClick={() => onPageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next
-                        </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div className="text-sm text-slate-600 font-medium">
-                            Page <span className="font-medium">{currentPage}</span> of{' '}
-                            <span className="font-medium">{totalPages}</span>
-                        </div>
-                        <div>
-                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                                <button
-                                    onClick={() => onPageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <span className="sr-only">Previous</span>
-                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                    let pageNum;
-                                    if (totalPages <= 5) {
-                                        pageNum = i + 1;
-                                    } else if (currentPage <= 3) {
-                                        pageNum = i + 1;
-                                    } else if (currentPage >= totalPages - 2) {
-                                        pageNum = totalPages - 4 + i;
-                                    } else {
-                                        pageNum = currentPage - 2 + i;
-                                    }
-
-                                    return (
-                                        <button
-                                            key={pageNum}
-                                            onClick={() => onPageChange(pageNum)}
-                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pageNum === currentPage
-                                                    ? 'z-10 bg-purple-50 border-purple-500 text-purple-600'
-                                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            {pageNum}
-                                        </button>
-                                    );
-                                })}
-                                <button
-                                    onClick={() => onPageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <span className="sr-only">Next</span>
-                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPrev={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onNext={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            />
         </div>
     );
 };

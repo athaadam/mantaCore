@@ -1,6 +1,9 @@
 'use client';
 
+import { formatDate } from '@/libs/utils/formats/formatdate';
 import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+import { getStatusColor } from '@/libs/utils/colors/statuscolor';
+
 
 // Simple SVG icons to replace @heroicons/react/24/outline
 const XMarkIcon = ({ className }) => (
@@ -60,32 +63,8 @@ const InformationCircleIcon = ({ className }) => (
 const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
     if (!isOpen || !purchase) return null;
 
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'approved':
-                return 'bg-green-100 text-green-800 border-green-200';
-            case 'rejected':
-                return 'bg-red-100 text-red-800 border-red-200';
-            case 'processing':
-                return 'bg-blue-100 text-blue-800 border-blue-200';
-            default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
-        }
-    };
-
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
-    const calculateItemTotal = (quantity, unitPrice) => {
-        return quantity * unitPrice;
+    const calculateItemTotal = (quantity, price) => {
+        return quantity * (price || 0);
     };
 
     return (
@@ -93,25 +72,25 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-200 transform transition-all duration-200 scale-100 z-10 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-purple-100 rounded-lg">
-                                <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                    Purchase Request #{purchase.purchaseID}
-                                </h3>
-                                <p className="text-sm text-gray-500">
-                                    View purchase request details
-                                </p>
-                            </div>
+                    <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                            <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
                         </div>
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <XMarkIcon className="w-5 h-5" />
-                        </button>
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Purchase Request #{purchase.purchaseID}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                                View purchase request details
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <XMarkIcon className="w-5 h-5" />
+                    </button>
                 </div>
 
                 {/* Content */}
@@ -164,7 +143,7 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                             <ClipboardDocumentListIcon className="w-5 h-5 text-gray-500" />
                             <h4 className="font-medium text-gray-900">Purchase Items</h4>
                         </div>
-                        
+
                         <div className="overflow-x-auto">
                             <table className="w-full border border-gray-200 rounded-lg">
                                 <thead className="bg-gray-50">
@@ -179,7 +158,7 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                             Quantity
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Unit Price
+                                            Item Price
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Total
@@ -207,12 +186,12 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap">
                                                     <div className="text-sm text-gray-900">
-                                                        {formatRupiah(item.unitPrice)}
+                                                        {formatRupiah(item.itemPrice || item.unitPrice || 0)}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap">
                                                     <div className="text-sm font-medium text-gray-900">
-                                                        {formatRupiah(calculateItemTotal(item.quantity, item.unitPrice))}
+                                                        {formatRupiah(calculateItemTotal(item.quantity, item.itemPrice || item.unitPrice))}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -256,8 +235,8 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                             <div>
                                 <span className="font-medium text-gray-700">Average Price:</span>
                                 <span className="ml-2 text-gray-900">
-                                    {purchase.items?.length > 0 
-                                        ? formatRupiah(purchase.amount / purchase.items.length) 
+                                    {purchase.items?.length > 0
+                                        ? formatRupiah(purchase.amount / purchase.items.length)
                                         : formatRupiah(0)
                                     }
                                 </span>

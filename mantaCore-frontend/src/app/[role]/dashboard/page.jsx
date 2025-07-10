@@ -1,9 +1,10 @@
 import AdminDashboardLayout from '@/components/layout/AdminDashboardLayout';
-import { cookies } from 'next/headers';
 import { apiHit } from '@/libs/api/fetch';
+import { cookies } from 'next/headers';
 
 export default async function DashboardPage() {
-  const token = cookies().get('auth')?.value;
+  const cookie = await cookies();
+  const token = await cookie.get('auth')?.value;
   const profile = await apiHit('user', token);
 
   if (profile.user.role === 'admin') {

@@ -201,14 +201,12 @@ class PurchaseController extends Controller
     public function getMyPurchases(Request $request): JsonResponse
     {
         //cek jika purchase yang saya buat kosong
-        if (!$request->user()->purchases()->exists()) {
-            return response()->json(['message' => 'You have no purchases yet'], 404);
-        }
         $purchases = Purchase::with(['user', 'company', 'items.item'])
             ->where('companyID', $request->user()->companyID)
             ->get();
+
         return response()->json([
-            'message' => 'My purchases retrieved successfully',
+            'message' => $purchases->isEmpty() ? 'No purchases available' : 'My purchases retrieved successfully',
             'purchases' => $purchases,
         ]);
     }

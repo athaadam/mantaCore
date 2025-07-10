@@ -1,6 +1,6 @@
 'use client';
 
-import SectionWrapper from '../section/SectionWrapper';
+import SectionWrapper from './SectionWrapper';
 import CountBadge from '../common/CountBadge';
 import AccountList from '../table/AccountList';
 

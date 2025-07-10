@@ -5,7 +5,7 @@ import Alert from '../common/Alert';
 import Cookies from 'js-cookie';
 import StatsGrid from '../card/StatsGrid';
 import AccountFormSection from '../section/AccountFormSection';
-import AccountListSection from '../table/AccountListSection';
+import AccountListSection from '../section/AccountListSection';
 import { apiHit } from '@/libs/api/fetch';
 
 export default function AccountManagementClient({ initialData }) {

@@ -2,7 +2,17 @@
 
 import React from 'react';
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Delete', cancelText = 'Cancel', type = 'danger' }) => {
+const ConfirmationModal = ({ 
+    isOpen, 
+    onClose, 
+    onConfirm, 
+    title, 
+    message, 
+    confirmText = 'Delete', 
+    cancelText = 'Cancel', 
+    type = 'danger',
+    loading = false 
+}) => {
     if (!isOpen) return null;
 
     const typeStyles = {
@@ -40,10 +50,18 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 
     const currentStyle = typeStyles[type] || typeStyles.danger;
 
+    // Loading spinner component
+    const LoadingSpinner = () => (
+        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    );
+
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
             {/* Backdrop */}
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={loading ? null : onClose}></div>
             
             {/* Modal Container */}
             <div className="flex min-h-full items-center justify-center p-4">
@@ -73,15 +91,18 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors duration-200 font-medium"
+                                disabled={loading}
+                                className={`px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors duration-200 font-medium ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {cancelText}
                             </button>
                             <button
                                 type="button"
                                 onClick={onConfirm}
-                                className={`px-4 py-2 text-white rounded-lg transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${currentStyle.confirmButton}`}
+                                disabled={loading}
+                                className={`flex items-center justify-center px-4 py-2 text-white rounded-lg transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${currentStyle.confirmButton} ${loading ? 'opacity-80 cursor-not-allowed' : ''}`}
                             >
+                                {loading && <LoadingSpinner />}
                                 {confirmText}
                             </button>
                         </div>

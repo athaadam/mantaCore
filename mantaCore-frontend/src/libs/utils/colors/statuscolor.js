@@ -10,6 +10,8 @@ export const getStatusColor = (status) => {
         management: 'bg-teal-500 text-white',
         active: 'bg-green-600 text-white',
         inactive: 'bg-gray-500 text-white',
+        denied: 'bg-red-700 text-white',
+        processing: 'bg-blue-400 text-white',
     };
 
     if (!status || typeof status !== 'string') return 'bg-gray-300 text-black';
