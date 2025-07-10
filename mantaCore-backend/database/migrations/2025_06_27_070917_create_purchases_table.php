@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('purchases', function (Blueprint $table) {
-            $table->id('purchaseID');
+            $table->string('purchaseID')->primary();
             $table->foreignId('userID')->constrained('users', 'userID')->cascadeOnDelete();
             $table->foreignId('companyID')->constrained('companies', 'companyID')->cascadeOnDelete();
             $table->string('status');

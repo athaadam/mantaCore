@@ -8,7 +8,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->id('invoiceItemID');
-            $table->foreignId('invoiceID')->constrained('invoices', 'invoiceID')->cascadeOnDelete();
+            $table->string('invoiceID'); // karena PK invoiceID adalah string
+            $table->foreign('invoiceID')->references('invoiceID')->on('invoices')->cascadeOnDelete();
             $table->foreignId('itemID')->constrained('items', 'itemID')->cascadeOnDelete();
             $table->string('type');
             $table->integer('quantity');

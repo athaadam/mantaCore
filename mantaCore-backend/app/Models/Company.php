@@ -16,6 +16,7 @@ class Company extends Model
     // Tambahkan kolom subscription_start dan subscription_until ke fillable
     protected $fillable = [
         'companyName',
+        'companyCode', // Kode unik untuk perusahaan
         'subscription_start',
         'subscription_until',
     ];

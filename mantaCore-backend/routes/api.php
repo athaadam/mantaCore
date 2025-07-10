@@ -38,12 +38,14 @@ Route::middleware('auth:sanctum')->group(function () {
         //cashier
         Route::middleware('cashier')->group(function () {
             // invoices
+            Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']); 
             Route::get('/getAllInvoices', [InvoiceController::class, 'getAllInvoices']);
             Route::get('/getInvoice/{id}', [InvoiceController::class, 'getInvoiceById']);
             Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
             Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
             Route::get('/filterInvoices', [InvoiceController::class, 'filterInvoices']);
             Route::get('/sales-report', [InvoiceController::class, 'salesReport']);
+            Route::get('/getMyInvoices', [InvoiceController::class, 'getMyInvoices']);
 
 
             //costumer
