@@ -82,7 +82,7 @@ class AccountManage extends Controller
             'email'        => 'sometimes|email|unique:users,email,' . $user->userID . ',userID',
             'phone_number' => 'sometimes|string|max:20',
             'role'         => 'nullable|string|in:cashier,management',
-            'status'       => 'sometimes|string|in:active,inactive', // Tambahkan validasi status
+            'status'       => 'active', // Tambahkan validasi status
         ]);
 
         $user->update($data);
