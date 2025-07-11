@@ -33,24 +33,22 @@ class CostumerController extends Controller
     public function createCostumer(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:costumers,username',
-            'companyID' => 'required|integer|exists:companies,companyID',
-            'email' => 'required|email|max:255',
+            'username'     => 'required|string|max:255|unique:costumers,username',
+            'email'        => 'required|email|max:255',
             'phone_number' => 'required|string|max:20',
         ]);
 
-        //jika ada yang kosong
-        if (empty($validated['username']) || empty($validated['companyID']) || empty($validated['email']) || empty($validated['phone_number'])) {
-            return response()->json(['message' => 'All fields are required'], 400);
-        }
+        // Ambil companyID dari user yang login
+        $validated['companyID'] = $request->user()->companyID;
 
         $costumer = Costumer::create($validated);
 
         return response()->json([
-            'message' => 'Costumer created successfully',
+            'message'  => 'Costumer created successfully',
             'costumer' => $costumer,
         ], 201);
     }
+
 
     // ✅ PUT: Update costumer
     public function updateCostumer(Request $request, int $id): JsonResponse
