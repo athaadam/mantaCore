@@ -228,9 +228,9 @@ class PurchaseController extends Controller
     //getmypurchases
     public function getMyPurchases(Request $request): JsonResponse
     {
-        //cek jika purchase yang saya buat kosong
+        // Ambil semua purchase yang dibuat oleh user yang sedang login
         $purchases = Purchase::with(['user', 'company', 'items.item'])
-            ->where('companyID', $request->user()->companyID)
+            ->where('userID', $request->user()->userID) // Ubah dari companyID ke userID
             ->get();
 
         return response()->json([
@@ -238,5 +238,6 @@ class PurchaseController extends Controller
             'purchases' => $purchases,
         ]);
     }
+
 
 }

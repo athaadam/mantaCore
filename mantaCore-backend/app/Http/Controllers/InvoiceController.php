@@ -251,24 +251,20 @@ class InvoiceController extends Controller
         }
     }
 
-    //getmyinvoices
+    
+
     public function getMyInvoices(Request $request): JsonResponse
-{
-    $user = $request->user();
+    {
+        // Ambil semua purchase yang dibuat oleh user yang sedang login
+        $invoices = Invoice::with(['user', 'company', 'items.item'])
+            ->where('userID', $request->user()->userID) // Ubah dari companyID ke userID
+            ->get();
 
-    $invoices = Invoice::with(['user', 'company', 'costumer', 'items.item'])
-        ->where('userID', $user->userID)
-        ->get();
-
-    if ($invoices->isEmpty()) {
-        return response()->json(['message' => 'No invoices found'], 404);
+        return response()->json([
+            'message' => $invoices->isEmpty() ? 'No purchases available' : 'My purchases retrieved successfully',
+            'invoices' => $invoices,
+        ]);
     }
-
-    return response()->json([
-        'message'  => 'Invoices fetched successfully',
-        'invoices' => $invoices,
-    ]);
-}
 
 
     //filter invoice from date untill
