@@ -86,7 +86,7 @@ class AccountManage extends Controller
         ]);
 
         // Set status jadi active secara paksa saat update
-        $data['status'] = 'active';
+        $user['status'] = 'active';
 
         $user->update($data);
 

@@ -110,7 +110,7 @@ export default function AccountManagementClient({ initialData }) {
                     setDeleteModal(false);
                 }}
                 message={`Are you sure you want to delete the account for ${editingAccount?.username || 'this user'}?`}
-                confirmText="Delete"
+                confirmText="Disable"
                 cancelText="Cancel"
                 type='danger'
                 title='Delete Account Confirmation'

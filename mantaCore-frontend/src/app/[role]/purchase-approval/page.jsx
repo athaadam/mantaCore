@@ -5,15 +5,16 @@ import { cookies } from 'next/headers';
 export default async function PurchaseApprovalPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth')?.value;
-
+    const allData = await apiHit('getAllPurchases', token);
+    const res = await apiHit('purchase-report', token);
     const summaryData = {
-        totalRequests: 120,
-        approvedRequests: 80,
-        pendingRequests: 30,
-        rejectedRequests: 10,
+        totalRequests: res.total_requests,
+        approvedRequests: res.approved_requests,
+        pendingRequests: res.pending_requests,
+        rejectedRequests: res.rejected_requests,
     };
 
-    const allData = await apiHit('getAllPurchases', token);
+
 
     return <PurchaseApprovalClient summaryData={summaryData} allData={allData} />;
 }

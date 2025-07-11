@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CustomerTable from "@/components/table/CustomerTable";
 import CustomerModal from "@/components/modal/CustomerModal";
-import { extractErrorMessage } from "@/libs/exceptions";
+import { extractErrorMessage } from "@/libs/exceptions/index";
 import Alert from "../common/Alert";
 import Header2 from "@/components/header/Header2";
 import DataCard from "@/components/card/DataCard";
@@ -19,11 +19,13 @@ export default function CustomerClient({ initialCustomers, profile }) {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [alert, setAlert] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [validationErrors, setValidationErrors] = useState(null);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
         setModalMode('edit');
         setIsModalOpen(true);
+        setValidationErrors(null); // Clear any previous validation errors
     };
 
     const initiateDeleteCustomer = (customer) => {
@@ -44,40 +46,50 @@ export default function CustomerClient({ initialCustomers, profile }) {
     };
 
     const handleSubmitModal = async (newData, mode) => {
-        if (mode === 'edit') {
-            try {
-                const token = Cookies.get('auth');
+        try {
+            const token = Cookies.get('auth');
+
+            if (mode === 'edit') {
                 const data = await apiHit(`updateCostumer/${selectedCustomer.costumerID}`, token, 'POST', newData);
                 setCustomers(prev =>
                     prev.map(c => (c.costumerID === data.costumer.costumerID ? data.costumer : c))
                 );
                 setAlert({ type: 'success', message: 'Customer updated successfully!' });
-            } catch (error) {
-                const message = extractErrorMessage(error);
-                setAlert({ type: 'error', message: message || 'Failed to update customer' });
-            }
-        } else {
-            try {
-                const token = Cookies.get('auth');
+                setIsModalOpen(false);
+            } else {
                 const dataToSend = {
                     username: newData.username,
-                    companyID: profile.company.companyID,
+                    email: newData.email,
+                    phone_number: newData.phone_number,
                 };
                 const data = await apiHit('createCostumer', token, 'POST', dataToSend);
                 setCustomers(prev => [data.costumer, ...prev]);
                 setAlert({ type: 'success', message: 'Customer added successfully!' });
-            } catch (error) {
-                const message = extractErrorMessage(error);
-                setAlert({ type: 'error', message: message || 'Failed to add customer' });
+                setIsModalOpen(false);
             }
+
+            // Clear validation errors on success
+            setValidationErrors(null);
+
+        } catch (error) {
+            // Check if error contains validation errors from backend
+            if (error.response && error.response.data && error.response.data.errors) {
+                // Pass backend validation errors to the modal
+                throw { validation: error.response.data.errors };
+            } else {
+                // General error handling
+                const message = extractErrorMessage(error);
+                setAlert({ type: 'error', message: message || `Failed to ${mode === 'edit' ? 'update' : 'add'} customer` });
+            }
+            setIsModalOpen(false); // Close modal on error
         }
-        setIsModalOpen(false);
     };
 
 
     const handleOpenAdd = () => {
         setModalMode('add');
         setSelectedCustomer(null);
+        setValidationErrors(null); // Clear any previous validation errors
         setIsModalOpen(true);
     };
 
@@ -123,10 +135,24 @@ export default function CustomerClient({ initialCustomers, profile }) {
             >
                 {/* Customer Stats Section */}
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-4">
                         <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
                             <span className="text-sm font-semibold text-slate-700">Total Customers:</span>
                             <span className="ml-2 font-bold text-purple-600">{customers.length}</span>
+                        </div>
+
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
+                            <span className="text-sm font-semibold text-slate-700">With Email:</span>
+                            <span className="ml-2 font-bold text-purple-600">
+                                {customers.filter(c => c.email && c.email.trim() !== '').length}
+                            </span>
+                        </div>
+
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
+                            <span className="text-sm font-semibold text-slate-700">With Phone:</span>
+                            <span className="ml-2 font-bold text-purple-600">
+                                {customers.filter(c => c.phone_number && c.phone_number.trim() !== '').length}
+                            </span>
                         </div>
                     </div>
                     <div className="text-sm text-slate-600 font-medium">
@@ -150,8 +176,12 @@ export default function CustomerClient({ initialCustomers, profile }) {
                 mode={modalMode}
                 customer={selectedCustomer}
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setValidationErrors(null); // Clear validation errors when closing modal
+                }}
                 onSubmit={handleSubmitModal}
+                validationErrors={validationErrors}
             />
 
             {/* Delete Confirmation Modal */}

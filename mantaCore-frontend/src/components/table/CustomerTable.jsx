@@ -41,7 +41,7 @@ const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) =
                     <table className="w-full table-auto">
                         <thead>
                             <tr className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
-                                {['No', 'Customer Name', 'Created', 'Updated', 'Actions'].map((header) => (
+                                {['No', 'Customer Name', 'Email', 'Phone', 'Created', 'Updated', 'Actions'].map((header) => (
                                     <th key={header} className="px-4 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                                         {header}
                                     </th>
@@ -51,7 +51,7 @@ const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) =
                         <tbody className="bg-white/50 backdrop-blur-sm divide-y divide-purple-100">
                             {visibleCustomers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-16 text-center">
+                                    <td colSpan={7} className="px-6 py-16 text-center">
                                         <div className="flex flex-col items-center gap-4">
                                             <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center">
                                                 <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -82,9 +82,36 @@ const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) =
                                                 </div>
                                                 <div>
                                                     <div className="text-sm font-bold text-slate-900">{customer.username}</div>
-                                                    <div className="text-xs text-purple-600 font-medium">Customer</div>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            {customer.email ? (
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    <a href={`mailto:${customer.email}`} className="text-sm text-slate-700 hover:text-purple-600 truncate max-w-[200px]">
+                                                        {customer.email}
+                                                    </a>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-400 italic">Not provided</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            {customer.phone_number ? (
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                                    </svg>
+                                                    <a href={`tel:${customer.phone_number}`} className="text-sm text-slate-700 hover:text-purple-600">
+                                                        {customer.phone_number}
+                                                    </a>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-400 italic">Not provided</span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
                                             {formatDate(customer.created_at)}

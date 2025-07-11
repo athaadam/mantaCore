@@ -160,8 +160,8 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.635 0L3.178 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                             <div>
-                                <p className="text-sm font-medium text-amber-800">Password Update</p>
-                                <p className="text-sm text-amber-600">Leave password fields empty to keep current password unchanged.</p>
+                                <p className="text-sm font-medium text-amber-800">Password & Status Update</p>
+                                <p className="text-sm text-amber-600">Leave password fields empty to keep current password unchanged and status automatically reactivated.</p>
                             </div>
                         </div>
                     </div>
