@@ -170,6 +170,7 @@ const PurchaseRequestClient = ({ api }) => {
             showAlert(response.message || (selectedPurchase ? "Purchase updated successfully" : "Purchase created successfully"), "success");
             setShowModal(false);
             setSelectedPurchase(null);
+            console.log("Purchase submitted successfully:", response);
 
         } catch (error) {
             console.error("Purchase submission error:", error);

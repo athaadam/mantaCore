@@ -68,7 +68,7 @@ const PurchaseRequestTable = ({
     const startIdx = Math.max((currentPage - 1) * itemsPerPage, 0);
     const currentData = purchasesList.slice(startIdx, startIdx + itemsPerPage);
 
-
+    console.log('from table', currentData);
 
 
     useEffect(() => {
