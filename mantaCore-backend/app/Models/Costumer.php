@@ -13,7 +13,7 @@ class Costumer extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['username', 'companyID']; // ✅ ditambahkan
+    protected $fillable = ['username', 'email', 'phone_number','companyID']; // ✅ ditambahkan
 
     // Relasi ke invoice
     public function invoices()

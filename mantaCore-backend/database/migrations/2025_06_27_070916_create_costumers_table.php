@@ -10,6 +10,8 @@ return new class extends Migration {
             $table->id('costumerID');
             $table->unsignedBigInteger('companyID'); // ✅ kolom foreign key ke company
             $table->string('username')->unique();
+            $table->string('email');
+            $table->string('phone_number');
             $table->timestamps();
 
             // ✅ definisi foreign key constraint

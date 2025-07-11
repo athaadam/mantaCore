@@ -35,7 +35,14 @@ class CostumerController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|max:255|unique:costumers,username',
             'companyID' => 'required|integer|exists:companies,companyID',
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|string|max:20',
         ]);
+
+        //jika ada yang kosong
+        if (empty($validated['username']) || empty($validated['companyID']) || empty($validated['email']) || empty($validated['phone_number'])) {
+            return response()->json(['message' => 'All fields are required'], 400);
+        }
 
         $costumer = Costumer::create($validated);
 
@@ -55,6 +62,8 @@ class CostumerController extends Controller
 
         $validated = $request->validate([
             'username' => 'required|string|max:255|unique:costumers,username,' . $id . ',costumerID',
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|string|max:20',
         ]);
 
         $costumer->update($validated);
