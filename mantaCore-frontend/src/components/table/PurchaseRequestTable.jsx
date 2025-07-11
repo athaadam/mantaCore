@@ -109,14 +109,7 @@ const PurchaseRequestTable = ({
                             : 'Get started by creating your first purchase request.'
                         }
                     </p>
-                    {hasActiveFilters && (
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                            Clear Filters
-                        </button>
-                    )}
+                    {/* The filter component now handles clearing filters */}
                 </div>
             </div>
         );
@@ -194,7 +187,7 @@ const PurchaseRequestTable = ({
                                     <div className="flex items-center">
                                         <CalendarDaysIcon className="h-5 w-5 text-gray-400 mr-2" />
                                         <div className="text-sm text-gray-900">
-                                            {formatDate(purchase.updated_at)}
+                                            {formatDate(purchase.date)}
                                         </div>
                                     </div>
                                 </td>

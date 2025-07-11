@@ -1,7 +1,7 @@
 'use client';
 
 import Header2 from "@/components/header/Header2";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PurchaseModal from "../modal/PurchaseModal";
 import PurchaseStats from "../card/PurchaseStatsCards";
 import PurchaseFilter from "../filter/PurchaseFilter";
@@ -23,6 +23,7 @@ const PurchaseRequestClient = ({ api }) => {
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
     const [filter, setFilter] = useState([]);
+    const [dateRange, setDateRange] = useState({ from: '', to: '', preset: '' });
     const [stats, setStats] = useState({
         totalAmount: 0, totalRequests: 0, pendingRequests: 0, acceptedRequests: 0,
         denied: 0, total: 0, pending: 0, accepted: 0, totalValue: 0, activeCompanies: 0, avgRequestValue: 0,
@@ -88,7 +89,6 @@ const PurchaseRequestClient = ({ api }) => {
             totalRequests,
             pendingRequests,
             acceptedRequests,
-            // For compatibility with PurchaseStats component
             denied: deniedRequests,
             total: totalRequests,
             pending: pendingRequests,
@@ -174,6 +174,7 @@ const PurchaseRequestClient = ({ api }) => {
         } catch (error) {
             console.error("Purchase submission error:", error);
             showAlert(error.message || "Failed to save purchase request", "error");
+            setShowModal(false);
         } finally {
             setIsSubmitting(false);
         }
@@ -225,12 +226,94 @@ const PurchaseRequestClient = ({ api }) => {
         setFilter(newFilters);
     };
 
-    // Filter purchases based on filter state
-    const filteredPurchases = Array.isArray(purchaseRequests)
-        ? (filter.length === 0
-            ? purchaseRequests
-            : purchaseRequests.filter(purchase => filter.includes(purchase.status)))
-        : [];
+    // Handle date filter changes
+    const handleDateChange = (newDateRange) => {
+        setDateRange(newDateRange);
+    };
+
+    // Get date range based on preset
+    const getDateRangeFromPreset = (preset) => {
+        const today = new Date();
+        const from = new Date();
+        const to = new Date();
+
+        switch (preset) {
+            case 'today':
+                // Just today
+                from.setHours(0, 0, 0, 0);
+                to.setHours(23, 59, 59, 999);
+                break;
+
+            case 'yesterday':
+                // Yesterday
+                from.setDate(from.getDate() - 1);
+                from.setHours(0, 0, 0, 0);
+                to.setDate(to.getDate() - 1);
+                to.setHours(23, 59, 59, 999);
+                break;
+
+            case 'thisWeek':
+                // Start of current week (Sunday) to today
+                const dayOfWeek = today.getDay(); // 0 is Sunday
+                from.setDate(from.getDate() - dayOfWeek);
+                from.setHours(0, 0, 0, 0);
+                break;
+
+            case 'lastWeek':
+                // Last week (Sunday to Saturday)
+                const lastWeekDay = today.getDay();
+                from.setDate(from.getDate() - lastWeekDay - 7);
+                from.setHours(0, 0, 0, 0);
+                to.setDate(to.getDate() - lastWeekDay - 1);
+                to.setHours(23, 59, 59, 999);
+                break;
+
+            case 'thisMonth':
+                // Start of current month to today
+                from.setDate(1);
+                from.setHours(0, 0, 0, 0);
+                break;
+
+            case 'lastMonth':
+                // Last month (1st to last day)
+                from.setMonth(from.getMonth() - 1);
+                from.setDate(1);
+                from.setHours(0, 0, 0, 0);
+                to.setDate(0); // Last day of previous month
+                to.setHours(23, 59, 59, 999);
+                break;
+
+            default:
+                return null;
+        }
+
+        return { from, to };
+    };
+
+    // Filter purchases based on filter state and date range
+    const filteredPurchases = useMemo(() => {
+        if (!Array.isArray(purchaseRequests)) return [];
+
+        let filtered = [...purchaseRequests];
+
+        // Apply status filters
+        if (filter.length > 0) {
+            filtered = filtered.filter(purchase => filter.includes(purchase.status));
+        }
+
+        // Apply date filters
+        if (dateRange.preset) {
+            const dateRangeObj = getDateRangeFromPreset(dateRange.preset);
+            if (dateRangeObj) { 
+                filtered = filtered.filter(purchase => {
+                    const purchaseDate = new Date(purchase.date);
+                    return purchaseDate >= dateRangeObj.from && purchaseDate <= dateRangeObj.to;
+                });
+            }
+        }
+
+        return filtered;
+    }, [purchaseRequests, filter, dateRange]);
 
     return (
         <>
@@ -262,6 +345,8 @@ const PurchaseRequestClient = ({ api }) => {
             <PurchaseFilter
                 onFilterChange={handleFilterChange}
                 activeFilters={filter}
+                onDateChange={handleDateChange}
+                dateRange={dateRange}
             />
             <DataCard
                 title="My Purchase Requests"
@@ -279,8 +364,8 @@ const PurchaseRequestClient = ({ api }) => {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         loading={loading}
-                        isFiltered={filter.length > 0}
-                        hasActiveFilters={filter.length > 0}
+                        isFiltered={filter.length > 0 || dateRange.preset}
+                        hasActiveFilters={filter.length > 0 || dateRange.preset}
                     />
                 }
             />
