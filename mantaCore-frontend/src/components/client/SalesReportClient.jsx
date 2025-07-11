@@ -8,7 +8,7 @@ import TransactionTable from '@/components/table/TransactionTable';
 import FilterControls from '@/components/filter/FilterControls';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
-import { extractCustomers, extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/libs/utils/filters/filterUtils';
+import { extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/libs/utils/filters/filterUtils';
 
 export default function SalesReportClient({ summaryData, transactions, report }) {
     const [filter, setFilter] = useState({
@@ -19,14 +19,14 @@ export default function SalesReportClient({ summaryData, transactions, report })
         author: '',
         status: '',
     });
-    
+
     const [appliedFilter, setAppliedFilter] = useState({});
 
     // Extract unique customers, authors and categories from transaction data
     const suitors = useMemo(() => extractSuitors(transactions || []), [transactions]);
     const authors = useMemo(() => extractAuthors(transactions || [], true), [transactions]);
     const categories = useMemo(() => extractCategories(transactions || []), [transactions]);
-    
+
     // Apply filters to data only when appliedFilter changes
     const filteredTransactions = useMemo(() => {
         if (!transactions || transactions.length === 0) {
@@ -39,7 +39,7 @@ export default function SalesReportClient({ summaryData, transactions, report })
         console.log('Filters applied:', filter);
         console.log('Original transactions count:', transactions?.length || 0);
         setAppliedFilter({ ...filter });
-        
+
         // Add delay to log filtered count after state update
         setTimeout(() => {
             console.log('Filtered transactions count:', filteredTransactions.length);
@@ -69,6 +69,16 @@ export default function SalesReportClient({ summaryData, transactions, report })
                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
     );
+
+    const convertToPercentage = () => {
+        if (!report.salesByCategory) return [];
+        const total = Object.values(report.salesByCategory).reduce((sum, value) => sum + value, 0);
+
+        return Object.entries(report.salesByCategory).map(([category, value]) => ({
+            category,
+            percentage: total > 0 ? Math.round((value / total) * 100) : 0
+        }));
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -120,7 +130,7 @@ export default function SalesReportClient({ summaryData, transactions, report })
                         }
                         gradient="bg-gradient-to-br from-white via-purple-50 to-pink-100"
                     >
-                        <SalesByCategory report={report.salesByCategory} />
+                        <SalesByCategory report={convertToPercentage()} />
                     </DataCard>
                 </div>
 
@@ -129,7 +139,7 @@ export default function SalesReportClient({ summaryData, transactions, report })
                     title="Transaction History"
                     subtitle="Detailed view of all sales transactions and customer activities"
                     icon={
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                 d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>

@@ -74,10 +74,11 @@ class PurchaseController extends Controller
                         'unitPrice'  => $row['unitPrice'],
                         'subTotal'   => $row['subTotal'],
                         'type'       => $row['type'] ?? null,
+
                     ]);
                 }
 
-                return $purchase->load('items.item');
+                return $purchase->load('items.item', 'user', 'company');
             });
 
             return response()->json([
