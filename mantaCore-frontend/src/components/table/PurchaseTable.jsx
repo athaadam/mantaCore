@@ -35,10 +35,10 @@ export default function PurchaseTable({ data = [], itemsPerPage = 5, mode = 'pur
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-purple-800 tracking-tight">
-                                {isPurchase ? 'Purchase Records' : ''}
+                                {isPurchase ? 'Purchase Records' : 'Purchases in last decade'}
                             </h3>
                             <p className="text-purple-600 text-sm mt-1">
-                                {isPurchase ? 'Complete purchase transaction history' : '-'}
+                                {isPurchase ? 'Complete purchase transaction history' : 'Latest purchases'}
                             </p>
                         </div>
                     </div>

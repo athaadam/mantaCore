@@ -11,12 +11,25 @@ const defaultColors = [
 
 export default function SalesByCategory({ report }) {
     const canvasRef = useRef(null);
-
-    const salesByCategory = report || {};
-    const labels = Object.keys(salesByCategory);
-    const data = Object.values(salesByCategory);
-    const hasData = labels.length > 0;
-
+    // Handle the percentage format: [{category, percentage}, ...]
+    let labels = [];
+    let data = [];
+    let hasData = false;
+    
+    if (Array.isArray(report)) {
+        // Array format: [{category, percentage}, ...] 
+        labels = report.map(item => item.category);
+        data = report.map(item => item.percentage);
+        hasData = report.length > 0;
+    } else {
+        // Original object format: {category1: value1, ...}
+        const salesByCategory = report || {};
+        labels = Object.keys(salesByCategory);
+        data = Object.values(salesByCategory);
+        hasData = labels.length > 0;
+    }
+    
+    console.log(report, " sales by category")
     useEffect(() => {
         if (!canvasRef.current || !hasData) return;
 
@@ -26,7 +39,7 @@ export default function SalesByCategory({ report }) {
                 labels,
                 datasets: [
                     {
-                        label: "Sales by Category",
+                        label: Array.isArray(report) ? "Category Percentage" : "Sales by Category",
                         data,
                         backgroundColor: defaultColors.slice(0, labels.length),
                         borderWidth: 1,
@@ -44,18 +57,24 @@ export default function SalesByCategory({ report }) {
                             boxWidth: 12,
                             padding: 15,
                         },
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => formatRupiah(context.raw),
+                    },                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    // If using percentage data format
+                                    if (Array.isArray(report)) {
+                                        return `${context.raw}%`;
+                                    }
+                                    // Original format
+                                    return formatRupiah(context.raw);
+                                },
+                            },
                         },
-                    },
                 },
             },
         });
 
         return () => chart.destroy();
-    }, [hasData, salesByCategory]);
+    }, [hasData, report, labels, data]);
 
     const legendLabels = hasData
         ? labels.map((label, index) => ({
@@ -66,7 +85,7 @@ export default function SalesByCategory({ report }) {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow flex-1 min-w-[340px] min-h-[280px] flex flex-col items-center">
-            
+
 
             {!hasData ? (
                 <div className="flex flex-col items-center justify-center flex-1 text-center text-gray-500 gap-4 w-full">
@@ -90,7 +109,10 @@ export default function SalesByCategory({ report }) {
                                     className="inline-block w-4 h-4 rounded-full"
                                     style={{ backgroundColor: color }}
                                 ></span>
-                                {label}
+                                <span className="font-medium">{label}</span>
+                                {Array.isArray(report) && (
+                                    <span className="text-gray-500 ml-1">({data[labels.indexOf(label)]}%)</span>
+                                )}
                             </div>
                         ))}
                     </div>
