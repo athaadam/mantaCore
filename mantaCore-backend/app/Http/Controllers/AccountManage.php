@@ -82,8 +82,11 @@ class AccountManage extends Controller
             'email'        => 'sometimes|email|unique:users,email,' . $user->userID . ',userID',
             'phone_number' => 'sometimes|string|max:20',
             'role'         => 'nullable|string|in:cashier,management',
-            'status'       => 'active', // Tambahkan validasi status
+            // kamu bisa hapus 'status' dari validasi kalau tidak diisi oleh client
         ]);
+
+        // Set status jadi active secara paksa saat update
+        $data['status'] = 'active';
 
         $user->update($data);
 
@@ -92,4 +95,5 @@ class AccountManage extends Controller
             'user'    => $user,
         ]);
     }
+
 }
