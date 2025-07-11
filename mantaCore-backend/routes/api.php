@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //cashier
         Route::middleware('cashier')->group(function () {
             // invoices
-            Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']); 
+            Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']);
             Route::get('/getAllInvoices', [InvoiceController::class, 'getAllInvoices']);
             Route::get('/getInvoice/{id}', [InvoiceController::class, 'getInvoiceById']);
             Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
@@ -53,12 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/createCostumer', [CostumerController::class, 'createCostumer']);
             Route::get('/getCostumer/{id}', [CostumerController::class, 'getCostumerById']);
             Route::post('/updateCostumer/{id}', [CostumerController::class, 'updateCostumer']);
+            Route::delete('/deleteCostumer/{id}', [CostumerController::class, 'deleteCostumer']);
         });
 
         //management
         Route::middleware('management')->group(function () {
 
-             //purchases
+            //purchases
             Route::get('/getAllPurchases', [PurchaseController::class, 'getAllPurchases']);
             Route::post('/createPurchase', [PurchaseController::class, 'createPurchase']);
             Route::get('/getPurchase/{id}', [PurchaseController::class, 'getPurchaseById']);
@@ -74,7 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
             Route::delete('/deleteItem/{id}', [ItemController::class, 'deleteItem']);
 
-             //account manage
+            //account manage
             Route::post('/addUser', [AccountManage::class, 'addUser']);
             Route::delete('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
             Route::post('/updateUser/{userID}', [AccountManage::class, 'updateUser']);
@@ -87,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //admin
         Route::middleware('admin')->group(function () {
-           //dashboard
+            //dashboard
             Route::get('/totalPenjualan', [DashboardController::class, 'totalPenjualan']);
             Route::get('/todayProfitLoss', [DashboardController::class, 'todayProfitLoss']);
             Route::get('/lifetimeProfitLoss', [DashboardController::class, 'lifetimeProfitLoss']);
@@ -95,11 +96,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::middleware('role.management')->group(function () {
-            
-        }); 
+
+        });
 
         Route::middleware('role.cashier')->group(function () {
-            
+
         });
     });
 });

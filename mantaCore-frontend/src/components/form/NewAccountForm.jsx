@@ -46,7 +46,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value, status: 'active' }));
     };
 
     const handleSubmit = async (e) => {

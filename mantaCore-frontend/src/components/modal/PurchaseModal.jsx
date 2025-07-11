@@ -221,13 +221,23 @@ const PurchaseModal = ({
         return items.find(item => item.itemID === itemID);
     };
 
+    // Add custom scrollbar styles to document if not already present
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-200 transform transition-all duration-200 scale-100 z-10" onClick={(e) => e.stopPropagation()}>
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-hidden" onClick={onClose}>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-200 transform transition-all duration-200 scale-100 z-10 flex flex-col h-[700px]" onClick={(e) => e.stopPropagation()}>
+                {/* Header - Fixed at top */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-2xl z-20">
                     <div className="flex items-center space-x-3">
                         <div className="p-2 bg-purple-100 rounded-lg">
                             <ShoppingCartIcon className="w-6 h-6 text-purple-600" />
@@ -249,8 +259,9 @@ const PurchaseModal = ({
                     </button>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="p-6">
+                {/* Form - Scrollable content */}
+                <div className="overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-hidden">
+                <form id="purchase-form" onSubmit={handleSubmit} className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {/* Company Display (Read-only) */}
                         <div>
@@ -319,12 +330,12 @@ const PurchaseModal = ({
 
                     {/* Purchase Items */}
                     <div className="mb-6">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-4 bg-white py-2">
                             <h4 className="text-lg font-medium text-gray-900">Purchase Items</h4>
                             <button
                                 type="button"
                                 onClick={addPurchaseItem}
-                                className="inline-flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                className="inline-flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
                             >
                                 <PlusIcon className="w-4 h-4 mr-1" />
                                 Add Item
@@ -335,9 +346,16 @@ const PurchaseModal = ({
                             <p className="mb-4 text-sm text-red-600">{errors.purchaseItems}</p>
                         )}
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 max-h-[calc(60vh-160px)] overflow-y-auto pr-2">
                             {formData.purchaseItems.map((item, index) => (
-                                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all duration-200 hover:shadow-md relative group">
+                                    <button
+                                        type="button"
+                                        onClick={() => removePurchaseItem(index)}
+                                        className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 hover:text-red-700 transition-all bg-white rounded-full p-1 shadow-sm"
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                    </button>
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         {/* Item Selection */}
                                         <div className="md:col-span-2">
@@ -400,18 +418,11 @@ const PurchaseModal = ({
                                         </div>
                                     </div>
 
-                                    {/* Subtotal and Remove Button */}
-                                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
-                                        <div className="text-sm text-gray-600">
+                                    {/* Subtotal Display */}
+                                    <div className="flex items-center justify-end mt-3 pt-3 border-t border-gray-200">
+                                        <div className="text-sm font-medium bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
                                             Subtotal: <span className="font-semibold">{formatRupiah(item.quantity * item.itemPrice)}</span>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => removePurchaseItem(index)}
-                                            className="text-red-600 hover:text-red-800 transition-colors"
-                                        >
-                                            <TrashIcon className="w-4 h-4" />
-                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -425,8 +436,12 @@ const PurchaseModal = ({
                         </div>
                     </div>
 
-                    {/* Form Actions */}
-                    <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                    </form>
+                </div>
+                
+                {/* Form Actions - Fixed at bottom */}
+                <div className="border-t border-gray-200 p-6 bg-gray-50 rounded-b-2xl z-20">
+                    <div className="flex items-center justify-end space-x-4">
                         <button
                             type="button"
                             onClick={onClose}
@@ -436,6 +451,7 @@ const PurchaseModal = ({
                         </button>
                         <button
                             type="submit"
+                            form="purchase-form" 
                             disabled={loading || userInfoLoading}
                             className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                         >
@@ -449,7 +465,7 @@ const PurchaseModal = ({
                             </span>
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );

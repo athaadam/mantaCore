@@ -8,6 +8,7 @@ import { useSidebar } from '@/hooks/context/SidebarContext';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { apiHit } from '@/libs/api/fetch';
+import { Slack, UserPen } from 'lucide-react';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', path: 'dashboard', roles: ['admin', 'management', 'cashier'] },
@@ -48,6 +49,7 @@ export default function Sidebar() {
     setIsOpen
   } = useSidebar();
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [username, setUsername] = useState('');
 
   // Close sidebar when clicking outside on mobile only
   useEffect(() => {
@@ -70,11 +72,21 @@ export default function Sidebar() {
 
   const [time, setTime] = useState(null)
 
+  const getProfile = async () => {
+    try {
+      const res = await apiHit('user', Cookies.get('auth'));
+      setUsername(res.user.username);
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+      setUsername('User');
+    }
+  }
+
   useEffect(() => {
     const updateTime = () => {
       setTime(new Date().toLocaleTimeString())
     }
-
+    getProfile();
     updateTime()
     const interval = setInterval(updateTime, 1000)
     return () => clearInterval(interval)
@@ -96,15 +108,14 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Enhanced Full-Width L-shaped Toggle Button */}
+      {/* Enhanced Top Navigation Bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        {/* Full Width Top Bar */}
         <div className="w-full h-16 bg-gradient-to-r from-slate-900/95 via-purple-900/95 to-indigo-900/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 flex items-center">
-          <div className="flex items-center justify-start px-4 gap-2">
+          <div className="flex items-center justify-start px-4">
             <button
               id="sidebar-toggle"
               onClick={toggleSidebar}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-all duration-300 hover:scale-105 border border-white/20"
+              className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-all duration-200 border border-white/20 mr-2"
               aria-label="Toggle sidebar"
             >
               <span className="material-icons-outlined text-xl">
@@ -116,7 +127,7 @@ export default function Sidebar() {
             {!isMobile && isOpen && (
               <button
                 onClick={toggleCollapse}
-                className="p-2 bg-indigo-500/20 hover:bg-indigo-500/30 rounded-lg text-white transition-all duration-300 hover:scale-105 border border-indigo-500/30"
+                className="p-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 rounded-lg text-white transition-all duration-200 border border-indigo-500/30"
                 aria-label="Collapse sidebar"
               >
                 <span className="material-icons-outlined text-xl">
@@ -125,28 +136,26 @@ export default function Sidebar() {
               </button>
             )}
 
-            {/* Logo in top bar when collapsed */}
-            {!isMobile && isOpen && isCollapsed && (
-              <div className="ml-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg shadow-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">M</span>
-                </div>
-              </div>
-            )}
+            {/* Mini Logo in top bar */}
+            <div className="ml-2 flex items-center">
+              <UserPen className="w-8 h-8 text-white" />
+              <span className="ml-2 text-white font-medium text-sm hidden sm:block">{username}</span>
+            </div>
           </div>
 
           {/* Right side content in top bar */}
-          <div className="flex-1 flex items-center justify-end px-4 gap-4">
+          <div className="flex-1 flex items-center justify-end px-4 gap-3">
             {/* Time Display */}
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="px-3 py-1 bg-white/10 rounded-full text-xs">
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="px-3 py-1.5 bg-white/10 rounded-lg text-xs border border-white/10">
                 {time}
               </div>
             </div>
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-white transition-all duration-300 hover:scale-105 border border-red-500/30 hover:border-red-500/50 flex items-center gap-2"
+              className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-white transition-all duration-200 border border-red-500/30 hover:border-red-500/50 flex items-center gap-2"
               aria-label="Logout"
             >
               <span className="material-icons-outlined text-lg">logout</span>
@@ -156,7 +165,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Left Bar - Only show when sidebar is closed */}
+      {/* Left Minimal Bar - Only show when sidebar is closed */}
       {!isOpen && (
         <div className="fixed top-16 left-0 w-16 bg-gradient-to-b from-slate-900/95 via-purple-900/95 to-indigo-900/95 backdrop-blur-xl border-r border-white/10 z-40"
           style={{ height: 'calc(100vh - 64px)' }}>
@@ -174,7 +183,7 @@ export default function Sidebar() {
       <aside
         id="sidebar"
         className={`fixed top-16 left-0 h-[calc(100vh-64px)] bg-gradient-to-br from-slate-900/95 via-purple-900/95 to-indigo-900/95 backdrop-blur-xl border-r border-white/10 text-white flex flex-col shadow-2xl z-40 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          } ${isCollapsed && !isMobile ? 'w-[80px]' : 'w-[280px]'
+          } ${isCollapsed && !isMobile ? 'w-[70px]' : 'w-[280px]'
           }`}
       >
         {/* Enhanced Background Effects */}
@@ -186,7 +195,7 @@ export default function Sidebar() {
 
         {/* Animated Particle System */}
         <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+          {[...Array(15)].map((_, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
@@ -205,18 +214,17 @@ export default function Sidebar() {
           <div className="absolute inset-0" style={{
             backgroundImage: `
               radial-gradient(circle at 25% 25%, currentColor 1px, transparent 1px),
-              radial-gradient(circle at 75% 75%, currentColor 1px, transparent 1px),
-              linear-gradient(45deg, transparent 48%, currentColor 49%, currentColor 50%, transparent 52%)
+              radial-gradient(circle at 75% 75%, currentColor 1px, transparent 1px)
             `,
-            backgroundSize: '20px 20px, 20px 20px, 40px 40px'
+            backgroundSize: '20px 20px, 20px 20px'
           }}></div>
         </div>
 
-        {/* Enhanced Header Section */}
-        <div className="relative z-10 px-6 py-6">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-5 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-            <div className="flex items-center justify-center">
-              {!isCollapsed ? (
+        {/* Logo Section - Only Show When Not Collapsed */}
+        {!isCollapsed && (
+          <div className="relative z-10 px-6 py-5">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="flex items-center justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-xl blur-lg opacity-50 animate-pulse"></div>
                   <Image
@@ -229,17 +237,9 @@ export default function Sidebar() {
                     style={{ width: 'auto', height: 'auto' }}
                   />
                 </div>
-              ) : (
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl shadow-2xl flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">M</span>
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
 
-            {/* Enhanced Status Indicator */}
-            {!isCollapsed && (
+              {/* Enhanced Status Indicator */}
               <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/80">
                 <div className="relative">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
@@ -247,22 +247,15 @@ export default function Sidebar() {
                 </div>
                 <span className="font-medium">System Online</span>
               </div>
-            )}
-
-            {/* Collapsed Status */}
-            {isCollapsed && (
-              <div className="flex justify-center mt-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Enhanced Navigation Section */}
-        <nav className="relative z-10 flex-1 px-4 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30 scroll-smooth">
+        {/* Enhanced Navigation Section - Positioned higher when collapsed */}
+        <nav className={`relative z-10 flex-1 ${isCollapsed ? 'px-2 mt-4' : 'px-4 mt-2'} overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30 scroll-smooth`}>
           <style jsx>{`
             nav::-webkit-scrollbar {
-              width: 6px;
+              width: 4px;
             }
             nav::-webkit-scrollbar-track {
               background: transparent;
@@ -291,7 +284,7 @@ export default function Sidebar() {
             }
           `}</style>
 
-          <div className="space-y-2 pb-4 min-h-full">
+          <div className="space-y-1.5 pb-4 min-h-full">
             {!isCollapsed && (
               <div className="px-4 py-2 text-xs font-bold text-white/60 uppercase tracking-wider flex items-center gap-2">
                 <span className="material-icons-outlined text-sm">dashboard</span>
@@ -299,63 +292,63 @@ export default function Sidebar() {
               </div>
             )}
 
+            {/* Show MantaCore logo at top of navigation when collapsed */}
+            {isCollapsed && (
+              <div className="flex justify-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl shadow-2xl flex items-center justify-center mb-2">
+                  {/* <span className="text-white font-bold text-xl">L</span> */}
+                  <Slack className="absolute w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
+
             {NAV_ITEMS.filter(item => item.roles.includes(role)).map(({ name, path }, index) => {
               const href = `/${role}/${path}`;
               const isActive = pathname.startsWith(href);
 
-              const baseClasses = `group relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 overflow-hidden ${isCollapsed ? 'justify-center' : ''
-                }`;
+              const baseClasses = `group relative flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isCollapsed ? 'justify-center' : ''}`;
 
               const activeClasses = isActive
-                ? "bg-gradient-to-r from-white/25 to-white/15 border border-white/30 shadow-2xl backdrop-blur-lg text-white transform scale-105 shadow-purple-500/20"
-                : "hover:bg-white/15 hover:border-white/20 hover:shadow-xl hover:backdrop-blur-lg hover:transform hover:scale-102 text-white/80 hover:text-white border border-transparent";
+                ? "bg-gradient-to-r from-white/25 to-white/15 border border-white/30 shadow-xl backdrop-blur-lg text-white"
+                : "hover:bg-white/15 hover:border-white/20 hover:shadow-lg hover:backdrop-blur-lg text-white/80 hover:text-white border border-transparent";
 
               const itemClasses = `${baseClasses} ${activeClasses}`;
 
               return (
-                <div key={name} className="animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div key={name} className="animate-fadeIn" style={{ animationDelay: `${index * 0.05}s` }}>
                   <Link
                     href={href}
                     className={itemClasses}
                     onMouseEnter={() => setHoveredItem(name)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
-                    {/* Enhanced Background Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-
-                    {/* Glowing Border Effect */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-purple-500/0 group-hover:border-purple-500/50 transition-all duration-300"></div>
+                    {/* Subtle Background Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl"></div>
 
                     {/* Icon Container */}
-                    <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${isCollapsed ? 'mx-auto' : ''
+                    <div className={`relative z-10 p-1.5 rounded-lg transition-all duration-200 ${isCollapsed ? 'mx-auto' : ''
                       } ${isActive
-                        ? 'bg-gradient-to-br from-purple-500 to-blue-600 shadow-lg shadow-purple-500/30'
-                        : 'bg-white/10 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-blue-600 group-hover:shadow-lg group-hover:shadow-purple-500/30'
+                        ? 'bg-gradient-to-br from-purple-500 to-blue-600 shadow-md shadow-purple-500/20'
+                        : 'bg-white/10 group-hover:bg-gradient-to-br group-hover:from-purple-500/80 group-hover:to-blue-600/80'
                       }`}>
-                      <span className="material-icons-outlined text-lg">{iconMap[name]}</span>
+                      <span className="material-icons-outlined">{iconMap[name]}</span>
                     </div>
 
                     {/* Text with Tooltip for Collapsed */}
                     {!isCollapsed ? (
-                      <span className="relative z-10 font-semibold">{name}</span>
+                      <span className="relative z-10 font-medium">{name}</span>
                     ) : (
-                      <div className="absolute left-full ml-2 px-3 py-2 bg-slate-800/95 text-white text-sm rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 whitespace-nowrap">
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800/90 text-white text-xs rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 whitespace-nowrap">
                         {name}
-                        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-slate-800 rotate-45"></div>
+                        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-1.5 h-1.5 bg-slate-800 rotate-45"></div>
                       </div>
                     )}
 
-                    {/* Enhanced Active Indicator */}
-                    {isActive && (
-                      <div className="absolute right-2 flex items-center gap-1">
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
-                        <div className="w-1 h-1 bg-emerald-300 rounded-full animate-ping"></div>
+                    {/* Active Indicator */}
+                    {isActive && !isCollapsed && (
+                      <div className="absolute right-3 flex items-center">
+                        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
                       </div>
-                    )}
-
-                    {/* Hover Effect Ripple */}
-                    {hoveredItem === name && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-blue-400/10 rounded-2xl animate-pulse"></div>
                     )}
                   </Link>
                 </div>
@@ -365,41 +358,24 @@ export default function Sidebar() {
         </nav>
 
         {/* Enhanced Footer Section */}
-        <div className="relative z-10 px-6 py-4">
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-3 border border-white/10 hover:bg-white/10 transition-all duration-300">
+        <div className="relative z-10 px-4 py-3">
+          <div className="bg-white/5 backdrop-blur-lg rounded-xl p-2 border border-white/10 hover:bg-white/10 transition-all duration-300">
             <div className="text-center">
               {!isCollapsed ? (
                 <>
-                  <div className="text-xs text-white/60 font-medium mb-1">
+                  <div className="text-xs text-white/60 font-medium">
                     &copy; {new Date().getFullYear()} MantaCore
                   </div>
-                  <div className="text-xs text-white/40 mb-2">
-                    All rights reserved
-                  </div>
-
-                  {/* Enhanced Version Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-white/10 hover:border-white/20 transition-all duration-300">
-                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-white/70 font-medium">v2.0.1</span>
-                    <div className="w-1 h-1 bg-blue-400 rounded-full animate-ping"></div>
-                  </div>
-
-                  {/* System Stats */}
-                  <div className="mt-3 flex justify-center gap-4 text-xs text-white/50">
-                    <div className="flex items-center gap-1">
-                      <span className="material-icons-outlined text-xs">memory</span>
-                      <span>98%</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="material-icons-outlined text-xs">speed</span>
-                      <span>Fast</span>
-                    </div>
+                  <div className="text-xs text-white/40 mt-1">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-white/10">
+                      <div className="w-1 h-1 bg-emerald-400 rounded-full"></div>
+                      <span className="text-2xs">v2.0.1</span>
+                    </span>
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-white/70 font-medium rotate-90 whitespace-nowrap">v2.0.1</span>
+                <div className="flex justify-center">
+                  <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
                 </div>
               )}
             </div>

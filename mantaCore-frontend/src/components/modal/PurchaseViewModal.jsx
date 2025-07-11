@@ -129,7 +129,7 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                 </p>
                                 <p className="text-sm">
                                     <span className="font-medium">Status:</span>
-                                    <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(purchase.status)}`}>
+                                    <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getStatusColor(purchase.status)}`}>
                                         {purchase.status || 'Unknown'}
                                     </span>
                                 </p>
@@ -250,7 +250,7 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                             <div>
                                 <span className="font-medium">Created:</span> {formatDate(purchase.created_at)}
                             </div>
-                            <div>
+                            <div className='text-right'>
                                 <span className="font-medium">Last Updated:</span> {formatDate(purchase.updated_at)}
                             </div>
                         </div>

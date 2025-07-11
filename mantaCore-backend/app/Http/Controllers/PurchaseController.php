@@ -171,7 +171,7 @@ class PurchaseController extends Controller
                     }
 
                     // Refresh items relasi
-                    $purchase->load('items');
+                    $purchase->load('items', 'user', 'company');
                 }
 
                 // 4. ➕ Tambahkan stok baru jika status sekarang accepted
@@ -231,7 +231,11 @@ class PurchaseController extends Controller
     {
         // Ambil semua purchase yang dibuat oleh user yang sedang login
         $purchases = Purchase::with(['user', 'company', 'items.item'])
+<<<<<<< Updated upstream
             ->where('userID', $request->user()->userID) // Ubah dari companyID ke userID
+=======
+            ->where('userID', $request->user()->userID)
+>>>>>>> Stashed changes
             ->get();
 
         return response()->json([

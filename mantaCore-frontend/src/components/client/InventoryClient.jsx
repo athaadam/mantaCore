@@ -10,6 +10,7 @@ import Header2 from '@/components/header/Header2';
 import DataCard from '@/components/card/DataCard';
 import Cookies from 'js-cookie';
 import { apiHit } from '@/libs/api/fetch';
+import ConfirmationModal from '../modal/ConfirmationModal';
 
 export default function InventoryClient({ initialItems, profile }) {
     const [alert, setAlert] = useState(null);
@@ -26,6 +27,7 @@ export default function InventoryClient({ initialItems, profile }) {
         units: '',
         itemPrice: '',
     });
+    const [deleteModal, setDeleteModal] = useState(false);
 
     const handleFilter = (category) => {
         if (category === 'all') {
@@ -76,10 +78,14 @@ export default function InventoryClient({ initialItems, profile }) {
     };
 
 
-    const handleDelete = async (index) => {
-        const confirmDelete = confirm('Are you sure you want to delete this item?');
-        if (!confirmDelete) return;
+    const initiateDeleteItem = (index) => {
+        const itemToDelete = items[index];
+        setNewItem(itemToDelete);
+        setSelectedItemIndex(index);
+        setDeleteModal(true);
+    };
 
+    const handleDelete = async (index) => {
         try {
             const token = Cookies.get('auth');
             const itemId = items[index].itemID;
@@ -161,7 +167,7 @@ export default function InventoryClient({ initialItems, profile }) {
                 <div className="w-full">
                     <InventoryTable
                         items={items}
-                        onDelete={handleDelete}
+                        onDelete={initiateDeleteItem}
                         onEdit={handleEditItem}
                         itemsPerPage={5}
                     />
@@ -180,6 +186,26 @@ export default function InventoryClient({ initialItems, profile }) {
                 onSubmit={handleSubmitItem}
                 item={newItem}
                 onChange={(e) => setNewItem({ ...newItem, [e.target.name]: e.target.value })}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={deleteModal}
+                onClose={() => {
+                    setDeleteModal(false);
+                    setSelectedItemIndex(null);
+                }}
+                onConfirm={() => {
+                    if (selectedItemIndex !== null) {
+                        handleDelete(selectedItemIndex);
+                    }
+                    setDeleteModal(false);
+                }}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete the item "${newItem?.name || ''}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                type="danger"
             />
         </div>
     );

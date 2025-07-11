@@ -9,6 +9,7 @@ import Header2 from "@/components/header/Header2";
 import DataCard from "@/components/card/DataCard";
 import { apiHit } from "@/libs/api/fetch";
 import Cookies from "js-cookie";
+import ConfirmationModal from "@/components/modal/ConfirmationModal";
 
 
 export default function CustomerClient({ initialCustomers, profile }) {
@@ -17,6 +18,7 @@ export default function CustomerClient({ initialCustomers, profile }) {
     const [modalMode, setModalMode] = useState('add');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [alert, setAlert] = useState(null);
+    const [deleteModal, setDeleteModal] = useState(false);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
@@ -24,8 +26,21 @@ export default function CustomerClient({ initialCustomers, profile }) {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (idToDelete) => {
-        setCustomers(prev => prev.filter(c => c.costumerID !== idToDelete));
+    const initiateDeleteCustomer = (customer) => {
+        setSelectedCustomer(customer);
+        setDeleteModal(true);
+    };
+
+    const handleDelete = async (idToDelete) => {
+        try {
+            const token = Cookies.get('auth');
+            await apiHit(`deleteCostumer/${idToDelete}`, token, 'DELETE');
+            setCustomers(prev => prev.filter(c => c.costumerID !== idToDelete));
+            setAlert({ type: 'success', message: 'Customer deleted successfully!' });
+        } catch (error) {
+            const message = extractErrorMessage(error);
+            setAlert({ type: 'error', message: message || 'Failed to delete customer' });
+        }
     };
 
     const handleSubmitModal = async (newData, mode) => {
@@ -125,7 +140,7 @@ export default function CustomerClient({ initialCustomers, profile }) {
                         customers={customers}
                         itemsPerPage={5}
                         onEdit={handleEdit}
-                        onDelete={handleDelete}
+                        onDelete={initiateDeleteCustomer}
                     />
                 </div>
             </DataCard>
@@ -137,6 +152,26 @@ export default function CustomerClient({ initialCustomers, profile }) {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleSubmitModal}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={deleteModal}
+                onClose={() => {
+                    setDeleteModal(false);
+                    setSelectedCustomer(null);
+                }}
+                onConfirm={() => {
+                    if (selectedCustomer?.costumerID) {
+                        handleDelete(selectedCustomer.costumerID);
+                    }
+                    setDeleteModal(false);
+                }}
+                title="Delete Customer"
+                message={`Are you sure you want to delete the customer "${selectedCustomer?.username || ''}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                type="danger"
             />
         </div>
     );

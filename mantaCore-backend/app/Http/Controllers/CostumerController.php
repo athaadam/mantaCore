@@ -65,4 +65,22 @@ class CostumerController extends Controller
         ]);
     }
 
+    // ✅ DELETE: Hapus costumer
+    public function deleteCostumer(Request $request, int $id): JsonResponse
+    {
+        $costumer = Costumer::find($id);
+        if (!$costumer) {
+            return response()->json(['message' => 'Costumer not found'], 404);
+        }
+
+        $costumer->delete();
+
+        return response()->json([
+            'message' => 'Costumer deleted successfully',
+        ]);
+    }
+    
 }
+
+
+

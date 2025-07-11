@@ -7,10 +7,10 @@ const InvoiceStats = ({ invoices = [] }) => {
     const stats = invoices.reduce((acc, invoice) => {
         const amount = invoice.total_amount || 0;
         const status = invoice.status?.toLowerCase() || 'draft';
-        
+
         acc.total += amount;
         acc.count += 1;
-        
+
         if (status === 'paid') {
             acc.paid += amount;
             acc.paidCount += 1;
@@ -24,7 +24,7 @@ const InvoiceStats = ({ invoices = [] }) => {
             acc.draft += amount;
             acc.draftCount += 1;
         }
-        
+
         return acc;
     }, {
         total: 0,

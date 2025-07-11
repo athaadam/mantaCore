@@ -99,7 +99,7 @@ class UserController extends Controller
         $users = User::where('companyID', $request->user()->companyID)
             ->with('company')
             //ambil user yang statusnya aktif
-            ->where('status', 'active')
+            // ->where('status', 'active')
             ->get();
 
         return response()->json($users);
