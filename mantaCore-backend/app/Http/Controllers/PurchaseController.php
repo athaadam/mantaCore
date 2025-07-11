@@ -240,5 +240,25 @@ class PurchaseController extends Controller
         ]);
     }
 
+    public function purchaseReport(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Ambil semua purchase milik company yang sama dengan user login
+        $purchases = Purchase::where('companyID', $user->companyID);
+
+        // Hitung total, approved, pending, rejected
+        $total = $purchases->count();
+        $approved = (clone $purchases)->where('status', 'accepted')->count();
+        $pending = (clone $purchases)->where('status', 'pending')->count();
+        $rejected = (clone $purchases)->where('status', 'denied')->count();
+
+        return response()->json([
+            'total_requests'    => $total,
+            'approved_requests' => $approved,
+            'pending_requests'  => $pending,
+            'rejected_requests' => $rejected,
+        ]);
+    }
 
 }
