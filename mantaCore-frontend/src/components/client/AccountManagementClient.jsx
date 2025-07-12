@@ -14,7 +14,7 @@ export default function AccountManagementClient({ initialData }) {
     const [editingAccount, setEditingAccount] = useState(null);
     const [alert, setAlert] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [deleteModal, setDeleteModal] = useState(false);
+    const [disableModal, setDisableModal] = useState(false);
     const itemsPerPage = 5;
 
 
@@ -31,31 +31,32 @@ export default function AccountManagementClient({ initialData }) {
         setAlert({ message: 'User updated successfully.', type: 'success' });
     };
 
-    const initiateDeleteAccount = (userId) => {
+    const initiateDisableAccount = (userId) => {
         // Find the account by userID
-        const accountToDelete = accounts.find(acc => acc.userID === userId);
-        if (accountToDelete) {
-            setEditingAccount(accountToDelete);
-            setDeleteModal(true);
+        const accountToDisable = accounts.find(acc => acc.userID === userId);
+        if (accountToDisable) {
+            setEditingAccount(accountToDisable);
+            setDisableModal(true);
         } else {
-            setAlert({ message: 'Cannot find user to delete', type: 'error' });
+            setAlert({ message: 'Cannot find user to disable', type: 'error' });
         }
     };
 
-    const handleDeleteAccount = async (id) => {
+    const handleDisableAccount = async (id) => {
         try {
-            const res = await apiHit(`deleteUser/${id}`, Cookies.get('auth'), 'DELETE');
-            const updatedAccounts = accounts.filter(acc => acc.userID !== id);
+            const res = await apiHit(`deleteUser/${id}`, Cookies.get('auth'), 'PUT');
+            
+            // Update the account status in the local state using the response data
+            const updatedAccounts = accounts.map(acc => 
+                acc.userID === id ? res.user : acc
+            );
+            
             setAccounts(updatedAccounts);
             if (editingAccount?.userID === id) setEditingAccount(null);
             
-            const newTotalPages = Math.ceil(updatedAccounts.length / itemsPerPage);
-            if (currentPage > newTotalPages) {
-                setCurrentPage(newTotalPages || 1);
-            }
-            setAlert({ message: res.message || 'User deleted successfully.', type: 'success' });
+            setAlert({ message: res.message || 'User disabled successfully.', type: 'success' });
         } catch (err) {
-            setAlert({ message: err.message || 'Failed to delete user.', type: 'error' });
+            setAlert({ message: err.message || 'Failed to disable user.', type: 'error' });
         }
     };
 
@@ -92,28 +93,28 @@ export default function AccountManagementClient({ initialData }) {
                 itemsPerPage={itemsPerPage}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
-                onDelete={initiateDeleteAccount}
+                onDelete={initiateDisableAccount}
                 onEdit={handleEditAccount}
             />
 
-            {/* Delete Confirmation Modal */}
+            {/* Disable Account Confirmation Modal */}
             <ConfirmationModal
-                isOpen={deleteModal}
+                isOpen={disableModal}
                 onClose={() => {
-                    setDeleteModal(false);
+                    setDisableModal(false);
                     setEditingAccount(null);
                 }}
                 onConfirm={() => {
                     if (editingAccount?.userID) {
-                        handleDeleteAccount(editingAccount.userID);
+                        handleDisableAccount(editingAccount.userID);
                     }
-                    setDeleteModal(false);
+                    setDisableModal(false);
                 }}
-                message={`Are you sure you want to delete the account for ${editingAccount?.username || 'this user'}?`}
+                message={`Are you sure you want to disable the account for ${editingAccount?.username || 'this user'}? The user will be marked as inactive but will remain in the system.`}
                 confirmText="Disable"
                 cancelText="Cancel"
                 type='danger'
-                title='Delete Account Confirmation'
+                title='Disable Account Confirmation'
             />
         </div>
     );

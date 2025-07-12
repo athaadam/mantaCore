@@ -77,7 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //account manage
             Route::post('/addUser', [AccountManage::class, 'addUser']);
-            Route::delete('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
+            Route::put('/deleteUser/{userID}', [AccountManage::class, 'deleteUser']);
             Route::post('/updateUser/{userID}', [AccountManage::class, 'updateUser']);
 
             //user management

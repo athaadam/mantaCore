@@ -1,5 +1,6 @@
 'use client';
 
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 import React from 'react';
 
 const InvoiceStats = ({ invoices = [] }) => {
@@ -41,12 +42,7 @@ const InvoiceStats = ({ invoices = [] }) => {
 
     // Format currency
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
+        return formatRupiah(amount, 'IDR');
     };
 
     const statCards = [

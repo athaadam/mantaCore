@@ -54,7 +54,7 @@ const CalendarDaysIcon = ({ className }) => (
 const PurchaseStats = ({ stats, loading = false }) => {
     if (loading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
                 {[...Array(5)].map((_, i) => (
                     <div key={i} className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div className="animate-pulse">
@@ -145,7 +145,7 @@ const PurchaseStats = ({ stats, loading = false }) => {
     };
 
     return (
-        <div className="mb-8">
+        <div className="mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {statCards.map((card, index) => (
                     <div

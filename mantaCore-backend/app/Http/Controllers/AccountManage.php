@@ -36,7 +36,7 @@ class AccountManage extends Controller
             'phone_number' => $data['phone_number'],
             'role'         => $data['role'],
             'status'       => 'active', // default status
-        ]);
+        ])->refresh();
 
         return response()->json([
             'message' => 'User created successfully',
@@ -54,19 +54,22 @@ class AccountManage extends Controller
 
         // Tidak boleh hapus diri sendiri
         if ($user->userID === $request->user()->userID) {
-            return response()->json(['message' => 'You cannot delete yourself'], 403);
+            return response()->json(['message' => 'You cannot disable yourself'], 403);
         }
 
         // Tidak boleh hapus admin
         if ($user->role === 'admin') {
-            return response()->json(['message' => 'You cannot delete an admin user'], 403);
+            return response()->json(['message' => 'You cannot disable an admin user'], 403);
         }
 
         //ubah user status menjadi tidak aktif
         $user->status = 'inactive';
         $user->save();
 
-        return response()->json(['message' => 'User deleted successfully'], 200);
+        return response()->json([
+            'message' => 'User disabled successfully',
+            'user'    => $user,
+        ], 200);
     }
 
     // ✅ Update user berdasarkan userID

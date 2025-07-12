@@ -5,6 +5,7 @@ import InvoiceAction from '@/components/action/InvoiceAction';
 import Pagination from '@/components/common/Pagination';
 import { formatDate } from '../../libs/utils/formats/formatdate';
 import { usePagination } from '../../hooks/usePagination';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 
 const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onView, isFiltered = false }) => {
     const {
@@ -19,11 +20,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
 
     // Format currency
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-        }).format(amount);
+        return formatRupiah(amount, 'IDR');
     };
 
     // Get status badge styles
@@ -35,7 +32,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
             'draft': 'bg-gray-100 text-gray-800 border-gray-200',
             'cancelled': 'bg-gray-100 text-gray-800 border-gray-200'
         };
-        
+
         return statusStyles[status?.toLowerCase()] || statusStyles['draft'];
     };
 
@@ -67,7 +64,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                             <thead>
                                 <tr className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
                                     {['No', 'Invoice #', 'Customer', 'Amount', 'Status', 'Issue Date', 'Due Date', 'Actions'].map((header) => (
-                                        <th key={header} className="px-4 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider whitespace-nowrap">
+                                        <th key={header} className="px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider whitespace-nowrap">
                                             {header}
                                         </th>
                                     ))}
@@ -94,8 +91,8 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                                         {isFiltered ? 'No Matching Invoices' : 'No Invoices Found'}
                                                     </p>
                                                     <p className="text-sm text-slate-400">
-                                                        {isFiltered 
-                                                            ? 'Try adjusting your filters to see more results' 
+                                                        {isFiltered
+                                                            ? 'Try adjusting your filters to see more results'
                                                             : 'Create your first invoice to get started with billing management'
                                                         }
                                                     </p>
@@ -120,7 +117,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                                     </div>
                                                     <div>
                                                         <div className="text-sm font-bold text-slate-900">
-                                                            {invoice.invoice_number || `INV-${invoice.invoiceID}`}
+                                                            {invoice.invoice_number || `${invoice.invoiceID}`}
                                                         </div>
                                                         <div className="text-xs text-purple-600 font-medium">Invoice</div>
                                                     </div>
@@ -135,20 +132,20 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                                     </div>
                                                     <div>
                                                         <div className="text-sm font-medium text-slate-900">
-                                                            {invoice.customer?.username || invoice.customer_name || 'Unknown Customer'}
+                                                            {invoice.costumer?.username || invoice.customer_name || 'Unknown Customer'}
                                                         </div>
                                                         <div className="text-xs text-slate-500">
-                                                            {invoice.customer?.email || invoice.customer_email || ''}
+                                                            {invoice.costumer?.email || invoice.customer_email || ''}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-bold text-slate-900">
-                                                    {formatCurrency(invoice.total_amount || 0)}
+                                                    {invoice.items.map(item => formatCurrency(item.subTotal))}
                                                 </div>
                                                 <div className="text-xs text-slate-500">
-                                                    {invoice.currency || 'USD'}
+                                                    {invoice.currency || 'IDR'}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
@@ -157,7 +154,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
-                                                {invoice.issue_date ? formatDate(invoice.issue_date) : formatDate(invoice.created_at)}
+                                                {formatDate(invoice.date)}
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
                                                 <div className={`${invoice.due_date && new Date(invoice.due_date) < new Date() && invoice.status !== 'paid' ? 'text-red-600 font-bold' : ''}`}>
@@ -165,10 +162,10 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
-                                                <InvoiceAction 
-                                                    invoice={invoice} 
-                                                    onDelete={onDelete} 
-                                                    onUpdate={onEdit} 
+                                                <InvoiceAction
+                                                    invoice={invoice}
+                                                    onDelete={onDelete}
+                                                    onUpdate={onEdit}
                                                     onView={onView}
                                                 />
                                             </td>
