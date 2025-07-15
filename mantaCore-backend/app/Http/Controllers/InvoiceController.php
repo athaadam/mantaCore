@@ -251,19 +251,14 @@ class InvoiceController extends Controller
         }
     }
 
-   public function getMyInvoices(Request $request): JsonResponse
-{
-    $user = $request->user();
+    
 
-    // Ambil semua invoice milik user beserta relasi lengkap
-    $invoices = Invoice::with([
-            'user',
-            'company',
-            'costumer',
-            'items.item'
-        ])
-        ->where('userID', $user->userID)
-        ->get();
+    public function getMyInvoices(Request $request): JsonResponse
+    {
+        // Ambil semua purchase yang dibuat oleh user yang sedang login
+        $invoices = Invoice::with(['user', 'company', 'items.item'])
+            ->where('userID', $request->user()->userID) // Ubah dari companyID ke userID
+            ->get();
 
     if ($invoices->isEmpty()) {
         return response()->json([

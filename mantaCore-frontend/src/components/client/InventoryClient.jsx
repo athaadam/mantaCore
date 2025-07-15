@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import InventoryFilter from '../filter/InventoryFilter';
 import InventoryTable from '../table/InventoryTable';
 import InventoryModal from '../modal/InventoryModal';
@@ -28,14 +28,36 @@ export default function InventoryClient({ initialItems, profile }) {
         itemPrice: '',
     });
     const [deleteModal, setDeleteModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentCategory, setCurrentCategory] = useState('all');
+
+    // Filter items based on both category and search term
+    const filteredItems = useMemo(() => {
+        let result = originalItems;
+        
+        // Apply category filter
+        if (currentCategory !== 'all') {
+            result = result.filter(item => item.category === currentCategory);
+        }
+        
+        // Apply search filter
+        if (searchTerm.trim() !== '') {
+            const searchLower = searchTerm.toLowerCase();
+            result = result.filter(item => 
+                (item.name && item.name.toLowerCase().includes(searchLower)) ||
+                (item.type && item.type.toLowerCase().includes(searchLower))
+            );
+        }
+        
+        return result;
+    }, [originalItems, currentCategory, searchTerm]);
+    
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
     const handleFilter = (category) => {
-        if (category === 'all') {
-            setItems(originalItems);
-        } else {
-            const filtered = originalItems.filter(item => item.category === category);
-            setItems(filtered);
-        }
+        setCurrentCategory(category);
     };
 
     const handleSubmitItem = async (e) => {
@@ -79,7 +101,7 @@ export default function InventoryClient({ initialItems, profile }) {
 
 
     const initiateDeleteItem = (index) => {
-        const itemToDelete = items[index];
+        const itemToDelete = filteredItems[index];
         setNewItem(itemToDelete);
         setSelectedItemIndex(index);
         setDeleteModal(true);
@@ -88,11 +110,9 @@ export default function InventoryClient({ initialItems, profile }) {
     const handleDelete = async (index) => {
         try {
             const token = Cookies.get('auth');
-            const itemId = items[index].itemID;
+            const itemId = filteredItems[index].itemID;
             await apiHit(`deleteItem/${itemId}`, token, 'DELETE');
-            const updated = [...items];
-            updated.splice(index, 1);
-            setItems(updated);
+            const updated = originalItems.filter(item => item.itemID !== itemId);
             setOriginalItems(updated);
             setAlert({ type: 'success', message: 'Item deleted successfully' });
         } catch (err) {
@@ -159,14 +179,47 @@ export default function InventoryClient({ initialItems, profile }) {
                         </div>
                     </div>
                     <div className="text-sm text-slate-600 font-medium">
-                        Total Items: <span className="font-bold text-purple-600">{items.length}</span>
+                        Total Items: <span className="font-bold text-purple-600">{filteredItems.length}</span>
                     </div>
+                </div>
+
+                {/* Search Input */}
+                <div className="mb-6">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input
+                            type="search"
+                            className="w-full p-3 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white/80 focus:ring-purple-500 focus:border-purple-500"
+                            placeholder="Search by item name or type..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+                    {searchTerm && (
+                        <div className="mt-2 flex items-center">
+                            <span className="text-sm text-purple-700 font-medium">
+                                Found {filteredItems.length} result{filteredItems.length !== 1 ? 's' : ''}
+                            </span>
+                            {filteredItems.length !== (currentCategory === 'all' ? originalItems.length : originalItems.filter(item => item.category === currentCategory).length) && (
+                                <button 
+                                    className="ml-2 text-xs text-gray-600 hover:text-purple-700 underline"
+                                    onClick={() => setSearchTerm('')}
+                                >
+                                    Clear search
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Inventory Table - Full width, no horizontal scroll */}
                 <div className="w-full">
                     <InventoryTable
-                        items={items}
+                        items={filteredItems}
                         onDelete={initiateDeleteItem}
                         onEdit={handleEditItem}
                         itemsPerPage={5}

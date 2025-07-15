@@ -305,7 +305,7 @@ const PurchaseRequestClient = ({ api }) => {
         // Apply date filters
         if (dateRange.preset) {
             const dateRangeObj = getDateRangeFromPreset(dateRange.preset);
-            if (dateRangeObj) { 
+            if (dateRangeObj) {
                 filtered = filtered.filter(purchase => {
                     const purchaseDate = new Date(purchase.date);
                     return purchaseDate >= dateRangeObj.from && purchaseDate <= dateRangeObj.to;
@@ -322,8 +322,8 @@ const PurchaseRequestClient = ({ api }) => {
                 icon={
                     <ScrollText color="#ffffff" absoluteStrokeWidth />
                 }
-                title="Purchase Request Portal"
-                description="Manage your purchase requests efficiently and effectively"
+                title="Purchase Request Operations"
+                description={`Manage your own purchase requests for ${company.companyName || 'Your Company'}`}
                 colorScheme="purple"
                 onAdd={() => {
                     setSelectedPurchase(null);
@@ -334,7 +334,7 @@ const PurchaseRequestClient = ({ api }) => {
             <PurchaseStats
                 stats={stats}
             />
-            <div className="py-4">
+            <div className="mb-4">
                 {alert && (
                     <Alert
                         message={alert.message}
@@ -343,33 +343,38 @@ const PurchaseRequestClient = ({ api }) => {
                     />
                 )}
             </div>
-            <PurchaseFilter
-                onFilterChange={handleFilterChange}
-                activeFilters={filter}
-                onDateChange={handleDateChange}
-                dateRange={dateRange}
-            />
             <DataCard
                 title="My Purchase Requests"
                 subtitle="View and track all your submitted purchase requests"
                 icon={
                     <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2m-4-8a2 2 0 110 4 2 2 0 010-4zm0 10a2 2 0 110 4 2 2 0 010-4z" />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2m-4-8a2 2 0 110 4 2 2 0 010-4zm0 10a2 2 0 110 4 2 2 0 010-4z"
+                        />
                     </svg>
                 }
-                children={
-                    <PurchaseRequestTable
-                        purchases={filteredPurchases}
-                        itemsPerPage={5}
-                        onView={handleView}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        loading={loading}
-                        isFiltered={filter.length > 0 || dateRange.preset}
-                        hasActiveFilters={filter.length > 0 || dateRange.preset}
-                    />
-                }
-            />
+            >
+                <PurchaseFilter
+                    onFilterChange={handleFilterChange}
+                    activeFilters={filter}
+                    onDateChange={handleDateChange}
+                    dateRange={dateRange}
+                />
+
+                <PurchaseRequestTable
+                    purchases={filteredPurchases}
+                    itemsPerPage={5}
+                    onView={handleView}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    loading={loading}
+                    isFiltered={filter.length > 0 || dateRange.preset}
+                    hasActiveFilters={filter.length > 0 || dateRange.preset}
+                />
+            </DataCard>
+
 
             {/* Modals */}
             <div className="flex justify-center">

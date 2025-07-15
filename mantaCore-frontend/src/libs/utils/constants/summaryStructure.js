@@ -7,7 +7,7 @@ export const summaryStructure = [
     { key: 'productSold', title: 'Products Sold', icon: '/assets/SummaryLogos/purchase.svg', isCurrency: false },
     { key: 'activeCustomers', title: 'Active Customers', icon: '/assets/SummaryLogos/customer.svg', isCurrency: false },
     { key: 'totalRequests', title: 'Total Requests', icon: '/assets/SummaryLogos/request.svg', isCurrency: false },
-    { key: 'approvedRequests', title: 'Approved Requests', icon: '/assets/SummaryLogos/approved.svg', isCurrency: false },
+    { key: 'approvedRequests', title: 'Accepted Requests', icon: '/assets/SummaryLogos/approved.svg', isCurrency: false },
     { key: 'pendingRequests', title: 'Pending Requests', icon: '/assets/SummaryLogos/pending.svg', isCurrency: false },
-    { key: 'rejectedRequests', title: 'Rejected Requests', icon: '/assets/SummaryLogos/rejected.svg', isCurrency: false },
+    { key: 'rejectedRequests', title: 'Denied Requests', icon: '/assets/SummaryLogos/rejected.svg', isCurrency: false },
 ];

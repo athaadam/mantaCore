@@ -107,10 +107,10 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                     <span className="font-medium">Name:</span> {purchase.company?.companyName || purchase.company?.name || 'N/A'}
                                 </p>
                                 <p className="text-sm">
-                                    <span className="font-medium">Email:</span> {purchase.company?.email || 'N/A'}
+                                    <span className="font-medium">Email:</span> {purchase.user?.email || 'N/A'}
                                 </p>
                                 <p className="text-sm">
-                                    <span className="font-medium">Phone:</span> {purchase.company?.phone || 'N/A'}
+                                    <span className="font-medium">Phone:</span> {purchase.user?.phone_number || 'N/A'}
                                 </p>
                             </div>
                         </div>
@@ -125,7 +125,7 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                     <span className="font-medium">Date:</span> {formatDate(purchase.date)}
                                 </p>
                                 <p className="text-sm">
-                                    <span className="font-medium">Requested by:</span> {purchase.user?.name || 'N/A'}
+                                    <span className="font-medium">Requested by:</span> {purchase.user?.username || 'N/A'}
                                 </p>
                                 <p className="text-sm">
                                     <span className="font-medium">Status:</span>

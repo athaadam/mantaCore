@@ -149,20 +149,20 @@ const PurchaseRequestTable = ({
                         </tr>
                     </thead>
                     <tbody className="bg-white/50 backdrop-blur-sm">
-                        {currentData.map((purchase) => (
+                        {currentData.map((purchase, idx) => (
                             <tr key={purchase.purchaseID} className="hover:bg-purple-50/70 transition-all duration-200 border-b border-purple-100 last:border-b-0 group">
                                 <td className="px-6 py-5 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-10 w-10">
                                             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                                                 <span className="text-white font-semibold text-sm">
-                                                    #{purchase.purchaseID}
+                                                    {idx + 1}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm font-medium text-gray-900">
-                                                Request #{purchase.purchaseID}
+                                                {purchase.purchaseID}
                                             </div>
                                             <div className="text-sm text-gray-500">
                                                 {purchase.user?.username || 'Unknown User'}
