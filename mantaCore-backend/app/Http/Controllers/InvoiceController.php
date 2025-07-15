@@ -117,6 +117,7 @@ class InvoiceController extends Controller
         }
     }
 
+
     private function generateInvoiceID(string $companyID): string
     {
         $company = \App\Models\Company::find($companyID);
@@ -137,84 +138,85 @@ class InvoiceController extends Controller
 
     /* ───── UPDATE ───── */
     public function updateInvoice(Request $request, string $id): JsonResponse
-{
-    $invoice = Invoice::with('items')->find($id);
-    if (!$invoice) {
-        return response()->json(['message' => 'Invoice not found'], 404);
-    }
-
-    $user = $request->user();
-
-    $validated = $request->validate([
-        'costumerID'             => 'sometimes|exists:costumers,costumerID',
-        'date'                   => 'sometimes|date',
-        'amount'                 => 'sometimes|numeric|min:0',
-        'items'                  => 'sometimes|array|min:1',
-        'items.*.itemID'         => 'required_with:items|exists:items,itemID',
-        'items.*.type'           => 'nullable|string|max:255',
-        'items.*.quantity'       => 'required_with:items|integer|min:1',
-        'items.*.unitPrice'      => 'required_with:items|numeric|min:0',
-        'items.*.subTotal'       => 'required_with:items|numeric|min:0',
-    ]);
-
-    try {
-        DB::beginTransaction();
-
-        // Kembalikan stok lama
-        foreach ($invoice->items as $oldItem) {
-            Item::lockForUpdate()->find($oldItem->itemID)
-                ->increment('stock', $oldItem->quantity);
+    {
+        $invoice = Invoice::with('items')->find($id);
+        if (!$invoice) {
+            return response()->json(['message' => 'Invoice not found'], 404);
         }
 
-        // Hapus semua item invoice lama
-        InvoiceItem::where('invoiceID', $invoice->invoiceID)->delete();
+        $user = $request->user();
 
-        // Update header invoice
-        $invoice->update([
-            'costumerID' => $validated['costumerID'] ?? $invoice->costumerID,
-            'date'       => $validated['date']       ?? $invoice->date,
-            'amount'     => $validated['amount']     ?? $invoice->amount,
+        $validated = $request->validate([
+            'costumerID'             => 'sometimes|exists:costumers,costumerID',
+            'date'                   => 'sometimes|date',
+            'amount'                 => 'sometimes|numeric|min:0',
+            'items'                  => 'sometimes|array|min:1',
+            'items.*.itemID'         => 'required_with:items|exists:items,itemID',
+            'items.*.type'           => 'nullable|string|max:255',
+            'items.*.quantity'       => 'required_with:items|integer|min:1',
+            'items.*.unitPrice'      => 'required_with:items|numeric|min:0',
+            'items.*.subTotal'       => 'required_with:items|numeric|min:0',
         ]);
 
-        // Simpan item baru jika ada
-        if (isset($validated['items'])) {
-            foreach ($validated['items'] as $row) {
-                $item = Item::lockForUpdate()->find($row['itemID']);
+        try {
+            DB::beginTransaction();
 
-                if ($item->stock < $row['quantity']) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => "Insufficient stock for item {$item->name} (ID {$item->itemID})"
-                    ], 422);
-                }
-
-                $item->decrement('stock', $row['quantity']);
-
-                InvoiceItem::create([
-                    'invoiceID' => $invoice->invoiceID,
-                    'itemID'    => $row['itemID'],
-                    'type'      => $row['type'] ?? null,
-                    'quantity'  => $row['quantity'],
-                    'unitPrice' => $row['unitPrice'],
-                    'subTotal'  => $row['subTotal'],
-                ]);
+            // Kembalikan stok lama
+            foreach ($invoice->items as $oldItem) {
+                Item::lockForUpdate()->find($oldItem->itemID)
+                    ->increment('stock', $oldItem->quantity);
             }
+
+            // Hapus semua item invoice lama
+            InvoiceItem::where('invoiceID', $invoice->invoiceID)->delete();
+
+            // Update header invoice
+            $invoice->update([
+                'costumerID' => $validated['costumerID'] ?? $invoice->costumerID,
+                'date'       => $validated['date']       ?? $invoice->date,
+                'amount'     => $validated['amount']     ?? $invoice->amount,
+            ]);
+
+            // Simpan item baru jika ada
+            if (isset($validated['items'])) {
+                foreach ($validated['items'] as $row) {
+                    $item = Item::lockForUpdate()->find($row['itemID']);
+
+                    if ($item->stock < $row['quantity']) {
+                        DB::rollBack();
+                        return response()->json([
+                            'message' => "Insufficient stock for item {$item->name} (ID {$item->itemID})"
+                        ], 422);
+                    }
+
+                    $item->decrement('stock', $row['quantity']);
+
+                    InvoiceItem::create([
+                        'invoiceID' => $invoice->invoiceID,
+                        'itemID'    => $row['itemID'],
+                        'type'      => $row['type'] ?? null,
+                        'quantity'  => $row['quantity'],
+                        'unitPrice' => $row['unitPrice'],
+                        'subTotal'  => $row['subTotal'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Invoice updated successfully',
+                'invoice' => $invoice->load(['costumer', 'items.item']),
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to update invoice',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Invoice updated successfully',
-            'invoice' => $invoice->load(['costumer', 'items.item']),
-        ]);
-    } catch (\Throwable $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Failed to update invoice',
-            'error'   => $e->getMessage(),
-        ], 500);
     }
-}
+
 
 
     /* ───── DELETE ───── */
@@ -255,23 +257,31 @@ class InvoiceController extends Controller
 
     public function getMyInvoices(Request $request): JsonResponse
     {
-        // Ambil semua purchase yang dibuat oleh user yang sedang login
-        $invoices = Invoice::with(['user', 'company', 'items.item'])
-            ->where('userID', $request->user()->userID) // Ubah dari companyID ke userID
+        $user = $request->user();
+
+        // Ambil semua invoice milik user beserta relasi lengkap
+        $invoices = Invoice::with([
+                'user',
+                'company',
+                'costumer',
+                'items.item'
+            ])
+            ->where('userID', $user->userID)
             ->get();
 
-    if ($invoices->isEmpty()) {
+        if ($invoices->isEmpty()) {
+            return response()->json([
+                'message' => 'No invoices found',
+                'invoices' => []
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'No invoices found',
-            'invoices' => []
-        ], 404);
+            'message' => 'My invoices fetched successfully',
+            'invoices' => $invoices
+        ]);
     }
 
-    return response()->json([
-        'message' => 'My invoices fetched successfully',
-        'invoices' => $invoices
-    ]);
-}
 
 
 
