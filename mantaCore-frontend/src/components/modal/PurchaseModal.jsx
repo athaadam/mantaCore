@@ -200,7 +200,7 @@ const PurchaseModal = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Prepare data and submit
         onSubmit({
             ...formData,
@@ -261,184 +261,185 @@ const PurchaseModal = ({
 
                 {/* Form - Scrollable content */}
                 <div className="overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-x-hidden">
-                <form id="purchase-form" onSubmit={handleSubmit} className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        {/* Company Display (Read-only) */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                <BuildingOfficeIcon className="w-4 h-4 inline mr-1" />
-                                Company
-                            </label>
-                            <div className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg text-gray-700">
-                                {companies && typeof companies === 'object' && (companies.companyName || companies.name) ?
-                                    (companies.companyName || companies.name) :
-                                    'Your Company'}
+                    <form id="purchase-form" onSubmit={handleSubmit} className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            {/* Company Display (Read-only) */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <BuildingOfficeIcon className="w-4 h-4 inline mr-1" />
+                                    Company
+                                </label>
+                                <div className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg text-gray-700">
+                                    {companies && typeof companies === 'object' && (companies.companyName || companies.name) ?
+                                        (companies.companyName || companies.name) :
+                                        'Your Company'}
+                                </div>
+                                {/* Hidden input to ensure companyID is included in form data */}
+                                <input type="hidden" value={formData.companyID} />
                             </div>
-                            {/* Hidden input to ensure companyID is included in form data */}
-                            <input type="hidden" value={formData.companyID} />
+
+                            {/* Date */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <CalendarDaysIcon className="w-4 h-4 inline mr-1" />
+                                    Date *
+                                </label>
+                                <input
+                                    type="date"
+                                    value={formData.date}
+                                    onChange={(e) => handleInputChange('date', e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors.date ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                />
+                                {errors.date && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.date}</p>
+                                )}
+                            </div>
+
+                            {/* Status */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <DocumentTextIcon className="w-4 h-4 inline mr-1" />
+                                    Status
+                                </label>
+                                <select
+                                    value={formData.status || 'pending'}
+                                    onChange={(e) => handleInputChange('status', e.target.value)}
+                                    disabled
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                >
+                                    <option value="pending">Pending</option>
+                                    <option value="accepted">Accepted</option>
+                                    <option value="denied">Denied</option>
+                                    <option value="processing">Processing</option>
+                                </select>
+                            </div>
+
+                            {/* Total Amount Display */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Banknote className="w-4 h-4 inline mr-1" />
+                                    Total Amount
+                                </label>
+                                <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                                    <span className="text-lg font-semibold text-purple-600">
+                                        {formatRupiah(calculateTotal())}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Date */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                <CalendarDaysIcon className="w-4 h-4 inline mr-1" />
-                                Date *
-                            </label>
-                            <input
-                                type="date"
-                                value={formData.date}
-                                onChange={(e) => handleInputChange('date', e.target.value)}
-                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors.date ? 'border-red-500' : 'border-gray-300'
-                                    }`}
-                            />
-                            {errors.date && (
-                                <p className="mt-1 text-sm text-red-600">{errors.date}</p>
+                        {/* Purchase Items */}
+                        <div className="mb-6">
+                            <div className="flex items-center justify-between mb-4 bg-white py-2">
+                                <h4 className="text-lg font-medium text-gray-900">Purchase Items</h4>
+                                <button
+                                    type="button"
+                                    onClick={addPurchaseItem}
+                                    className="inline-flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
+                                >
+                                    <PlusIcon className="w-4 h-4 mr-1" />
+                                    Add Item
+                                </button>
+                            </div>
+
+                            {errors.purchaseItems && (
+                                <p className="mb-4 text-sm text-red-600">{errors.purchaseItems}</p>
                             )}
-                        </div>
 
-                        {/* Status */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                <DocumentTextIcon className="w-4 h-4 inline mr-1" />
-                                Status
-                            </label>
-                            <select
-                                value={formData.status || 'pending'}
-                                onChange={(e) => handleInputChange('status', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                            >
-                                <option value="pending">Pending</option>
-                                <option value="accepted">Accepted</option>
-                                <option value="denied">Denied</option>
-                                {/* <option value="processing">Processing</option> */}
-                            </select>
-                        </div>
+                            <div className="space-y-4 max-h-[calc(60vh-160px)] overflow-y-auto pr-2">
+                                {formData.purchaseItems.map((item, index) => (
+                                    <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all duration-200 hover:shadow-md relative group">
+                                        <button
+                                            type="button"
+                                            onClick={() => removePurchaseItem(index)}
+                                            className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 hover:text-red-700 transition-all bg-white rounded-full p-1 shadow-sm"
+                                        >
+                                            <TrashIcon className="w-4 h-4" />
+                                        </button>
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            {/* Item Selection */}
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Item *
+                                                </label>
+                                                <select
+                                                    value={item.itemID}
+                                                    onChange={(e) => updatePurchaseItem(index, 'itemID', e.target.value)}
+                                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`item_${index}`] ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                >
+                                                    <option value="">Select an item</option>
+                                                    {items.map(availableItem => (
+                                                        <option key={availableItem.itemID} value={availableItem.itemID}>
+                                                            {availableItem.name} - {availableItem.category}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {errors[`item_${index}`] && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors[`item_${index}`]}</p>
+                                                )}
+                                            </div>
 
-                        {/* Total Amount Display */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                <Banknote className="w-4 h-4 inline mr-1" />
-                                Total Amount
-                            </label>
-                            <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                                <span className="text-lg font-semibold text-purple-600">
-                                    {formatRupiah(calculateTotal())}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                                            {/* Quantity */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Quantity *
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={item.quantity}
+                                                    onChange={(e) => updatePurchaseItem(index, 'quantity', parseInt(e.target.value) || 0)}
+                                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`quantity_${index}`] ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors[`quantity_${index}`] && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors[`quantity_${index}`]}</p>
+                                                )}
+                                            </div>
 
-                    {/* Purchase Items */}
-                    <div className="mb-6">
-                        <div className="flex items-center justify-between mb-4 bg-white py-2">
-                            <h4 className="text-lg font-medium text-gray-900">Purchase Items</h4>
-                            <button
-                                type="button"
-                                onClick={addPurchaseItem}
-                                className="inline-flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
-                            >
-                                <PlusIcon className="w-4 h-4 mr-1" />
-                                Add Item
-                            </button>
-                        </div>
-
-                        {errors.purchaseItems && (
-                            <p className="mb-4 text-sm text-red-600">{errors.purchaseItems}</p>
-                        )}
-
-                        <div className="space-y-4 max-h-[calc(60vh-160px)] overflow-y-auto pr-2">
-                            {formData.purchaseItems.map((item, index) => (
-                                <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200 transition-all duration-200 hover:shadow-md relative group">
-                                    <button
-                                        type="button"
-                                        onClick={() => removePurchaseItem(index)}
-                                        className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 hover:text-red-700 transition-all bg-white rounded-full p-1 shadow-sm"
-                                    >
-                                        <TrashIcon className="w-4 h-4" />
-                                    </button>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        {/* Item Selection */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Item *
-                                            </label>
-                                            <select
-                                                value={item.itemID}
-                                                onChange={(e) => updatePurchaseItem(index, 'itemID', e.target.value)}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`item_${index}`] ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            >
-                                                <option value="">Select an item</option>
-                                                {items.map(availableItem => (
-                                                    <option key={availableItem.itemID} value={availableItem.itemID}>
-                                                        {availableItem.name} - {availableItem.category}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors[`item_${index}`] && (
-                                                <p className="mt-1 text-sm text-red-600">{errors[`item_${index}`]}</p>
-                                            )}
+                                            {/* Item Price */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Item Price *
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    value={item.itemPrice}
+                                                    onChange={(e) => updatePurchaseItem(index, 'itemPrice', parseFloat(e.target.value) || 0)}
+                                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`itemPrice_${index}`] ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors[`itemPrice_${index}`] && (
+                                                    <p className="mt-1 text-sm text-red-600">{errors[`itemPrice_${index}`]}</p>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        {/* Quantity */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Quantity *
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={item.quantity}
-                                                onChange={(e) => updatePurchaseItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`quantity_${index}`] ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors[`quantity_${index}`] && (
-                                                <p className="mt-1 text-sm text-red-600">{errors[`quantity_${index}`]}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Item Price */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Item Price *
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                step="0.01"
-                                                value={item.itemPrice}
-                                                onChange={(e) => updatePurchaseItem(index, 'itemPrice', parseFloat(e.target.value) || 0)}
-                                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${errors[`itemPrice_${index}`] ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors[`itemPrice_${index}`] && (
-                                                <p className="mt-1 text-sm text-red-600">{errors[`itemPrice_${index}`]}</p>
-                                            )}
+                                        {/* Subtotal Display */}
+                                        <div className="flex items-center justify-end mt-3 pt-3 border-t border-gray-200">
+                                            <div className="text-sm font-medium bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
+                                                Subtotal: <span className="font-semibold">{formatRupiah(item.quantity * item.itemPrice)}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
 
-                                    {/* Subtotal Display */}
-                                    <div className="flex items-center justify-end mt-3 pt-3 border-t border-gray-200">
-                                        <div className="text-sm font-medium bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
-                                            Subtotal: <span className="font-semibold">{formatRupiah(item.quantity * item.itemPrice)}</span>
-                                        </div>
+                                {formData.purchaseItems.length === 0 && (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <ShoppingCartIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                                        <p>No items added yet. Click "Add Item" to get started.</p>
                                     </div>
-                                </div>
-                            ))}
-
-                            {formData.purchaseItems.length === 0 && (
-                                <div className="text-center py-8 text-gray-500">
-                                    <ShoppingCartIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                                    <p>No items added yet. Click "Add Item" to get started.</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
 
                     </form>
                 </div>
-                
+
                 {/* Form Actions - Fixed at bottom */}
                 <div className="border-t border-gray-200 p-6 bg-gray-50 rounded-b-2xl z-20">
                     <div className="flex items-center justify-end space-x-4">
@@ -451,7 +452,7 @@ const PurchaseModal = ({
                         </button>
                         <button
                             type="submit"
-                            form="purchase-form" 
+                            form="purchase-form"
                             disabled={loading || userInfoLoading}
                             className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                         >

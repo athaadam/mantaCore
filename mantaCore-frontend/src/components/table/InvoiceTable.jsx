@@ -23,17 +23,10 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
         return formatRupiah(amount, 'IDR');
     };
 
-    // Get status badge styles
-    const getStatusBadge = (status) => {
-        const statusStyles = {
-            'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-            'paid': 'bg-green-100 text-green-800 border-green-200',
-            'overdue': 'bg-red-100 text-red-800 border-red-200',
-            'draft': 'bg-gray-100 text-gray-800 border-gray-200',
-            'cancelled': 'bg-gray-100 text-gray-800 border-gray-200'
-        };
-
-        return statusStyles[status?.toLowerCase()] || statusStyles['draft'];
+    // Format date helper
+    const formatDateForDisplay = (dateStr) => {
+        if (!dateStr) return 'Date Pending';
+        return formatDate(dateStr);
     };
 
     return (
@@ -63,7 +56,7 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                         <table className="w-full table-auto min-w-full">
                             <thead>
                                 <tr className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
-                                    {['No', 'Invoice #', 'Customer', 'Amount', 'Status', 'Issue Date', 'Due Date', 'Actions'].map((header) => (
+                                    {['No', 'Invoice #', 'Customer', 'Amount', 'Items', 'Date', 'Actions'].map((header) => (
                                         <th key={header} className="px-4 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider whitespace-nowrap">
                                             {header}
                                         </th>
@@ -142,23 +135,26 @@ const InvoiceTable = ({ invoices = [], itemsPerPage = 5, onEdit, onDelete, onVie
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-bold text-slate-900">
-                                                    {invoice.items.map(item => formatCurrency(item.subTotal))}
+                                                    {formatCurrency(invoice.amount || 0)}
                                                 </div>
                                                 <div className="text-xs text-slate-500">
                                                     {invoice.currency || 'IDR'}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium border ${getStatusBadge(invoice.status)}`}>
-                                                    {invoice.status ? invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1) : 'Draft'}
-                                                </span>
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-sm font-bold text-purple-700">
+                                                        {invoice.items?.length || 0}
+                                                    </span>
+                                                    <span className="text-xs text-slate-500">
+                                                        {invoice.items?.length === 1 ? 'item' : 'items'}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
-                                                {formatDate(invoice.date)}
-                                            </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-xs font-medium text-slate-600">
-                                                <div className={`${invoice.due_date && new Date(invoice.due_date) < new Date() && invoice.status !== 'paid' ? 'text-red-600 font-bold' : ''}`}>
-                                                    {invoice.due_date ? formatDate(invoice.due_date) : 'No due date'}
+                                                <div className="flex flex-col items-center">
+                                                    <span className="font-semibold">{formatDateForDisplay(invoice.date)}</span>
+                                                    <span className="text-xs text-slate-500 mt-1">Created</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">

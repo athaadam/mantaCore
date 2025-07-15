@@ -6,38 +6,49 @@ import React from 'react';
 const InvoiceStats = ({ invoices = [] }) => {
     // Calculate statistics
     const stats = invoices.reduce((acc, invoice) => {
-        const amount = invoice.total_amount || 0;
-        const status = invoice.status?.toLowerCase() || 'draft';
-
+        const amount = invoice.amount || 0;
+        const itemCount = invoice.items?.length || 0;
+        
+        // Total revenue and invoice count
         acc.total += amount;
         acc.count += 1;
-
-        if (status === 'paid') {
-            acc.paid += amount;
-            acc.paidCount += 1;
-        } else if (status === 'pending') {
-            acc.pending += amount;
-            acc.pendingCount += 1;
-        } else if (status === 'overdue') {
-            acc.overdue += amount;
-            acc.overdueCount += 1;
-        } else if (status === 'draft') {
-            acc.draft += amount;
-            acc.draftCount += 1;
+        
+        // Total items sold
+        acc.totalItems += itemCount;
+        
+        // Highest value invoice
+        if (amount > acc.highestValue) {
+            acc.highestValue = amount;
+            acc.highestInvoiceId = invoice.invoiceID;
+        }
+        
+        // Invoice with most items
+        if (itemCount > acc.mostItems) {
+            acc.mostItems = itemCount;
+            acc.mostItemsInvoiceId = invoice.invoiceID;
+        }
+        
+        // Recent invoices (last 30 days)
+        const invoiceDate = new Date(invoice.date);
+        const now = new Date();
+        const daysDiff = Math.floor((now - invoiceDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff <= 30) {
+            acc.recent += amount;
+            acc.recentCount += 1;
         }
 
         return acc;
     }, {
         total: 0,
-        paid: 0,
-        pending: 0,
-        overdue: 0,
-        draft: 0,
         count: 0,
-        paidCount: 0,
-        pendingCount: 0,
-        overdueCount: 0,
-        draftCount: 0
+        totalItems: 0,
+        highestValue: 0,
+        highestInvoiceId: '',
+        mostItems: 0,
+        mostItemsInvoiceId: '',
+        recent: 0,
+        recentCount: 0
     });
 
     // Format currency
@@ -59,21 +70,21 @@ const InvoiceStats = ({ invoices = [] }) => {
             bg: 'bg-gradient-to-br from-purple-100 to-indigo-100'
         },
         {
-            title: 'Paid',
-            value: formatCurrency(stats.paid),
-            count: `${stats.paidCount} invoices`,
+            title: 'Total Items Sold',
+            value: stats.totalItems.toString(),
+            count: `Across all invoices`,
             icon: (
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
             ),
             gradient: 'from-green-500 to-emerald-600',
             bg: 'bg-gradient-to-br from-green-100 to-emerald-100'
         },
         {
-            title: 'Pending',
-            value: formatCurrency(stats.pending),
-            count: `${stats.pendingCount} invoices`,
+            title: 'Recent Revenue',
+            value: formatCurrency(stats.recent),
+            count: `${stats.recentCount} invoices in 30 days`,
             icon: (
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -83,16 +94,16 @@ const InvoiceStats = ({ invoices = [] }) => {
             bg: 'bg-gradient-to-br from-yellow-100 to-orange-100'
         },
         {
-            title: 'Overdue',
-            value: formatCurrency(stats.overdue),
-            count: `${stats.overdueCount} invoices`,
+            title: 'Best Selling Invoice',
+            value: formatCurrency(stats.highestValue),
+            count: stats.highestInvoiceId ? `Invoice #${stats.highestInvoiceId}` : 'No data available',
             icon: (
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
             ),
-            gradient: 'from-red-500 to-red-600',
-            bg: 'bg-gradient-to-br from-red-100 to-red-100'
+            gradient: 'from-blue-500 to-sky-600',
+            bg: 'bg-gradient-to-br from-blue-100 to-sky-100'
         }
     ];
 

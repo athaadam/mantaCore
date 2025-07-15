@@ -1,5 +1,6 @@
 import DataCard from "@/components/card/DataCard"
 import InvoiceStats from "@/components/card/InvoiceStatsCards"
+import InvoicesClient from "@/components/client/InvoicesClient"
 // import Alert from "@/components/common/Alert"
 import InvoiceFilter from "@/components/filter/InvoiceFilter"
 import Header2 from "@/components/header/Header2"
@@ -13,23 +14,41 @@ const { apiHit } = require("@/libs/api/fetch")
 const { cookies } = require("next/headers")
 
 const Page = async () => {
+
     const cookie = await cookies()
     const token = await cookie.get('auth').value
-    const myInvoiceRes = await apiHit('getMyInvoices', token)
-    const myInvoices = myInvoiceRes.invoices || []
+    
+    // Get user profile and customers which should always exist
     const myProfile = await apiHit('user', token)
     const customer = await apiHit('getAllCostumers', token)
-
-    if (!myInvoices || myInvoices.length === 0) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-800">No Invoices Found</h1>
-                    <p className="mt-2 text-gray-600">You have no invoices available.</p>
-                </div>
-            </div>
-        );
+    const getItems = await apiHit('getAllItems', token)
+    
+    // Try to get invoices, handle the case when none exist
+    let myInvoices = []
+    try {
+        const myInvoiceRes = await apiHit('getMyInvoices', token)
+        myInvoices = myInvoiceRes.invoices || []
+    } catch (error) {
+        // If the API returns a 404 "No invoices found", we'll just use an empty array
+        // No need to throw, we'll continue with empty invoices array
     }
+
+    // Get items and ensure they have the right properties
+    let items = []
+    try {
+        items = Array.isArray(getItems) ? getItems : []
+    } catch (error) {
+        // Silently handle any errors processing items
+    }
+
+    const data = {
+        myInvoices: Array.isArray(myInvoices) ? myInvoices : [],
+        myProfile: myProfile || { user: {}, company: {} },
+        customer: customer || [],
+        items: items
+    }
+
+
 
     return (
         <>
@@ -52,45 +71,7 @@ const Page = async () => {
                             colorScheme="purple"
 
                         />
-                        {/* Header2 */}
-                        <Header2
-                            title="Invoices Operations"
-                            description={`Manage your own invoices for ${myProfile.company.companyName || 'Your Company'}`}
-                        />
-                        {/* Invoice Stats */}
-                        <InvoiceStats
-
-                        />
-
-                        {/* <Alert
-
-                        /> */}
-
-                        <DataCard
-                            title="My Invoices"
-                            subtitle="Manage your invoices efficiently"
-                            icon={
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m-3-7a9 9 0 11-9 9 9 9 0 019-9z" />
-                                </svg>
-                            }
-                            gradient={'bg-gradient-to-br from-purple-50 via-white to-indigo-100'}
-
-                        >
-                            <InvoiceFilter />
-
-                            <InvoiceTable
-                                invoices={myInvoices}
-                                itemsPerPage={5}
-                            // onEdit={() => { }}
-                            // onDelete={() => { }}
-                            // onView={() => { }}
-                            // isFiltered={false}
-                            />
-                        </DataCard>
-                        {/* <InvoiceViewModal />
-                        <InvoiceModal />
-                        <ConfirmationModal /> */}
+                        <InvoicesClient data={data} />
                     </div>
                 </div>
             </div >

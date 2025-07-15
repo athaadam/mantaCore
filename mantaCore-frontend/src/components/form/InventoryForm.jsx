@@ -65,8 +65,8 @@ export default function InventoryForm({ item, onChange, onSubmit, onClose }) {
                         required
                     >
                         <option value="">Select type</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Operational">Operational</option>
+                        <option value="sales">Sales</option>
+                        <option value="operational">Operational</option>
                     </select>
                 </div>
 

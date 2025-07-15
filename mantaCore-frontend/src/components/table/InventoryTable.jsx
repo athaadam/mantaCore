@@ -81,8 +81,8 @@ export default function InventoryTable({ items, itemsPerPage, onDelete, onEdit, 
                           </svg>
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-slate-900">{item.name}</div>
-                          <div className="text-xs text-purple-600 font-medium">{item.type} • {item.units}</div>
+                          <div className="text-sm font-bold text-slate-900 capitalize">{item.name}</div>
+                          <div className="text-xs text-purple-600 font-medium capitalize">{item.type} • {item.units}</div>
                         </div>
                       </div>
                     </td>

@@ -2,30 +2,15 @@
 
 import React from 'react';
 import { formatDate } from '../../libs/utils/formats/formatdate';
+import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
+import { getStatusColor } from '@/libs/utils/colors/statuscolor';
 
 const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
     if (!isOpen || !invoice) return null;
-
-    // Format currency
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: invoice.currency || 'USD',
-            minimumFractionDigits: 2,
-        }).format(amount);
-    };
-
-    // Get status badge styles
-    const getStatusBadge = (status) => {
-        const statusStyles = {
-            'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-            'paid': 'bg-green-100 text-green-800 border-green-200',
-            'overdue': 'bg-red-100 text-red-800 border-red-200',
-            'draft': 'bg-gray-100 text-gray-800 border-gray-200',
-            'cancelled': 'bg-gray-100 text-gray-800 border-gray-200'
-        };
-        
-        return statusStyles[status?.toLowerCase()] || statusStyles['draft'];
+    
+    // Helper function to count items
+    const getTotalItems = () => {
+        return invoice.items?.length || 0;
     };
 
     const handlePrint = () => {
@@ -34,7 +19,8 @@ const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
 
     const handleDownload = () => {
         // Add PDF download logic here
-        console.log('Download PDF for invoice:', invoice.invoiceID);
+        // Implementation to be added later
+        alert('Download feature will be available soon');
     };
 
     return (
@@ -99,16 +85,16 @@ const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h1 className="text-3xl font-bold text-slate-800 mb-2">INVOICE</h1>
-                                    <p className="text-slate-600">Invoice #{invoice.invoice_number}</p>
+                                    <p className="text-slate-600">Invoice ID: {invoice.invoiceID}</p>
                                 </div>
                                 <div className="text-right">
                                     <div className="mb-2">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(invoice.status)}`}>
-                                            {invoice.status ? invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1) : 'Draft'}
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor('draft')}`}>
+                                            {invoice.date ? formatDate(invoice.date) : 'Date Pending'}
                                         </span>
                                     </div>
                                     <div className="text-2xl font-bold text-slate-800">
-                                        {formatCurrency(invoice.total_amount)}
+                                        {formatRupiah(invoice.amount)}
                                     </div>
                                 </div>
                             </div>
@@ -116,55 +102,50 @@ const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
 
                         {/* Invoice Details Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            {/* Bill From */}
+                            {/* Company Information */}
                             <div className="bg-white border border-slate-200 rounded-xl p-6">
-                                <h3 className="text-lg font-semibold text-slate-800 mb-4">Bill From</h3>
+                                <h3 className="text-lg font-semibold text-slate-800 mb-4">Company Information</h3>
                                 <div className="space-y-2">
-                                    <p className="font-medium text-slate-800">Your Company</p>
-                                    <p className="text-slate-600">123 Business Street</p>
-                                    <p className="text-slate-600">City, State 12345</p>
-                                    <p className="text-slate-600">contact@yourcompany.com</p>
-                                    <p className="text-slate-600">+1 (555) 123-4567</p>
+                                    <p className="font-medium text-slate-800">{invoice.company?.companyName || 'Your Company'}</p>
+                                    <p className="text-slate-600">{invoice.user?.email || ''}</p>
+                                    <p className="text-slate-600">{invoice.user?.phone_number || ''}</p>
+                                    {/* <p className="text-slate-600">{invoice.company?.companyPhone || ''}</p> */}
                                 </div>
                             </div>
 
-                            {/* Bill To */}
+                            {/* Customer Information */}
                             <div className="bg-white border border-slate-200 rounded-xl p-6">
-                                <h3 className="text-lg font-semibold text-slate-800 mb-4">Bill To</h3>
+                                <h3 className="text-lg font-semibold text-slate-800 mb-4">Customer Information</h3>
                                 <div className="space-y-2">
                                     <p className="font-medium text-slate-800">
-                                        {invoice.customer?.username || 'Unknown Customer'}
+                                        {invoice.costumer?.username || 'Unknown Customer'}
                                     </p>
                                     <p className="text-slate-600">
-                                        {invoice.customer?.email || 'No email provided'}
+                                        {invoice.costumer?.email || 'No email provided'}
                                     </p>
-                                    {invoice.customer?.address && (
-                                        <p className="text-slate-600">{invoice.customer.address}</p>
+                                    {invoice.costumer?.phone_number && (
+                                        <p className="text-slate-600">{invoice.costumer.phone_number}</p>
                                     )}
-                                    {invoice.customer?.phone && (
-                                        <p className="text-slate-600">{invoice.customer.phone}</p>
-                                    )}
+                                    {/* {invoice.costumer?.address && (
+                                        <p className="text-slate-600">{invoice.costumer.address}</p>
+                                    )} */}
                                 </div>
                             </div>
                         </div>
 
                         {/* Date Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div className="bg-white border border-slate-200 rounded-xl p-4">
-                                <h4 className="font-medium text-slate-800 mb-2">Issue Date</h4>
+                                <h4 className="font-medium text-slate-800 mb-2">Invoice Date</h4>
                                 <p className="text-slate-600">
-                                    {invoice.issue_date ? formatDate(invoice.issue_date) : formatDate(invoice.created_at)}
+                                    {invoice.date ? formatDate(invoice.date) : 'No date provided'}
                                 </p>
                             </div>
                             <div className="bg-white border border-slate-200 rounded-xl p-4">
-                                <h4 className="font-medium text-slate-800 mb-2">Due Date</h4>
-                                <p className={`${invoice.due_date && new Date(invoice.due_date) < new Date() && invoice.status !== 'paid' ? 'text-red-600 font-semibold' : 'text-slate-600'}`}>
-                                    {invoice.due_date ? formatDate(invoice.due_date) : 'No due date'}
+                                <h4 className="font-medium text-slate-800 mb-2">Created By</h4>
+                                <p className="text-slate-600">
+                                    {invoice.user?.username || 'Unknown User'}
                                 </p>
-                            </div>
-                            <div className="bg-white border border-slate-200 rounded-xl p-4">
-                                <h4 className="font-medium text-slate-800 mb-2">Currency</h4>
-                                <p className="text-slate-600">{invoice.currency || 'USD'}</p>
                             </div>
                         </div>
 
@@ -177,25 +158,27 @@ const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-200">
-                                            <th className="text-left px-6 py-3 text-sm font-medium text-slate-700">Description</th>
+                                            <th className="text-left px-6 py-3 text-sm font-medium text-slate-700">Product</th>
+                                            <th className="text-right px-6 py-3 text-sm font-medium text-slate-700">Type</th>
                                             <th className="text-right px-6 py-3 text-sm font-medium text-slate-700">Quantity</th>
                                             <th className="text-right px-6 py-3 text-sm font-medium text-slate-700">Unit Price</th>
-                                            <th className="text-right px-6 py-3 text-sm font-medium text-slate-700">Total</th>
+                                            <th className="text-right px-6 py-3 text-sm font-medium text-slate-700">Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {invoice.items && invoice.items.length > 0 ? (
                                             invoice.items.map((item, index) => (
                                                 <tr key={index} className="border-b border-slate-100">
-                                                    <td className="px-6 py-4 text-sm text-slate-800">{item.description}</td>
+                                                    <td className="px-6 py-4 text-sm text-slate-800">{item.item?.name || 'Unknown Item'}</td>
+                                                    <td className="px-6 py-4 text-sm text-slate-600 text-right">{item.type || 'Standard'}</td>
                                                     <td className="px-6 py-4 text-sm text-slate-600 text-right">{item.quantity}</td>
-                                                    <td className="px-6 py-4 text-sm text-slate-600 text-right">{formatCurrency(item.unit_price)}</td>
-                                                    <td className="px-6 py-4 text-sm font-medium text-slate-800 text-right">{formatCurrency(item.total)}</td>
+                                                    <td className="px-6 py-4 text-sm text-slate-600 text-right">{formatRupiah(item.unitPrice)}</td>
+                                                    <td className="px-6 py-4 text-sm font-medium text-slate-800 text-right">{formatRupiah(item.subTotal)}</td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
+                                                <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
                                                     No items found for this invoice
                                                 </td>
                                             </tr>
@@ -214,22 +197,14 @@ const InvoiceViewModal = ({ isOpen, onClose, invoice }) => {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-3xl font-bold text-purple-600">
-                                        {formatCurrency(invoice.total_amount)}
+                                        {formatRupiah(invoice.amount)}
                                     </div>
                                     <div className="text-sm text-slate-600">
-                                        {invoice.currency || 'USD'}
+                                        IDR
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Description */}
-                        {invoice.description && (
-                            <div className="bg-white border border-slate-200 rounded-xl p-6 mt-6">
-                                <h3 className="text-lg font-semibold text-slate-800 mb-3">Notes</h3>
-                                <p className="text-slate-600">{invoice.description}</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@ export const getStatusColor = (status) => {
         inactive: 'bg-gray-500 text-white',
         denied: 'bg-red-700 text-white',
         processing: 'bg-blue-400 text-white',
+        draft : 'bg-gray-300 text-black',
     };
 
     if (!status || typeof status !== 'string') return 'bg-gray-300 text-black';

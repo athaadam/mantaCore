@@ -67,12 +67,12 @@ export default function TransactionTable({ transactions = [], itemsPerPage, mode
                                     {mode === 'detailed' && (
                                         <>
                                             <td className="py-3 px-4">
-                                                <Link
-                                                    href={`sales-report/${trx.invoiceID}`}
+                                                <button
+                                                    onView={() => console.log('View details for', trx.invoiceID)}
                                                     className="inline-block px-3 py-1 rounded-md bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
                                                 >
                                                     View Detail
-                                                </Link>
+                                                </button>
                                             </td>
                                         </>
                                     )}
