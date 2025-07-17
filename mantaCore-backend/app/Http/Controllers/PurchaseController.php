@@ -17,36 +17,36 @@ class PurchaseController extends Controller
         $user = $request->user();
         $purchases = Purchase::with(['user', 'company', 'items.item'])
             ->where('companyID', $user->companyID)
-            ->get();   
+            ->get();
         return response()->json($purchases);
     }
 
     public function getPurchaseById(Request $request, string $id): JsonResponse
     {
         $user = $request->user();
-        $purchase = Purchase::with(['user','company','items.item'])
+        $purchase = Purchase::with(['user', 'company', 'items.item'])
             ->where('companyID', $user->companyID)
             ->find($id);
 
         return $purchase
             ? response()->json($purchase)
-            : response()->json(['message'=>'Purchase not found'], 404);
+            : response()->json(['message' => 'Purchase not found'], 404);
     }
 
     /* ───── CREATE ───── */
     public function createPurchase(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'userID'           => 'required|exists:users,userID',
-            'companyID'        => 'required|exists:companies,companyID',
-            'date'             => 'required|date',
-            'amount'           => 'required|numeric|min:0',
-            'items'            => 'required|array|min:1',
-            'items.*.itemID'   => 'required|exists:items,itemID',
+            'userID' => 'required|exists:users,userID',
+            'companyID' => 'required|exists:companies,companyID',
+            'date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'items' => 'required|array|min:1',
+            'items.*.itemID' => 'required|exists:items,itemID',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.unitPrice'=> 'required|numeric|min:0',
+            'items.*.unitPrice' => 'required|numeric|min:0',
             'items.*.subTotal' => 'required|numeric|min:0',
-            'items.*.type'     => 'nullable|string|max:255',
+            'items.*.type' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -58,22 +58,22 @@ class PurchaseController extends Controller
                 /* ── simpan header ── */
                 $purchase = Purchase::create([
                     'purchaseID' => $purchaseID,
-                    'userID'     => $validated['userID'],
-                    'companyID'  => $validated['companyID'],
-                    'status'     => 'pending',
-                    'date'       => $validated['date'],
-                    'amount'     => $validated['amount'],
+                    'userID' => $validated['userID'],
+                    'companyID' => $validated['companyID'],
+                    'status' => 'pending',
+                    'date' => $validated['date'],
+                    'amount' => $validated['amount'],
                 ]);
 
                 /* ── simpan tiap item ── */
                 foreach ($validated['items'] as $row) {
                     PurchaseItem::create([
                         'purchaseID' => $purchase->purchaseID,
-                        'itemID'     => $row['itemID'],
-                        'quantity'   => $row['quantity'],
-                        'unitPrice'  => $row['unitPrice'],
-                        'subTotal'   => $row['subTotal'],
-                        'type'       => $row['type'] ?? null,
+                        'itemID' => $row['itemID'],
+                        'quantity' => $row['quantity'],
+                        'unitPrice' => $row['unitPrice'],
+                        'subTotal' => $row['subTotal'],
+                        'type' => $row['type'] ?? null,
 
                     ]);
                 }
@@ -82,14 +82,14 @@ class PurchaseController extends Controller
             });
 
             return response()->json([
-                'message'  => 'Purchase created successfully',
+                'message' => 'Purchase created successfully',
                 'purchase' => $purchase,
             ], 201);
 
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Internal server error',
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -103,13 +103,17 @@ class PurchaseController extends Controller
         }
 
         $prefix = 'PR-' . strtoupper($company->companyCode) . '-';
+        $i = 1;
 
-        $count = \App\Models\Purchase::where('companyID', $companyID)
-            ->where('purchaseID', 'like', $prefix . '%')
-            ->count() + 1;
+        do {
+            $purchaseID = $prefix . str_pad($i, 3, '0', STR_PAD_LEFT);
+            $exists = \App\Models\Purchase::where('purchaseID', $purchaseID)->exists();
+            $i++;
+        } while ($exists);
 
-        return $prefix . str_pad($count, 3, '0', STR_PAD_LEFT);
+        return $purchaseID;
     }
+
 
 
     /* ───── UPDATE ───── */
@@ -121,15 +125,15 @@ class PurchaseController extends Controller
         }
 
         $data = $request->validate([
-            'status'              => 'nullable|in:pending,accepted,denied',
-            'date'                => 'sometimes|date',
-            'amount'              => 'nullable|numeric|min:0',
-            'items'               => 'sometimes|array|min:1',
-            'items.*.itemID'      => 'required_with:items|exists:items,itemID',
-            'items.*.quantity'    => 'required_with:items|integer|min:1',
-            'items.*.unitPrice'   => 'required_with:items|numeric|min:0',
-            'items.*.subTotal'    => 'required_with:items|numeric|min:0',
-            'items.*.type'        => 'nullable|string|max:255',
+            'status' => 'nullable|in:pending,accepted,denied',
+            'date' => 'sometimes|date',
+            'amount' => 'nullable|numeric|min:0',
+            'items' => 'sometimes|array|min:1',
+            'items.*.itemID' => 'required_with:items|exists:items,itemID',
+            'items.*.quantity' => 'required_with:items|integer|min:1',
+            'items.*.unitPrice' => 'required_with:items|numeric|min:0',
+            'items.*.subTotal' => 'required_with:items|numeric|min:0',
+            'items.*.type' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -151,7 +155,7 @@ class PurchaseController extends Controller
                 // 2. 🔄 Update data utama (status, tanggal, jumlah)
                 $purchase->update([
                     'status' => $newStatus,
-                    'date'   => $data['date']   ?? $purchase->date,
+                    'date' => $data['date'] ?? $purchase->date,
                     'amount' => $data['amount'] ?? $purchase->amount,
                 ]);
 
@@ -162,11 +166,11 @@ class PurchaseController extends Controller
                     foreach ($data['items'] as $row) {
                         PurchaseItem::create([
                             'purchaseID' => $purchase->purchaseID,
-                            'itemID'     => $row['itemID'],
-                            'quantity'   => $row['quantity'],
-                            'unitPrice'  => $row['unitPrice'],
-                            'subTotal'   => $row['subTotal'],
-                            'type'       => $row['type'] ?? null,
+                            'itemID' => $row['itemID'],
+                            'quantity' => $row['quantity'],
+                            'unitPrice' => $row['unitPrice'],
+                            'subTotal' => $row['subTotal'],
+                            'type' => $row['type'] ?? null,
                         ]);
                     }
 
@@ -189,14 +193,14 @@ class PurchaseController extends Controller
             });
 
             return response()->json([
-                'message'  => 'Purchase updated successfully',
+                'message' => 'Purchase updated successfully',
                 'purchase' => $result,
             ]);
 
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Internal server error',
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -254,9 +258,9 @@ class PurchaseController extends Controller
         $rejected = (clone $purchases)->where('status', 'denied')->count();
 
         return response()->json([
-            'total_requests'    => $total,
+            'total_requests' => $total,
             'approved_requests' => $approved,
-            'pending_requests'  => $pending,
+            'pending_requests' => $pending,
             'rejected_requests' => $rejected,
         ]);
     }
