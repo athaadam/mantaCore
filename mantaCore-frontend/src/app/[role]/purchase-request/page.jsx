@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 const Page = async () => {
     const cookie = await cookies();
-    const token = cookie.get('auth').value;
+    const token = await cookie.get('auth').value;
 
     // Fetch all necessary data for the purchase request page
     const [profile, myPurchaseRequests, items] = await Promise.all([

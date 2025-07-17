@@ -133,7 +133,7 @@ const PurchaseModal = ({
                     itemID: '',
                     quantity: 1,
                     itemPrice: 0,
-                    type: 'purchase'
+                    type: ''
                 }
             ]
         }));
@@ -212,7 +212,7 @@ const PurchaseModal = ({
                 itemPrice: parseFloat(item.itemPrice),
                 unitPrice: parseFloat(item.itemPrice),
                 subTotal: parseFloat(item.quantity) * parseFloat(item.itemPrice),
-                type: item.type || 'purchase'
+                type: item.type
             }))
         });
     };
