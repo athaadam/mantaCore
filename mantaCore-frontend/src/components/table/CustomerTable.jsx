@@ -17,7 +17,7 @@ const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) =
 
     return (
         <>
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-visible hover:shadow-2xl transition-all duration-300">
                 <div className="px-8 pt-8 pb-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 via-white to-indigo-50">
                     <div className="flex items-center gap-3">
                         <div className="p-3 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl">
@@ -37,8 +37,8 @@ const CustomerTable = ({ customers = [], itemsPerPage = 5, onEdit, onDelete }) =
                     </div>
                 </div>
 
-                <div className="px-6 pb-6">
-                    <table className="w-full table-auto">
+                <div className="px-6 pb-6 overflow-x-auto block w-full">
+                    <table className="w-full min-w-[1000px] table-auto">
                         <thead>
                             <tr className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
                                 {['No', 'Customer Name', 'Email', 'Phone', 'Created', 'Updated', 'Actions'].map((header) => (

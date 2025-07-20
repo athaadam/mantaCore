@@ -59,6 +59,7 @@ const iconMap = {
   'Customer': 'people',
 };
 
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { role } = useParams();
@@ -95,7 +96,7 @@ export default function Sidebar() {
     }
   }, [pathname, isMobile, setIsOpen]);
 
-  const [time, setTime] = useState(null);
+  const [time, setTime] = useState(null)
 
   const getProfile = async () => {
     try {
@@ -105,19 +106,19 @@ export default function Sidebar() {
       console.error('Failed to fetch user profile:', error);
       setUsername('User');
     }
-  };
+  }
 
   useEffect(() => {
     const updateTime = () => {
-      setTime(new Date().toLocaleTimeString());
-    };
+      setTime(new Date().toLocaleTimeString())
+    }
     getProfile();
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
-  if (!time) return null;
+  if (!time) return null
 
   const handleLogout = async () => {
     try {
@@ -139,13 +140,12 @@ export default function Sidebar() {
           <div className="flex items-center justify-start px-4">
             <button
               id="sidebar-toggle"
-              onClick={isMobile ? toggleSidebar : toggleCollapse}
+              onClick={!isMobile ? toggleCollapse : toggleSidebar}
               className="p-1.5 bg-white/10 hover:bg-white/20 rounded-md text-white transition-all duration-200 hover:shadow-md mr-2 flex items-center justify-center"
               aria-label="Toggle sidebar"
-              title={isMobile ? "Toggle sidebar" : (isCollapsed ? "Expand sidebar" : "Collapse sidebar")}
             >
               <span className="material-icons-outlined text-lg">
-                menu
+                {isMobile ? 'menu' : (isCollapsed ? 'keyboard_double_arrow_right' : 'keyboard_double_arrow_left')}
               </span>
             </button>
 
@@ -308,41 +308,76 @@ export default function Sidebar() {
                         
                       const itemClasses = `${baseClasses} ${activeClasses}`;
 
-                      return (
-                        <div key={name} className="animate-fadeIn" style={{ animationDelay: `${index * 0.03}s` }}>
-                          <Link
-                            href={href}
-                            className={itemClasses}
-                            onMouseEnter={() => setHoveredItem(name)}
-                            onMouseLeave={() => setHoveredItem(null)}
-                          >
-                            {/* Icon Container - Simpler design */}
-                            <div className={`flex items-center justify-center text-lg ${isCollapsed ? 'mx-auto' : ''}`}>
-                              <span className="material-icons-outlined text-sm">{iconMap[name]}</span>
-                            </div>
+              return (
+                <div key={name} className="animate-fadeIn" style={{ animationDelay: `${index * 0.03}s` }}>
+                  <Link
+                    href={href}
+                    className={itemClasses}
+                    onMouseEnter={() => setHoveredItem(name)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  >
+                    {/* Icon Container - Simpler design */}
+                    <div className={`flex items-center justify-center text-lg ${isCollapsed ? 'mx-auto' : ''}`}>
+                      <span className="material-icons-outlined text-sm">{iconMap[name]}</span>
+                    </div>
 
-                            {/* Text with Tooltip for Collapsed */}
-                            {!isCollapsed ? (
-                              <span className="font-medium truncate">{name}</span>
-                            ) : (
-                              <div className="absolute left-full ml-2 px-2 py-1 bg-slate-700 text-white text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 whitespace-nowrap">
-                                {name}
-                                <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-1.5 h-1.5 bg-slate-700 rotate-45"></div>
-                              </div>
-                            )}
+                    {/* Text with Tooltip for Collapsed */}
+                    {!isCollapsed ? (
+                      <span className="font-medium truncate">{name}</span>
+                    ) : (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-slate-700 text-white text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 whitespace-nowrap">
+                        {name}
+                        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-1.5 h-1.5 bg-slate-700 rotate-45"></div>
+                      </div>
+                    )}
 
-                            {/* Active Indicator - only show when not active and hovered */}
-                            {!isActive && !isCollapsed && (
-                              <span className="absolute right-2 flex h-2 w-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-50"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                              </span>
-                            )}
-                          </Link>
-                        </div>
-                      );
-                    })}
+                    {/* Active Indicator - only show when not active and hovered */}
+                    {!isActive && !isCollapsed && (
+                      <span className="absolute right-2 flex h-2 w-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-50"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                      </span>
+                    )}
+                  </Link>
+                </div>
+              );
+            })}
                   </div>
+                </div>
+              );
+            })}
+
+              return (
+                <div key={name} className="animate-fadeIn" style={{ animationDelay: `${index * 0.03}s` }}>
+                  <Link
+                    href={href}
+                    className={itemClasses}
+                    onMouseEnter={() => setHoveredItem(name)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  >
+                    {/* Icon Container - Simpler design */}
+                    <div className={`flex items-center justify-center text-lg ${isCollapsed ? 'mx-auto' : ''}`}>
+                      <span className="material-icons-outlined text-sm">{iconMap[name]}</span>
+                    </div>
+
+                    {/* Text with Tooltip for Collapsed */}
+                    {!isCollapsed ? (
+                      <span className="font-medium truncate">{name}</span>
+                    ) : (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-slate-700 text-white text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 whitespace-nowrap">
+                        {name}
+                        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 w-1.5 h-1.5 bg-slate-700 rotate-45"></div>
+                      </div>
+                    )}
+
+                    {/* Active Indicator - only show when not active and hovered */}
+                    {!isActive && !isCollapsed && (
+                      <span className="absolute right-2 flex h-2 w-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-50"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                      </span>
+                    )}
+                  </Link>
                 </div>
               );
             })}

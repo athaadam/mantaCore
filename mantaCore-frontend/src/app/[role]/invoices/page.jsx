@@ -1,14 +1,5 @@
-import DataCard from "@/components/card/DataCard"
-import InvoiceStats from "@/components/card/InvoiceStatsCards"
 import InvoicesClient from "@/components/client/InvoicesClient"
-// import Alert from "@/components/common/Alert"
-import InvoiceFilter from "@/components/filter/InvoiceFilter"
-import Header2 from "@/components/header/Header2"
 import Header3 from "@/components/header/Header3"
-// import ConfirmationModal from "@/components/modal/ConfirmationModal"
-// import InvoiceModal from "@/components/modal/InvoiceModal"
-// import InvoiceViewModal from "@/components/modal/InvoiceViewModal"
-import InvoiceTable from "@/components/table/InvoiceTable"
 
 const { apiHit } = require("@/libs/api/fetch")
 const { cookies } = require("next/headers")
@@ -17,12 +8,12 @@ const Page = async () => {
 
     const cookie = await cookies()
     const token = await cookie.get('auth').value
-    
+
     // Get user profile and customers which should always exist
     const myProfile = await apiHit('user', token)
     const customer = await apiHit('getAllCostumers', token)
     const getItems = await apiHit('getAllItems', token)
-    
+
     // Try to get invoices, handle the case when none exist
     let myInvoices = []
     try {

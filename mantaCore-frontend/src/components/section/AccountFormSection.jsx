@@ -21,6 +21,7 @@ export default function AccountFormSection({
 
     return (
         <SectionWrapper
+            id="account-form-section"
             title={title}
             description={description}
             icon={icon}

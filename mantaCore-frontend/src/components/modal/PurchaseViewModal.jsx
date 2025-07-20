@@ -60,12 +60,14 @@ const InformationCircleIcon = ({ className }) => (
     </svg>
 );
 
-const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
+const PurchaseViewModal = ({ isOpen, onClose, purchase, mode = "view", onApprove, onReject }) => {
     if (!isOpen || !purchase) return null;
 
     const calculateItemTotal = (quantity, price) => {
         return quantity * (price || 0);
     };
+
+    const isPending = purchase.status === 'pending';
 
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
@@ -242,6 +244,29 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                                 </span>
                             </div>
                         </div>
+                        {/* Tampilkan tombol approve dan reject jika statusnya pending */}
+                        {isPending && mode === "view" && (
+                            <div className="mt-6 flex flex-wrap gap-4 justify-end">
+                                <button
+                                    onClick={() => onReject && onReject(purchase.purchaseID)}
+                                    className="px-4 py-2 bg-red-100 text-red-700 font-medium rounded-lg hover:bg-red-200 transition-colors flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Reject
+                                </button>
+                                <button
+                                    onClick={() => onApprove && onApprove(purchase.purchaseID)}
+                                    className="px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg hover:bg-green-200 transition-colors flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Approve
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Timestamps */}
@@ -258,7 +283,43 @@ const PurchaseViewModal = ({ isOpen, onClose, purchase }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <div>
+                        {purchase.status === 'accepted' && (
+                            <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1 rounded-md">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span className="font-medium">Approved</span>
+                            </div>
+                        )}
+                        {purchase.status === 'denied' && (
+                            <div className="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-1 rounded-md">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="font-medium">Rejected</span>
+                            </div>
+                        )}
+                        {purchase.status === 'pending' && (
+                            <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 px-3 py-1 rounded-md"> 
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                <span className="font-medium">Pending</span>
+                            </div>
+                        )}
+                    </div>
                     <button
                         onClick={onClose}
                         className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"

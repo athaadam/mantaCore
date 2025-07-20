@@ -25,15 +25,15 @@ export default function CustomerClient({ initialCustomers, profile }) {
     // Filter customers based on search term
     const filteredCustomers = useMemo(() => {
         if (!searchTerm.trim()) return customers;
-        
+
         const searchLower = searchTerm.toLowerCase();
-        return customers.filter(customer => 
+        return customers.filter(customer =>
             (customer.username && customer.username.toLowerCase().includes(searchLower)) ||
             (customer.email && customer.email.toLowerCase().includes(searchLower)) ||
             (customer.phone_number && customer.phone_number.toLowerCase().includes(searchLower))
         );
     }, [customers, searchTerm]);
-    
+
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
@@ -128,15 +128,15 @@ export default function CustomerClient({ initialCustomers, profile }) {
             />
 
             {/* Alert Section */}
-            {alert && (
-                <div className="mb-6">
+            <div className="fixed bottom-4 right-4 z-50">
+                {alert && (
                     <Alert
                         type={alert.type}
                         message={alert.message}
                         onClose={() => setAlert(null)}
                     />
-                </div>
-            )}
+                )}
+            </div>
 
             {/* DataCard Wrapper for Main Content */}
             <DataCard
@@ -199,7 +199,7 @@ export default function CustomerClient({ initialCustomers, profile }) {
                                 Found {filteredCustomers.length} result{filteredCustomers.length !== 1 ? 's' : ''}
                             </span>
                             {filteredCustomers.length !== customers.length && (
-                                <button 
+                                <button
                                     className="ml-2 text-xs text-gray-600 hover:text-purple-700 underline"
                                     onClick={() => setSearchTerm('')}
                                 >
@@ -210,14 +210,16 @@ export default function CustomerClient({ initialCustomers, profile }) {
                     )}
                 </div>
 
-                {/* Customer Table - Full width, no horizontal scroll */}
-                <div className="w-full">
-                    <CustomerTable
-                        customers={filteredCustomers}
-                        itemsPerPage={5}
-                        onEdit={handleEdit}
-                        onDelete={initiateDeleteCustomer}
-                    />
+                {/* Customer Table - With horizontal scroll for responsiveness */}
+                <div className="relative overflow-hidden">
+                    <div className="overflow-x-auto w-full">
+                        <CustomerTable
+                            customers={filteredCustomers}
+                            itemsPerPage={5}
+                            onEdit={handleEdit}
+                            onDelete={initiateDeleteCustomer}
+                        />
+                    </div>
                 </div>
             </DataCard>
 

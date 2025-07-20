@@ -8,27 +8,43 @@ export function SidebarProvider({ children }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
-  // Check if device is mobile
+  // Check device size and set responsive states
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      // On desktop, sidebar should be open by default
-      if (window.innerWidth >= 768) {
+    const checkDeviceSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 640); // sm breakpoint
+      setIsTablet(width >= 640 && width < 1024); // md to lg breakpoint
+      
+      // Auto-collapse on tablet
+      if (width >= 640 && width < 1024) {
+        setIsCollapsed(true);
         setIsOpen(true);
+      } 
+      // Full open on desktop
+      else if (width >= 1024) {
+        setIsOpen(true);
+        setIsCollapsed(false);
+      }
+      // Closed by default on mobile
+      else {
+        setIsOpen(false);
       }
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkDeviceSize();
+    window.addEventListener('resize', checkDeviceSize);
     
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkDeviceSize);
   }, []);
 
+  // Fungsi untuk mobile: membuka/menutup sidebar
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
+  // Fungsi untuk tablet & desktop: mengubah ukuran sidebar (collapse/expand)
   const toggleCollapse = () => {
     if (!isMobile) {
       setIsCollapsed(!isCollapsed);
@@ -37,8 +53,9 @@ export function SidebarProvider({ children }) {
 
   const getSidebarWidth = () => {
     if (!isOpen) return 0;
-    if (isMobile) return 280;
-    return isCollapsed ? 80 : 280;
+    if (isMobile) return 280; // Full width on mobile
+    if (isTablet) return isCollapsed ? 70 : 240; // Smaller on tablet
+    return isCollapsed ? 80 : 280; // Default for desktop
   };
 
   const getTopBarHeight = () => {
@@ -49,6 +66,7 @@ export function SidebarProvider({ children }) {
     isOpen,
     isCollapsed,
     isMobile,
+    isTablet,
     toggleSidebar,
     toggleCollapse,
     getSidebarWidth,

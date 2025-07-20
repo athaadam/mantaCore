@@ -79,7 +79,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
 
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" id="account-form-section">
             {/* Personal Information Section */}
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-700 border-b border-slate-200 pb-2">

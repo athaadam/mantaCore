@@ -45,15 +45,15 @@ export default function AccountManagementClient({ initialData }) {
     const handleDisableAccount = async (id) => {
         try {
             const res = await apiHit(`deleteUser/${id}`, Cookies.get('auth'), 'PUT');
-            
+
             // Update the account status in the local state using the response data
-            const updatedAccounts = accounts.map(acc => 
+            const updatedAccounts = accounts.map(acc =>
                 acc.userID === id ? res.user : acc
             );
-            
+
             setAccounts(updatedAccounts);
             if (editingAccount?.userID === id) setEditingAccount(null);
-            
+
             setAlert({ message: res.message || 'User disabled successfully.', type: 'success' });
         } catch (err) {
             setAlert({ message: err.message || 'Failed to disable user.', type: 'error' });
@@ -63,6 +63,13 @@ export default function AccountManagementClient({ initialData }) {
     const handleEditAccount = (account) => {
         setEditingAccount(account);
         setAlert(null);
+        // Memastikan elemen ada sebelum melakukan scrollIntoView
+        setTimeout(() => {
+            const formElement = document.getElementById('account-form-section');
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     };
 
     return (
@@ -79,13 +86,15 @@ export default function AccountManagementClient({ initialData }) {
             />
 
             {/* Alerts */}
-            {alert && (
-                <Alert
-                    type={alert.type}
-                    message={alert.message}
-                    onClose={() => setAlert(null)}
-                />
-            )}
+            <div className="fixed bottom-4 right-4 z-50">
+                {alert && (
+                    <Alert
+                        type={alert.type}
+                        message={alert.message}
+                        onClose={() => setAlert(null)}
+                    />
+                )}
+            </div>
 
             {/* Account List Section */}
             <AccountListSection

@@ -34,24 +34,24 @@ export default function InventoryClient({ initialItems, profile }) {
     // Filter items based on both category and search term
     const filteredItems = useMemo(() => {
         let result = originalItems;
-        
+
         // Apply category filter
         if (currentCategory !== 'all') {
             result = result.filter(item => item.category === currentCategory);
         }
-        
+
         // Apply search filter
         if (searchTerm.trim() !== '') {
             const searchLower = searchTerm.toLowerCase();
-            result = result.filter(item => 
+            result = result.filter(item =>
                 (item.name && item.name.toLowerCase().includes(searchLower)) ||
                 (item.type && item.type.toLowerCase().includes(searchLower))
             );
         }
-        
+
         return result;
     }, [originalItems, currentCategory, searchTerm]);
-    
+
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
@@ -148,15 +148,15 @@ export default function InventoryClient({ initialItems, profile }) {
                 onAdd={() => setShowModal(true)}
             />
             {/* Alert Section */}
-            {alert && (
-                <div className="mb-6">
+            <div className="fixed bottom-4 right-4 z-50">
+                {alert && (
                     <Alert
                         type={alert.type}
                         message={alert.message}
                         onClose={() => setAlert(null)}
                     />
-                </div>
-            )}
+                )}
+            </div>
 
             {/* Enhanced Inventory Management Section */}
             <DataCard
@@ -205,7 +205,7 @@ export default function InventoryClient({ initialItems, profile }) {
                                 Found {filteredItems.length} result{filteredItems.length !== 1 ? 's' : ''}
                             </span>
                             {filteredItems.length !== (currentCategory === 'all' ? originalItems.length : originalItems.filter(item => item.category === currentCategory).length) && (
-                                <button 
+                                <button
                                     className="ml-2 text-xs text-gray-600 hover:text-purple-700 underline"
                                     onClick={() => setSearchTerm('')}
                                 >
@@ -216,14 +216,16 @@ export default function InventoryClient({ initialItems, profile }) {
                     )}
                 </div>
 
-                {/* Inventory Table - Full width, no horizontal scroll */}
-                <div className="w-full">
-                    <InventoryTable
-                        items={filteredItems}
-                        onDelete={initiateDeleteItem}
-                        onEdit={handleEditItem}
-                        itemsPerPage={5}
-                    />
+                {/* Inventory Table - Can Horizontal Scroll */}
+                <div className="relative overflow-hidden">
+                    <div className="overflow-x-auto w-full">
+                        <InventoryTable
+                            items={filteredItems}
+                            onDelete={initiateDeleteItem}
+                            onEdit={handleEditItem}
+                            itemsPerPage={5}
+                        />
+                    </div>
                 </div>
             </DataCard>
 

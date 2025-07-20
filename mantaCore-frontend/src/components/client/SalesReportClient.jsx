@@ -9,6 +9,7 @@ import FilterControls from '@/components/filter/FilterControls';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
 import { extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/libs/utils/filters/filterUtils';
+import InvoiceViewModal from '../modal/InvoiceViewModal';
 
 export default function SalesReportClient({ summaryData, transactions, report }) {
     const [filter, setFilter] = useState({
@@ -21,6 +22,10 @@ export default function SalesReportClient({ summaryData, transactions, report })
     });
 
     const [appliedFilter, setAppliedFilter] = useState({});
+    
+    // State untuk modal view detail invoice
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
 
     // Extract unique customers, authors and categories from transaction data
     const suitors = useMemo(() => extractSuitors(transactions || []), [transactions]);
@@ -60,6 +65,18 @@ export default function SalesReportClient({ summaryData, transactions, report })
             return;
         }
         // Export logic here
+    };
+    
+    // Handler untuk membuka modal dengan detail invoice
+    const handleViewInvoice = (invoice) => {
+        setSelectedInvoice(invoice);
+        setIsModalOpen(true);
+    };
+    
+    // Handler untuk menutup modal
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedInvoice(null);
     };
 
     // Sales performance icon
@@ -172,10 +189,20 @@ export default function SalesReportClient({ summaryData, transactions, report })
                             transactions={filteredTransactions}
                             itemsPerPage={5}
                             mode="detailed"
+                            onViewDetails={handleViewInvoice}
                         />
                     </div>
                 </DataCard>
             </div>
+
+            {/* Invoice View Modal */}
+            {isModalOpen && (
+                <InvoiceViewModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    invoice={selectedInvoice}
+                />
+            )}
         </div>
     );
 }

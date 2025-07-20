@@ -1,6 +1,7 @@
 'use client';
 
 export default function SectionWrapper({ 
+    id,
     title, 
     description, 
     icon, 
@@ -10,7 +11,7 @@ export default function SectionWrapper({
     badge = null 
 }) {
     return (
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div id={id} className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
             <div className={`bg-gradient-to-r ${headerGradient} px-6 py-4 border-b border-slate-200`}>
                 <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 bg-gradient-to-br ${iconGradient} rounded-lg flex items-center justify-center`}>

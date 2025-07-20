@@ -334,15 +334,17 @@ const PurchaseRequestClient = ({ api }) => {
             <PurchaseStats
                 stats={stats}
             />
-            <div className="mb-4">
+            {/* Alert Component */}
+            <div className="fixed bottom-4 right-4 z-50">
                 {alert && (
                     <Alert
-                        message={alert.message}
                         type={alert.type}
+                        message={alert.message}
                         onClose={() => setAlert(null)}
                     />
                 )}
             </div>
+            
             <DataCard
                 title="My Purchase Requests"
                 subtitle="View and track all your submitted purchase requests"
@@ -392,6 +394,7 @@ const PurchaseRequestClient = ({ api }) => {
                 />
 
                 <PurchaseViewModal
+                    mode="notAdmin"
                     isOpen={showViewModal}
                     onClose={() => {
                         setShowViewModal(false);
