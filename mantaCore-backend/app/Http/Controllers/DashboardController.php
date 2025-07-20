@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\InvoiceItem;
+use App\Models\Invoice;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -54,16 +56,17 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $totalIncome = $user->invoices()
-            ->where('companyID', $user->companyID)
+        // Total semua invoice untuk perusahaan user
+        $totalIncome = Invoice::where('companyID', $user->companyID)
             ->sum('amount');
 
-        $totalExpense = $user->purchases()
-            ->where('companyID', $user->companyID)
+        // Total semua purchase accepted untuk perusahaan user
+        $totalExpense = Purchase::where('companyID', $user->companyID)
             ->where('status', 'accepted')
             ->sum('amount');
 
         $totalPnL = $totalIncome - $totalExpense;
+
         return response()->json([
             'totalIncome'  => $totalIncome,
             'totalExpense' => $totalExpense,
