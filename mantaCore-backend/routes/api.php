@@ -34,8 +34,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/editProfile', [UserController::class, 'editProfile']);
         Route::post('/changePassword', [UserController::class, 'changePassword']);
         Route::delete('/deleteAccount', [UserController::class, 'deleteAccount']);
-
+        Route::get('/getAllItems', [ItemController::class, 'getAllItems']);
+        
         //cashier
+
         Route::middleware('cashier')->group(function () {
             // invoices
             Route::post('/createInvoice', [InvoiceController::class, 'createInvoice']);
@@ -69,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/purchase-report', [PurchaseController::class, 'purchaseReport']);
 
             // items
-            Route::get('/getAllItems', [ItemController::class, 'getAllItems']);
+            
             Route::get('/getItem/{id}', [ItemController::class, 'getItemById']);
             Route::post('/createItem', [ItemController::class, 'createItem']);
             Route::post('/updateItem/{id}', [ItemController::class, 'updateItem']);
