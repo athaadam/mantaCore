@@ -45,8 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/getInvoice/{id}', [InvoiceController::class, 'getInvoiceById']);
             Route::post('/updateInvoice/{id}', [InvoiceController::class, 'updateInvoice']);
             Route::delete('/deleteInvoice/{id}', [InvoiceController::class, 'deleteInvoice']);
-            Route::get('/filterInvoices', [InvoiceController::class, 'filterInvoices']);
-            Route::get('/sales-report', [InvoiceController::class, 'salesReport']);
             Route::get('/getMyInvoices', [InvoiceController::class, 'getMyInvoices']);
 
 
@@ -60,6 +58,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //management
         Route::middleware('management')->group(function () {
+
+            //sales
+            Route::get('/sales-report', [InvoiceController::class, 'salesReport']);
+            Route::get('/filterInvoices', [InvoiceController::class, 'filterInvoices']);
+            Route::get('/getAllInvoices', [InvoiceController::class, 'getAllInvoices']);
 
             //purchases
             Route::get('/getAllPurchases', [PurchaseController::class, 'getAllPurchases']);

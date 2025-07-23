@@ -124,6 +124,8 @@ class PurchaseController extends Controller
             return response()->json(['message' => 'Purchase not found'], 404);
         }
 
+        $user = $request->user(); // Mendapatkan user yang sedang login
+
         $data = $request->validate([
             'status' => 'nullable|in:pending,accepted,denied',
             'date' => 'sometimes|date',
@@ -137,10 +139,17 @@ class PurchaseController extends Controller
         ]);
 
         try {
-            $result = DB::transaction(function () use ($purchase, $data) {
+            $result = DB::transaction(function () use ($purchase, $data, $user) {
 
                 $oldStatus = strtolower($purchase->status);
-                $newStatus = strtolower($data['status'] ?? $oldStatus);
+                $newStatus = $data['status'] ?? $oldStatus;
+
+                // 🚫 Batasi perubahan status hanya untuk admin
+                if (isset($data['status']) && $user->role !== 'admin') {
+                    return response()->json([
+                        'message' => 'Only admin can update the status'
+                    ], 403);
+                }
 
                 // 1. 🧼 Kembalikan stok lama jika status sebelumnya accepted
                 if ($oldStatus === 'accepted') {
@@ -152,7 +161,7 @@ class PurchaseController extends Controller
                     }
                 }
 
-                // 2. 🔄 Update data utama (status, tanggal, jumlah)
+                // 2. 🔄 Update data utama
                 $purchase->update([
                     'status' => $newStatus,
                     'date' => $data['date'] ?? $purchase->date,
@@ -174,7 +183,6 @@ class PurchaseController extends Controller
                         ]);
                     }
 
-                    // Refresh items relasi
                     $purchase->load('items', 'user', 'company');
                 }
 
@@ -185,12 +193,16 @@ class PurchaseController extends Controller
                             Item::lockForUpdate()->find($newItem->itemID)
                                 ->increment('stock', $newItem->quantity);
                         }
-
                     }
                 }
 
                 return $purchase->load('items.item');
             });
+
+            // Jika result berupa response JSON (karena user bukan admin), langsung return
+            if ($result instanceof JsonResponse) {
+                return $result;
+            }
 
             return response()->json([
                 'message' => 'Purchase updated successfully',
@@ -204,6 +216,7 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
+
 
 
     /* ───── DELETE ───── */
