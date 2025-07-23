@@ -145,9 +145,10 @@ class PurchaseController extends Controller
                 // 🧼 1. Kembalikan stok lama jika status berubah dari 'accepted' ke bukan 'accepted'
                 if ($oldStatus === 'accepted' && $newStatus !== 'accepted') {
                     foreach ($purchase->items as $oldItem) {
-                        if (isset($oldItem->type) && strtolower($oldItem->type) === 'sales') {
-                            Item::lockForUpdate()->find($oldItem->itemID)
-                                ->decrement('stock', $oldItem->quantity);
+                        // Kurangi stok untuk semua item tanpa memeriksa tipe
+                        $item = Item::lockForUpdate()->find($oldItem->itemID);
+                        if ($item) {
+                            $item->decrement('stock', $oldItem->quantity);
                         }
                     }
                 }
@@ -155,17 +156,18 @@ class PurchaseController extends Controller
                 // 🔄 2. Update data utama (status, tanggal, jumlah)
                 $purchase->update([
                     'status' => $newStatus,
-                    'date' => $data['date'] ?? $purchase->date,
-                    'amount' => $data['amount'] ?? $purchase->amount,
+                    'date' => $data['date'] ?? $purchase->getAttribute('date'),
+                    'amount' => $data['amount'] ?? $purchase->getAttribute('amount'),
                 ]);
 
                 // 🔁 3. Ganti semua item jika dikirim ulang
                 if (isset($data['items'])) {
-                    PurchaseItem::where('purchaseID', $purchase->purchaseID)->delete();
+                    $purchaseID = $purchase->getAttribute('purchaseID');
+                    PurchaseItem::where('purchaseID', $purchaseID)->delete();
 
                     foreach ($data['items'] as $row) {
                         PurchaseItem::create([
-                            'purchaseID' => $purchase->purchaseID,
+                            'purchaseID' => $purchaseID,
                             'itemID' => $row['itemID'],
                             'quantity' => $row['quantity'],
                             'unitPrice' => $row['unitPrice'],
@@ -181,9 +183,10 @@ class PurchaseController extends Controller
                 // ➕ 4. Tambahkan stok baru jika status berubah dari bukan 'accepted' ke 'accepted'
                 if ($oldStatus !== 'accepted' && $newStatus === 'accepted') {
                     foreach ($purchase->items as $newItem) {
-                        if (isset($newItem->type) && strtolower($newItem->type) === 'sales') {
-                            Item::lockForUpdate()->find($newItem->itemID)
-                                ->increment('stock', $newItem->quantity);
+                        // Tambahkan stok untuk semua item yang dibeli tanpa memeriksa tipe
+                        $item = Item::lockForUpdate()->find($newItem->itemID);
+                        if ($item) {
+                            $item->increment('stock', $newItem->quantity);
                         }
                     }
                 }
@@ -216,14 +219,17 @@ class PurchaseController extends Controller
 
         DB::transaction(function () use ($purchase) {
             /* kembalikan stok bila accepted */
-            if (strtolower($purchase->status) === 'accepted') {
+            if (strtolower($purchase->getAttribute('status')) === 'accepted') {
                 foreach ($purchase->items as $d) {
-                    Item::lockForUpdate()->find($d->itemID)
-                        ->decrement('stock', $d->quantity);
+                    // Kurangi stok untuk semua item saat purchase dihapus
+                    $item = Item::lockForUpdate()->find($d->itemID);
+                    if ($item) {
+                        $item->decrement('stock', $d->quantity);
+                    }
                 }
             }
 
-            PurchaseItem::where('purchaseID', $purchase->purchaseID)->delete();
+            PurchaseItem::where('purchaseID', $purchase->getAttribute('purchaseID'))->delete();
             $purchase->delete();
         });
 
@@ -233,9 +239,21 @@ class PurchaseController extends Controller
     //getmypurchases
     public function getMyPurchases(Request $request): JsonResponse
     {
+        $user = $request->user();
+        
+        // Use a safer way to access the userID - assuming the property might be 'userID' or 'id'
+        $userID = $user->userID ?? $user->id ?? null;
+        
+        if (!$userID) {
+            return response()->json([
+                'message' => 'User ID not found',
+                'purchases' => [],
+            ], 404);
+        }
+        
         // Ambil semua purchase yang dibuat oleh user yang sedang login
         $purchases = Purchase::with(['user', 'company', 'items.item'])
-            ->where('userID', $request->user()->userID)
+            ->where('userID', $userID)
             ->get();
 
         return response()->json([
@@ -247,9 +265,22 @@ class PurchaseController extends Controller
     public function purchaseReport(Request $request): JsonResponse
     {
         $user = $request->user();
+        
+        // Use a safer way to access the companyID - assuming the property might be 'companyID' or 'company_id'
+        $companyID = $user->companyID ?? $user->company_id ?? null;
+        
+        if (!$companyID) {
+            return response()->json([
+                'message' => 'User company not found',
+                'total_requests' => 0,
+                'approved_requests' => 0,
+                'pending_requests' => 0,
+                'rejected_requests' => 0,
+            ], 404);
+        }
 
         // Ambil semua purchase milik company yang sama dengan user login
-        $purchases = Purchase::where('companyID', $user->companyID);
+        $purchases = Purchase::where('companyID', $companyID);
 
         // Hitung total, approved, pending, rejected
         $total = $purchases->count();

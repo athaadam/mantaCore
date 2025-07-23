@@ -49,7 +49,7 @@ class InvoiceController extends Controller
     public function createInvoice(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'costumerID'             => 'required|exists:costumers,costumerID',
+            'costumerID'             => 'nullable|exists:costumers,costumerID',
             'date'                   => 'required|date',
             'amount'                 => 'required|numeric|min:0',
             'items'                  => 'required|array|min:1',
