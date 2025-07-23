@@ -42,7 +42,7 @@ export default function AdminDashboardLayout({ data }) {
                         }
                         gradient="bg-white/80 backdrop-blur-xl border border-white/50"
                     >
-                        <TopSales report={topSells} />
+                        <TopSales report={topSells.slice(0, 5)} />
                     </DataCard>
 
                     <DataCard
@@ -55,7 +55,7 @@ export default function AdminDashboardLayout({ data }) {
                         }
                         gradient="bg-white/80 backdrop-blur-xl border border-white/50"
                     >
-                        <TransactionTable transactions={transactions?.invoices} itemsPerPage={5} />
+                        <TransactionTable transactions={transactions?.invoices.slice(0, 5)} itemsPerPage={5} />
                     </DataCard>
                 </div>
 

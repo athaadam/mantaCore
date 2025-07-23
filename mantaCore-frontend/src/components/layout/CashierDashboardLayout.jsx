@@ -122,7 +122,7 @@ export default function CashierDashboardLayout({ data }) {
                         >
                             <div className="mt-6">
                                 <TransactionTable 
-                                    transactions={myInvoices || []} 
+                                    transactions={myInvoices.slice(0, 5) || []} 
                                     itemsPerPage={5}
                                     mode="simple"
                                 />
@@ -131,8 +131,8 @@ export default function CashierDashboardLayout({ data }) {
 
                         {/* All Invoices */}
                         <DataCard 
-                            title="All Invoices" 
-                            subtitle="Transactions from all cashiers"
+                            title="Recent Transactions" 
+                            subtitle="All sales transactions"
                             gradient="bg-gradient-to-br from-white to-indigo-50"
                             icon={
                                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@ export default function CashierDashboardLayout({ data }) {
                             <div className="mt-6">
                                 <TransactionTable 
                                     mode="simple" 
-                                    transactions={(invoices?.invoices || [])} 
+                                    transactions={(invoices?.invoices.slice(0,5) || [])} 
                                     itemsPerPage={5}
                                 />
                             </div>

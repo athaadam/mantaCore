@@ -306,10 +306,10 @@ const InvoicesClient = ({ data }) => {
             
             {/* Invoice Stats */}
             <InvoiceStats invoices={filteredInvoices} />
-            
+             
             {/* Alert */}
             {alert.show && (
-                <div className="mb-4">
+                <div className="fixed bottom-4 right-4 z-50">
                     <Alert 
                         type={alert.type} 
                         message={alert.message}
