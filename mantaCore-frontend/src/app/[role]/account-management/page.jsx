@@ -1,4 +1,4 @@
-import PageBreadcrumb from "@/components/header/layout/PageBreadCrump";
+import PageBreadcrumb from "@/components/layout/PageBreadCrump";
 import Header4 from "@/components/Header/Header4";
 import QuickActions from "@/components/Action/QuickActions";
 import AccountManagementClient from "@/components/client/AccountManagementClient";

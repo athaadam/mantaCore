@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import { formatDate } from "@/libs/utils/formats/formatdate";
 import { ProfileAction, EditAccountAction } from '@/components/action/ProfileAction';
-import PageBreadcrumb from "@/components/header/layout/PageBreadCrump";
+import PageBreadcrumb from "@/components/layout/PageBreadCrump";
 import { apiHit } from "@/libs/api/fetch";
 
 
