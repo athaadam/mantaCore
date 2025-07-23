@@ -124,8 +124,6 @@ class PurchaseController extends Controller
             return response()->json(['message' => 'Purchase not found'], 404);
         }
 
-        $user = $request->user(); // Mendapatkan user yang sedang login
-
         $data = $request->validate([
             'status' => 'nullable|in:pending,accepted,denied',
             'date' => 'sometimes|date',
@@ -139,36 +137,29 @@ class PurchaseController extends Controller
         ]);
 
         try {
-            $result = DB::transaction(function () use ($purchase, $data, $user) {
+            $result = DB::transaction(function () use ($purchase, $data) {
 
                 $oldStatus = strtolower($purchase->status);
-                $newStatus = $data['status'] ?? $oldStatus;
+                $newStatus = strtolower($data['status'] ?? $oldStatus);
 
-                // 🚫 Batasi perubahan status hanya untuk admin
-                if (isset($data['status']) && $user->role !== 'admin') {
-                    return response()->json([
-                        'message' => 'Only admin can update the status'
-                    ], 403);
-                }
-
-                // 1. 🧼 Kembalikan stok lama jika status sebelumnya accepted
-                if ($oldStatus === 'accepted') {
+                // 🧼 1. Kembalikan stok lama jika status berubah dari 'accepted' ke bukan 'accepted'
+                if ($oldStatus === 'accepted' && $newStatus !== 'accepted') {
                     foreach ($purchase->items as $oldItem) {
-                        if (isset($oldItem->type) && strtolower($oldItem->type) !== 'sales') {
+                        if (isset($oldItem->type) && strtolower($oldItem->type) === 'sales') {
                             Item::lockForUpdate()->find($oldItem->itemID)
                                 ->decrement('stock', $oldItem->quantity);
                         }
                     }
                 }
 
-                // 2. 🔄 Update data utama
+                // 🔄 2. Update data utama (status, tanggal, jumlah)
                 $purchase->update([
                     'status' => $newStatus,
                     'date' => $data['date'] ?? $purchase->date,
                     'amount' => $data['amount'] ?? $purchase->amount,
                 ]);
 
-                // 3. 🔁 Ganti semua item jika dikirim ulang
+                // 🔁 3. Ganti semua item jika dikirim ulang
                 if (isset($data['items'])) {
                     PurchaseItem::where('purchaseID', $purchase->purchaseID)->delete();
 
@@ -183,11 +174,12 @@ class PurchaseController extends Controller
                         ]);
                     }
 
+                    // Refresh relasi
                     $purchase->load('items', 'user', 'company');
                 }
 
-                // 4. ➕ Tambahkan stok baru jika status sekarang accepted
-                if ($newStatus === 'accepted') {
+                // ➕ 4. Tambahkan stok baru jika status berubah dari bukan 'accepted' ke 'accepted'
+                if ($oldStatus !== 'accepted' && $newStatus === 'accepted') {
                     foreach ($purchase->items as $newItem) {
                         if (isset($newItem->type) && strtolower($newItem->type) === 'sales') {
                             Item::lockForUpdate()->find($newItem->itemID)
@@ -198,11 +190,6 @@ class PurchaseController extends Controller
 
                 return $purchase->load('items.item');
             });
-
-            // Jika result berupa response JSON (karena user bukan admin), langsung return
-            if ($result instanceof JsonResponse) {
-                return $result;
-            }
 
             return response()->json([
                 'message' => 'Purchase updated successfully',
