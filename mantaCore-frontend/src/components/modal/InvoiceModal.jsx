@@ -115,15 +115,18 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
         
         if (selectedItem) {            
             // According to ItemController.php, the field for price is 'itemPrice'
-            const itemPrice = selectedItem.itemPrice || 0;
+            // We use this price as the starting point, which can be adjusted for profit
+            const baseItemPrice = selectedItem.itemPrice || 0;
             
+            // Start with the base price - this can be adjusted later for profit margins
             const newItems = [...formData.items];
             
             newItems[index] = {
                 ...newItems[index],
                 itemID: selectedItem.itemID, // Already a string
-                unitPrice: itemPrice,
-                subTotal: itemPrice * newItems[index].quantity
+                unitPrice: baseItemPrice,
+                subTotal: baseItemPrice * newItems[index].quantity,
+                type: 'sales' // Ensure this is always set to 'sales'
             };
             
             // Update selected items array for UI
@@ -337,6 +340,7 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
                                         className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors.costumerID ? 'border-red-500' : 'border-slate-300'}`}
                                     >
                                         <option value="">Select a customer</option>
+                                        <option value="Non-Member">Non-Member</option>
                                         {customers.map(customer => (
                                             <option key={customer.costumerID} value={customer.costumerID}>
                                                 {customer.username} - {customer.email}
@@ -399,7 +403,7 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
                                                     </button>
                                                 )}
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-slate-700 mb-1">
                                                         Product *
@@ -454,13 +458,36 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
                                                     )}
                                                 </div>
                                                 
-                                                {/* Type field removed since we're already filtering for sales items */}
+                                                {/* Adding Unit Price field for profit adjustment */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                                                        Unit Price *
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        value={item.unitPrice}
+                                                        onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
+                                                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors[`item_${index}_unitPrice`] ? 'border-red-500' : 'border-slate-300'}`}
+                                                        min="0"
+                                                        step="100"
+                                                    />
+                                                    {errors[`item_${index}_unitPrice`] && (
+                                                        <p className="mt-1 text-sm text-red-600">{errors[`item_${index}_unitPrice`]}</p>
+                                                    )}
+                                                    {selectedItems[index] && (
+                                                        <p className="mt-1 text-xs text-green-600">
+                                                            Base price: {formatRupiah(selectedItems[index].itemPrice || 0)}
+                                                            {item.unitPrice > selectedItems[index].itemPrice && (
+                                                                <span className="ml-2 text-emerald-500 font-medium">
+                                                                    (+{formatRupiah(item.unitPrice - selectedItems[index].itemPrice)})
+                                                                </span>
+                                                            )}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
                                             
-                                            <div className="mt-4 flex justify-between items-center">
-                                                <div className="text-sm text-slate-600">
-                                                    <span className="font-medium">Unit Price:</span> {formatRupiah(item.unitPrice)}
-                                                </div>
+                                            <div className="mt-4 flex justify-end items-center">
                                                 <div className="text-sm font-semibold text-purple-700">
                                                     <span className="font-medium">Subtotal:</span> {formatRupiah(item.subTotal)}
                                                 </div>
@@ -473,7 +500,12 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
                             {/* Total Amount */}
                             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold text-slate-700">Total Amount:</span>
+                                    <div>
+                                        <span className="text-lg font-semibold text-slate-700">Total Amount:</span>
+                                        <p className="text-xs text-slate-500 mt-1">
+                                            This is the final selling price including any profit margins
+                                        </p>
+                                    </div>
                                     <span className="text-2xl font-bold text-purple-600">
                                         {formatRupiah(formData.amount)}
                                     </span>
