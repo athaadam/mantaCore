@@ -1,5 +1,5 @@
 import UserForm from '@/components/form/UserChangesForm'
-import PageBreadcrumb from '@/components/layout/PageBreadCrump'
+import PageBreadcrumb from '@/components/header/layout/PageBreadCrump'
 
 export default function EditAccountPage() {
     return (
