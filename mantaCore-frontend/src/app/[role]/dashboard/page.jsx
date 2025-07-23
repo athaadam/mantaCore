@@ -42,29 +42,22 @@ export default async function DashboardPage() {
     return <AdminDashboardLayout data={data} />;
   } else if (profile.user.role === 'cashier') {
     // Fetch all necessary data in parallel for improved performance
-    const [customersData, myInvoicesRaw, allItems, allInvoices] = await Promise.all([
+    const [customersData, myInvoicesRaw, allItems] = await Promise.all([
       apiHit('getAllCostumers', token),
       apiHit('getMyInvoices', token),
       apiHit('getAllItems', token),
-      apiHit('getAllInvoices', token),
     ]);
 
     // Process the invoice data to handle different response formats
     const myInvoices = Array.isArray(myInvoicesRaw)
       ? myInvoicesRaw
       : (myInvoicesRaw?.invoices ?? []); 
-      
-    // Process all invoices data in the same way
-    const processedAllInvoices = Array.isArray(allInvoices)
-      ? { invoices: allInvoices }
-      : (allInvoices || { invoices: [] });
 
-    // Prepare data object for the cashier dashboard
+    // Prepare data object for the cashier dashboard with customers as the primary focus
     const data = {
       customers: customersData,
-      myInvoices,
       items: allItems,
-      invoices: processedAllInvoices
+      myInvoices
     };
 
     return <CashierDashboardLayout data={data} />;

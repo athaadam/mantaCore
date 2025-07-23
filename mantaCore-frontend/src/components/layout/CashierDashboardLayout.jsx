@@ -7,25 +7,30 @@ import DataCard from "../card/DataCard";
 import CustomerTable from "../table/CustomerTable";
 import { formatRupiah } from "@/libs/utils/formats/formatRupiah";
 import Link from "next/link";
-import TransactionTable from "../table/TransactionTable";
 
 export default function CashierDashboardLayout({ data }) {
-    const { customers, myInvoices, invoices } = data;
-    const totalCustomers = customers?.length || 0;
-    const totalInvoices = myInvoices?.length || 0;
-    const totalSales = myInvoices?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+    // Pastikan data tidak undefined/null
+    const customers = data?.customers || [];
+    const myInvoices = data?.myInvoices || [];
+    const items = data?.items || [];
+    
+    // Hitung total dengan aman
+    const totalCustomers = customers.length;
+    const totalInvoices = myInvoices.length;
+    const totalSales = myInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
     
     // Calculate recent activity (transactions in the last 7 days)
     const today = new Date();
     const lastWeek = new Date(today);
     lastWeek.setDate(today.getDate() - 7);
     
-    const recentInvoices = myInvoices?.filter(invoice => {
+    const recentInvoices = myInvoices.filter(invoice => {
+        if (!invoice.date) return false;
         const invoiceDate = new Date(invoice.date);
         return invoiceDate >= lastWeek;
-    }) || [];
+    });
     
-    const recentSales = recentInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+    const recentSales = recentInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
     
     // Format the total sales value
     const formattedTotalSales = formatRupiah(totalSales);
@@ -83,9 +88,8 @@ export default function CashierDashboardLayout({ data }) {
                 
                 {/* Quick Actions */}
                 <div className="mb-12">
-                    <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Link href="/cashier/invoices/new" className="block">
+                        <Link href="/cashier/invoices" className="block">
                             <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-white text-center hover:scale-[1.02]">
                                 <svg className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -94,7 +98,7 @@ export default function CashierDashboardLayout({ data }) {
                                 <p className="mt-2 text-blue-100">Add a new sales transaction</p>
                             </div>
                         </Link>
-                        <Link href="/cashier/customer/new" className="block">
+                        <Link href="/cashier/customer" className="block">
                             <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-white text-center hover:scale-[1.02]">
                                 <svg className="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
@@ -105,7 +109,7 @@ export default function CashierDashboardLayout({ data }) {
                         </Link>
                     </div>
                 </div>
-
+                
                 {/* Invoices Tables - Side by Side */}
                 <div className="mb-12">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -120,32 +124,162 @@ export default function CashierDashboardLayout({ data }) {
                                 </svg>
                             }
                         >
-                            <div className="mt-6">
-                                <TransactionTable 
-                                    transactions={myInvoices.slice(0, 5) || []} 
-                                    itemsPerPage={5}
-                                    mode="simple"
-                                />
+                            <div className="mt-6 overflow-x-auto">
+                                <table className="w-full text-left table-auto bg-white rounded-lg overflow-hidden">
+                                    <thead>
+                                        <tr className="text-xs font-semibold tracking-wide text-blue-800 bg-blue-50 border-b border-blue-100">
+                                            <th className="px-4 py-3 rounded-tl-lg">
+                                                <div className="flex items-center">
+                                                    <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Date
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3">
+                                                <div className="flex items-center">
+                                                    <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                                    </svg>
+                                                    Invoice ID
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3">
+                                                <div className="flex items-center">
+                                                    <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                    </svg>
+                                                    Items
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3">
+                                                <div className="flex items-center">
+                                                    <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                    </svg>
+                                                    Category
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3 rounded-tr-lg">
+                                                <div className="flex items-center">
+                                                    <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Amount
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(myInvoices?.slice(0, 5) || []).map((invoice, i) => {
+                                            // Extract item names and join them
+                                            const itemNames = invoice.items?.map(item => item.item?.name || 'Unknown').join(', ') || '-';
+                                            // Get first category or default
+                                            const firstCategory = invoice.items?.[0]?.item?.category || 'Uncategorized';
+                                            // Format date
+                                            const date = invoice.date ? new Date(invoice.date).toLocaleDateString() : '-';
+                                            
+                                            return (
+                                                <tr key={i} className={`border-b border-gray-100 text-sm hover:bg-blue-50/30 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                                    <td className="px-4 py-3.5 font-medium text-gray-800">
+                                                        <div className="flex items-center">
+                                                            <span className="inline-block w-6 text-center mr-2 text-blue-600">
+                                                                <svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                            </span>
+                                                            {date}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3.5 text-blue-700 font-medium">#{invoice.invoiceID}</td>
+                                                    <td className="px-4 py-3.5 text-gray-600 max-w-[150px] truncate" title={itemNames}>{itemNames}</td>
+                                                    <td className="px-4 py-3.5">
+                                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs">
+                                                            {firstCategory}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3.5 font-medium text-emerald-700">{formatRupiah(invoice.amount || 0)}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                        {(!myInvoices || myInvoices.length === 0) && (
+                                            <tr>
+                                                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                                                    No invoices found. Create your first invoice!
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div className="mt-4 text-right">
+                                    <Link 
+                                        href="/cashier/invoices" 
+                                        className="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded-md shadow-sm text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100"
+                                    >
+                                        View All Invoices
+                                        <svg className="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </Link>
+                                </div>
                             </div>
                         </DataCard>
 
-                        {/* All Invoices */}
+                        {/* Inventory Items Overview */}
                         <DataCard 
-                            title="Recent Transactions" 
-                            subtitle="All sales transactions"
+                            title="Inventory Overview" 
+                            subtitle="Products and stock information"
                             gradient="bg-gradient-to-br from-white to-indigo-50"
                             icon={
                                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7"></path>
                                 </svg>
                             }
                         >
-                            <div className="mt-6">
-                                <TransactionTable 
-                                    mode="simple" 
-                                    transactions={(invoices?.invoices.slice(0,5) || [])} 
-                                    itemsPerPage={5}
-                                />
+                            <div className="mt-6 overflow-x-auto">
+                                <table className="w-full text-left table-auto bg-white rounded-lg overflow-hidden">
+                                    <thead>
+                                        <tr className="text-xs font-semibold tracking-wide text-indigo-800 bg-indigo-50 border-b border-indigo-100">
+                                            <th className="px-4 py-3 rounded-tl-lg">Item Name</th>
+                                            <th className="px-4 py-3">Category</th>
+                                            <th className="px-4 py-3">Price</th>
+                                            <th className="px-4 py-3 rounded-tr-lg">Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(items?.slice(0, 5) || []).map((item, i) => (
+                                            <tr key={i} className={`border-b border-gray-100 text-sm hover:bg-indigo-50/30 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                                <td className="px-4 py-3.5 font-medium text-gray-800">{item.name}</td>
+                                                <td className="px-4 py-3.5">
+                                                    <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs">
+                                                        {item.category || 'Uncategorized'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3.5 font-medium">{formatRupiah(item.itemPrice)}</td>
+                                                <td className="px-4 py-3.5">
+                                                    <span className={`px-2.5 py-1.5 text-xs font-medium rounded-full ${
+                                                        item.stock > 10 ? 'bg-green-100 text-green-800 border border-green-200' : 
+                                                        item.stock > 0 ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 
+                                                        'bg-red-100 text-red-800 border border-red-200'
+                                                    }`}>
+                                                        {item.stock} {item.units || 'pcs'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className="mt-4 text-right">
+                                    <Link 
+                                        href="/cashier/invoices" 
+                                        className="inline-flex items-center px-3 py-1.5 border border-indigo-300 rounded-md shadow-sm text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
+                                    >
+                                        View All Items
+                                        <svg className="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </Link>
+                                </div>
                             </div>
                         </DataCard>
                     </div>
