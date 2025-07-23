@@ -273,7 +273,7 @@ class InvoiceController extends Controller
             return response()->json([
                 'message' => 'No invoices found',
                 'invoices' => []
-            ], 404);
+            ], 200);
         }
 
         return response()->json([
