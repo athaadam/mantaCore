@@ -201,7 +201,7 @@ export default function Sidebar() {
       >
         {/* Simple, subtle background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900 via-purple-800 to-indigo-900 opacity-90"></div>
-        
+
         {/* Subtle pattern for depth */}
         <div className="absolute inset-0 opacity-3">
           <div className="absolute inset-0" style={{
@@ -269,15 +269,15 @@ export default function Sidebar() {
                 </div>
               </div>
             )}
-            
+
             {/* Menu groups */}
             {NAV_GROUPS.map((group, groupIndex) => {
               // Filter items based on user role
               const groupItems = group.items.filter(item => item.roles.includes(role));
-              
+
               // Skip groups with no accessible items
               if (groupItems.length === 0) return null;
-              
+
               return (
                 <div key={`group-${groupIndex}`} className="animate-fadeIn mb-2">
                   {/* Group Header - Only shown when not collapsed */}
@@ -287,25 +287,25 @@ export default function Sidebar() {
                       <span>{group.title}</span>
                     </div>
                   )}
-                  
+
                   {/* Group Divider when collapsed */}
                   {isCollapsed && groupIndex > 0 && (
                     <div className="mx-2 my-3 border-t border-white/10"></div>
                   )}
-                  
+
                   {/* Group items */}
                   <div className="space-y-1 pl-1">
                     {groupItems.map(({ name, path }, index) => {
                       const href = `/${role}/${path}`;
                       const isActive = pathname.startsWith(href);
-                      
+
                       // Classes setup
                       const baseClasses = `group relative flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${isCollapsed ? 'justify-center' : ''}`;
-                      
+
                       const activeClasses = isActive
                         ? "bg-purple-700 text-white shadow-sm"
                         : "text-white/80 hover:text-white hover:bg-purple-800/50";
-                        
+
                       const itemClasses = `${baseClasses} ${activeClasses}`;
 
                       return (
