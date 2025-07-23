@@ -134,7 +134,7 @@ export default function ManagementDashboardLayout({ data }) {
                                 )}
                                 <div className="mt-6 text-center">
                                     <Link
-                                        href="/management/purchase-approval"
+                                        href="/management/sales-report"
                                         className="inline-flex items-center px-4 py-2 border border-teal-300 rounded-md shadow-sm text-sm font-medium text-teal-700 bg-teal-50 hover:bg-teal-100"
                                     >
                                         View Purchase History

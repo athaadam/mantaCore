@@ -83,7 +83,7 @@ export default function InventoryForm({ item, onChange, onSubmit, onClose }) {
                         type="number"
                         min="0"
                         className="w-full border border-slate-300 px-4 py-3 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 outline-none placeholder-slate-500"
-                        required
+                        disabled
                     />
                 </div>
 
