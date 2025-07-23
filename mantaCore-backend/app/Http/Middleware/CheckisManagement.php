@@ -17,7 +17,7 @@ class CheckisManagement
     {
         $user = $request->user();
         if (!$user || !in_array($user->role, ['management', 'admin'])) {
-            return response()->json(['message' => 'Access denied. Cashiers or admins only.'], 403);
+            return response()->json(['message' => 'Access denied. Management or admins only.'], 403);
         }
         return $next($request);
     }
