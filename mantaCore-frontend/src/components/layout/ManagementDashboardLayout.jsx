@@ -7,7 +7,6 @@ import DataCard from '../card/DataCard';
 import Link from 'next/link';
 import TransactionTable from '../table/TransactionTable';
 import CustomerTable from '../table/CustomerTable';
-import InventoryTable from '../table/InventoryTable';
 import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 
 export default function ManagementDashboardLayout({ data }) {
