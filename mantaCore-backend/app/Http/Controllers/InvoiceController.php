@@ -19,13 +19,14 @@ class InvoiceController extends Controller
         $user = $request->user();
         $invoices = Invoice::with(['user', 'company', 'costumer', 'items.item'])
             ->where('companyID', $user->companyID)
+            ->orderBy('created_at', 'desc') // Tambahkan ini untuk urutan dari terbaru
             ->get();
+
         return response()->json([
             'message' => 'Invoices fetched successfully',
             'invoices' => $invoices,
         ]);
     }
-    
 
     /* ───── GET BY ID ───── */
     public function getInvoiceById(Request $request, int $id): JsonResponse
@@ -259,7 +260,7 @@ class InvoiceController extends Controller
     {
         $user = $request->user();
 
-        // Ambil semua invoice milik user beserta relasi lengkap
+        // Ambil semua invoice milik user beserta relasi lengkap, urutkan dari terbaru
         $invoices = Invoice::with([
                 'user',
                 'company',
@@ -267,6 +268,7 @@ class InvoiceController extends Controller
                 'items.item'
             ])
             ->where('userID', $user->userID)
+            ->orderBy('created_at', 'desc') // Urutkan dari yang paling baru
             ->get();
 
         if ($invoices->isEmpty()) {
@@ -281,10 +283,6 @@ class InvoiceController extends Controller
             'invoices' => $invoices
         ]);
     }
-
-
-
-
 
     //filter invoice from date untill
     public function filterInvoices(Request $request): JsonResponse

@@ -17,7 +17,9 @@ class PurchaseController extends Controller
         $user = $request->user();
         $purchases = Purchase::with(['user', 'company', 'items.item'])
             ->where('companyID', $user->companyID)
+            ->orderBy('created_at', 'desc') // Urutkan berdasarkan waktu pembuatan terbaru
             ->get();
+
         return response()->json($purchases);
     }
 
@@ -241,7 +243,7 @@ class PurchaseController extends Controller
     {
         $user = $request->user();
         
-        // Use a safer way to access the userID - assuming the property might be 'userID' or 'id'
+        // Gunakan cara aman untuk mengambil userID
         $userID = $user->userID ?? $user->id ?? null;
         
         if (!$userID) {
@@ -251,9 +253,10 @@ class PurchaseController extends Controller
             ], 404);
         }
         
-        // Ambil semua purchase yang dibuat oleh user yang sedang login
+        // Ambil semua purchase milik user, urutkan dari yang terbaru
         $purchases = Purchase::with(['user', 'company', 'items.item'])
             ->where('userID', $userID)
+            ->orderBy('created_at', 'desc') // Urutkan dari terbaru
             ->get();
 
         return response()->json([
@@ -261,6 +264,7 @@ class PurchaseController extends Controller
             'purchases' => $purchases,
         ]);
     }
+
 
     public function purchaseReport(Request $request): JsonResponse
     {
