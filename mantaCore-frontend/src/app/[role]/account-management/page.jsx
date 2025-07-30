@@ -1,6 +1,6 @@
 import PageBreadcrumb from "@/components/layout/PageBreadCrump";
-import Header4 from "@/components/Header/Header4";
-import QuickActions from "@/components/Action/QuickActions";
+import Header4 from '@/components/header/Header4'
+import QuickActions from '@/components/action/QuickActions'
 import AccountManagementClient from "@/components/client/AccountManagementClient";
 import { cookies } from "next/headers";
 import { apiHit } from "@/libs/api/fetch";
