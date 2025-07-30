@@ -1,0 +1,30 @@
+FROM php:8.2-apache
+
+# Install extensions dan tools
+RUN apt-get update && apt-get install -y \
+    unzip \
+    zip \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy project files
+COPY . /var/www/html
+
+# Set working dir
+WORKDIR /var/www/html
+
+# Set permissions
+RUN chmod -R 775 storage bootstrap/cache
+
+# Apache rewrite
+RUN a2enmod rewrite
+
+# Laravel start command
+CMD php artisan serve --host=0.0.0.0 --port=3000
