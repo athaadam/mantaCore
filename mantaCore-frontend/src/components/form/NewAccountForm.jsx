@@ -56,7 +56,7 @@ export default function NewAccountForm({ onAdd, onUpdate, editingAccount, cancel
 
         try {
             if (editingAccount) {
-                const updatePayload = { ...form };
+                const updatePayload = { ...form, status: 'active' };
                 if (!updatePayload.password) {
                     delete updatePayload.password;
                     delete updatePayload.password_confirmation;

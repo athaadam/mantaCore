@@ -1,71 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import TopSales from '@/components/chart/TopSales';
 import SummaryCards from '@/components/card/SummaryCards';
 import SalesByCategory from '@/components/chart/SalesByCategory';
 import TransactionTable from '@/components/table/TransactionTable';
-import FilterControls from '@/components/filter/FilterControls';
 import Header from '@/components/header/Header';
 import DataCard from '@/components/card/DataCard';
-import { extractCategories, extractAuthors, extractSuitors, applyFilters } from '@/libs/utils/filters/filterUtils';
 import InvoiceViewModal from '../modal/InvoiceViewModal';
 
 export default function SalesReportClient({ summaryData, transactions, report }) {
-    const [filter, setFilter] = useState({
-        from: '',
-        to: '',
-        category: '',
-        suitor: '',
-        author: '',
-        status: '',
-    });
-
-    const [appliedFilter, setAppliedFilter] = useState({});
     
     // State untuk modal view detail invoice
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
 
-    // Extract unique customers, authors and categories from transaction data
-    const suitors = useMemo(() => extractSuitors(transactions || []), [transactions]);
-    const authors = useMemo(() => extractAuthors(transactions || [], true), [transactions]);
-    const categories = useMemo(() => extractCategories(transactions || []), [transactions]);
-
-    // Apply filters to data only when appliedFilter changes
-    const filteredTransactions = useMemo(() => {
-        if (!transactions || transactions.length === 0) {
-            return [];
-        }
-        return applyFilters(transactions, appliedFilter);
-    }, [transactions, appliedFilter]);
-
-    const handleApplyFilter = () => {
-        console.log('Filters applied:', filter);
-        console.log('Original transactions count:', transactions?.length || 0);
-        setAppliedFilter({ ...filter });
-
-        // Add delay to log filtered count after state update
-        setTimeout(() => {
-            console.log('Filtered transactions count:', filteredTransactions.length);
-        }, 100);
-    };
-
-    const handleClearFilter = () => {
-        const clearedFilter = { from: '', to: '', category: '', suitor: '', author: '', status: '' };
-        setFilter(clearedFilter);
-        setAppliedFilter({});
-        console.log('Filters cleared');
-    };
-
-    const handleExport = () => {
-        console.log('Exporting filtered sales data:', filteredTransactions);
-        if (filteredTransactions.length === 0) {
-            alert('No data to export. Please adjust your filters.');
-            return;
-        }
-        // Export logic here
-    };
     
     // Handler untuk membuka modal dengan detail invoice
     const handleViewInvoice = (invoice) => {
@@ -101,7 +50,7 @@ export default function SalesReportClient({ summaryData, transactions, report })
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             {/* Modern Header Component */}
             <Header
-                mode={'sales'}
+                mode={'dashboard'}
                 data={report}
                 icon={salesIcon}
                 title="Sales Analytics"
@@ -163,30 +112,10 @@ export default function SalesReportClient({ summaryData, transactions, report })
                     }
                     gradient="bg-gradient-to-br from-white via-emerald-50 to-teal-100"
                 >
-                    {/* Enhanced Filter Controls */}
-                    <div className="mb-6">
-                        <FilterControls
-                            filter={filter}
-                            setFilter={setFilter}
-                            onApply={handleApplyFilter}
-                            onClear={handleClearFilter}
-                            onExport={handleExport}
-                            customers={suitors}
-                            authors={authors}
-                            categories={categories}
-                            resultCount={filteredTransactions.length}
-                            totalCount={transactions?.length || 0}
-                            showCategory={true}
-                            showSuitor={true}
-                            showAuthor={true}
-                            showStatus={false}
-                        />
-                    </div>
-
                     {/* Transaction Table */}
                     <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
                         <TransactionTable
-                            transactions={filteredTransactions}
+                            transactions={transactions}
                             itemsPerPage={5}
                             mode="detailed"
                             onViewDetails={handleViewInvoice}

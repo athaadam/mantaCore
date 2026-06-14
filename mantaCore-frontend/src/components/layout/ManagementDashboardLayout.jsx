@@ -14,13 +14,16 @@ export default function ManagementDashboardLayout({ data }) {
     const { purchases, purchaseReport, items, users } = data;
 
     // Process purchase data
-    // const pendingPurchases = purchases?.filter(p => p.status === 'pending') || [];
-    const recentPurchases = [...(purchases || [])].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-    console.log(recentPurchases)
+    const purchasesArray = Array.isArray(purchases) ? purchases : [];
+    const recentPurchases = purchasesArray.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
 
     // Process inventory data
-    const lowStockItems = items?.filter(item => item.stock < 10) || [];
-    const totalStockValue = items?.reduce((sum, item) => sum + (item.stock * item.itemPrice), 0) || 0;
+    const itemsArray = Array.isArray(items) ? items : [];
+    const lowStockItems = itemsArray.filter(item => item.stock < 10);
+    const totalStockValue = itemsArray.reduce((sum, item) => sum + (item.stock * item.itemPrice), 0);
+
+    // Process users data
+    const usersArray = Array.isArray(users) ? users : [];
     const formattedStockValue = formatRupiah(totalStockValue);
 
     return (
@@ -259,7 +262,7 @@ export default function ManagementDashboardLayout({ data }) {
                                 <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 overflow-hidden hover:shadow-2xl transition-all duration-300 overflow-x-auto">
                                     <div className="px-6 py-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-white">
                                         <CustomerTable
-                                            customers={users?.slice(0, 5) || []}
+                                            customers={usersArray.slice(0, 5)}
                                             itemsPerPage={5}
                                             hideActions={true}
                                         />

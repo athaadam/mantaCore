@@ -24,18 +24,19 @@ const Page = async () => {
         // No need to throw, we'll continue with empty invoices array
     }
 
-    // Get items and ensure they have the right properties
-    let items = []
-    try {
-        items = Array.isArray(getItems) ? getItems : []
-    } catch (error) {
-        // Silently handle any errors processing items
-    }
+    // Extract arrays from responses (handle both object and array formats)
+    let customers = Array.isArray(customer)
+        ? customer
+        : (customer?.customers ?? []);
+
+    let items = Array.isArray(getItems)
+        ? getItems
+        : (getItems?.items ?? []);
 
     const data = {
         myInvoices: Array.isArray(myInvoices) ? myInvoices : [],
         myProfile: myProfile || { user: {}, company: {} },
-        customer: customer || [],
+        customers: customers,
         items: items
     }
 

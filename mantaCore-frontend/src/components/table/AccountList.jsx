@@ -62,8 +62,8 @@ export default function AccountList({ accounts, itemsPerPage, currentPage, onPag
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {currentData.map((acc, index) => (
-                            <tr key={acc.userID} className="hover:bg-slate-50 transition-colors duration-200 group">
+                        {currentData.filter(acc => acc).map((acc, index) => (
+                            <tr key={acc?.userID || index} className="hover:bg-slate-50 transition-colors duration-200 group">
                                 {/* User Info */}
                                 <td className="py-4 px-4">
                                     <div className="flex items-center gap-3">

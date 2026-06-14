@@ -121,13 +121,34 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await apiHit('logout', Cookies.get('auth'), 'POST');
-      Cookies.remove('auth');
+      console.log('🚪 Logout clicked');
+
+      // Call frontend logout API to clear httpOnly cookie
+      const res = await fetch('/api/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (res.ok) {
+        console.log('✓ Auth cookie cleared from server');
+      }
+
+      // Clear role from context
       setRole('');
-      router.push('/');
+      console.log('✓ Role cleared');
+
+      // Redirect to login page
+      console.log('🔄 Redirecting to login...');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 300);
     } catch (error) {
-      console.error('Logout failed:', error);
-      alert('Logout failed. Please try again.');
+      console.error('Logout error:', error);
+      // Still redirect even if logout call fails
+      setRole('');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 300);
     }
   };
 
@@ -167,9 +188,11 @@ export default function Sidebar() {
 
             {/* Logout Button */}
             <button
+              type="button"
               onClick={handleLogout}
-              className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-md text-white transition-all duration-200 hover:shadow-md flex items-center gap-2"
+              className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-md text-white transition-all duration-200 hover:shadow-md flex items-center gap-2 cursor-pointer"
               aria-label="Logout"
+              title="Click to logout"
             >
               <span className="material-icons-outlined text-lg">logout</span>
               <span className="text-xs font-medium hidden sm:inline">Logout</span>

@@ -1,0 +1,20 @@
+# Dependencies
+/node_modules
+/npm-debug.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+/.vscode
+/.idea
+/.fleet
+/.zed
+Thumbs.db
+.DS_Store
+
+# OS
+*.log
+.DS_Store

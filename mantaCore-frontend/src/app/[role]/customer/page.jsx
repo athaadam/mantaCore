@@ -9,7 +9,12 @@ const CustomerPage = async () => {
     const profile = await apiHit('user', token);
 
     try {
-        const api = await apiHit('getAllCostumers', token);
+        const costumersResponse = await apiHit('getAllCostumers', token);
+        // Extract costumers array from response
+        const costumers = Array.isArray(costumersResponse)
+            ? costumersResponse
+            : (costumersResponse?.costumers ?? []);
+
         return (
             <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
                 {/* Background Decoration */}
@@ -36,7 +41,7 @@ const CustomerPage = async () => {
 
                         {/* Main Content */}
                         <div className="w-full">
-                            <CustomerClient initialCustomers={api} profile={profile} />
+                            <CustomerClient initialCustomers={costumers} profile={profile} />
                         </div>
                     </div>
                 </div>

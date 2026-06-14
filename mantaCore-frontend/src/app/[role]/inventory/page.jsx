@@ -13,7 +13,11 @@ export default async function InventoryPage() {
     let fetchError = null;
 
     try {
-        itemsData = await apiHit('getAllItems', token);
+        const itemsResponse = await apiHit('getAllItems', token);
+        // Extract items array from response
+        itemsData = Array.isArray(itemsResponse)
+            ? itemsResponse
+            : (itemsResponse?.items ?? []);
     } catch (error) {
         fetchError = error;
         console.log(error)

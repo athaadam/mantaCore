@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SalesFilter from '../filter/SalesFilter';
 
 export default function Header({ mode = "dashboard", data = null, icon, title, subtitle, badgeText }) {
     const [clientTime, setClientTime] = useState('');
@@ -27,18 +26,6 @@ export default function Header({ mode = "dashboard", data = null, icon, title, s
                         </div>
                     </div>
                     
-                    {/* Sales Filter positioned at top right */}
-                    {mode === "sales" && data && (
-                        <div className="mt-2">
-                            <SalesFilter 
-                                data={data} 
-                                onFilterChange={(dateRange) => {
-                                    console.log('Date range changed:', dateRange);
-                                    // Handle filter change here
-                                }}
-                            />
-                        </div>
-                    )}
                 </div>
 
                 {badgeText && (

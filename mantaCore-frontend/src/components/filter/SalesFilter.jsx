@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const SalesFilter = ({ data, onFilterChange }) => {
+const SalesFilter = ({ data, onFilterChange, onApply }) => {
     const [dateRange, setDateRange] = useState({
         start: data?.dateRange?.start || '',
         end: data?.dateRange?.end || ''
@@ -13,6 +13,12 @@ const SalesFilter = ({ data, onFilterChange }) => {
         setDateRange(newRange);
         if (onFilterChange) {
             onFilterChange(newRange);
+        }
+    };
+
+    const handleApplyClick = () => {
+        if (onApply) {
+            onApply(dateRange);
         }
     };
 
@@ -48,7 +54,10 @@ const SalesFilter = ({ data, onFilterChange }) => {
                     </div>
 
                     {/* Apply Button */}
-                    <button className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 text-sm">
+                    <button
+                        onClick={handleApplyClick}
+                        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 text-sm"
+                    >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>

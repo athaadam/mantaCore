@@ -32,11 +32,24 @@ export default async function DashboardPage() {
       lifetimePnL: lifetimeProfitLossValue?.profitLoss || 0,
     };
 
+    // Extract arrays from responses (handle both object and array formats)
+    const purchases = Array.isArray(purchaseRequests)
+      ? purchaseRequests
+      : (purchaseRequests?.purchases ?? []);
+
+    const invoices = Array.isArray(transactions)
+      ? transactions
+      : (transactions?.invoices ?? []);
+
+    const items = Array.isArray(topSells)
+      ? topSells
+      : (topSells?.items ?? []);
+
     const data = {
       summaryData,
-      transactions,
-      topSells,
-      purchaseRequests,
+      transactions: { invoices },
+      topSells: items,
+      purchaseRequests: purchases,
     };
 
     return <AdminDashboardLayout data={data} />;
@@ -48,15 +61,23 @@ export default async function DashboardPage() {
       apiHit('getAllItems', token),
     ]);
 
-    // Process the invoice data to handle different response formats
+    // Extract arrays from responses (handle both object and array formats)
+    const customers = Array.isArray(customersData)
+      ? customersData
+      : (customersData?.customers ?? []);
+
     const myInvoices = Array.isArray(myInvoicesRaw)
       ? myInvoicesRaw
-      : (myInvoicesRaw?.invoices ?? []); 
+      : (myInvoicesRaw?.invoices ?? []);
+
+    const items = Array.isArray(allItems)
+      ? allItems
+      : (allItems?.items ?? []);
 
     // Prepare data object for the cashier dashboard with customers as the primary focus
     const data = {
-      customers: customersData,
-      items: allItems,
+      customers,
+      items,
       myInvoices
     };
 
@@ -71,12 +92,25 @@ export default async function DashboardPage() {
       apiHit('getAllUsers', token),
     ]);
 
+    // Extract arrays from responses (handle both object and array formats)
+    const purchases = Array.isArray(allPurchases)
+      ? allPurchases
+      : (allPurchases?.purchases ?? []);
+
+    const items = Array.isArray(allItems)
+      ? allItems
+      : (allItems?.items ?? []);
+
+    const users = Array.isArray(allUsers)
+      ? allUsers
+      : (allUsers?.users ?? []);
+
     // Prepare data object for the management dashboard
     const data = {
-      purchases: allPurchases,
+      purchases,
       purchaseReport: purchaseReportData,
-      items: allItems,
-      users: allUsers
+      items,
+      users
     };
 
     return <ManagementDashboardLayout data={data} />;

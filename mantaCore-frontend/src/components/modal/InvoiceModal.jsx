@@ -4,26 +4,30 @@ import React, { useState, useEffect } from 'react';
 import { formatRupiah } from '@/libs/utils/formats/formatRupiah';
 
 const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customers = [], items = [] }) => {
+    // Ensure customers is always an array
+    const customersArray = Array.isArray(customers) ? customers : [];
+    const itemsArray = Array.isArray(items) ? items : [];
+
     // Process items to ensure consistent ID format and filter for sales items only
     const processedItems = React.useMemo(() => {
         // More flexible matching: check if type is 'sales' in any case, or if it's 'Sales' or doesn't exist
-        const filteredItems = items.filter(item => {
+        const filteredItems = itemsArray.filter(item => {
             // If type doesn't exist or is empty, include the item
             if (!item.type) return true;
-            
+
             // Check for 'sales' in any case format
             const itemType = item.type.toLowerCase();
             return itemType === 'sales' || itemType === '';
         });
-        
+
         // If we filtered out everything, just show all items
-        const itemsToUse = filteredItems.length > 0 ? filteredItems : items;
-        
+        const itemsToUse = filteredItems.length > 0 ? filteredItems : itemsArray;
+
         return itemsToUse.map(item => ({
             ...item,
             itemID: String(item.itemID) // Convert all IDs to strings for consistent comparison
         }));
-    }, [items]);
+    }, [itemsArray]);
 
     const [formData, setFormData] = useState({
         costumerID: '',
@@ -341,7 +345,7 @@ const InvoiceModal = ({ isOpen, onClose, invoice, onSave, mode = 'add', customer
                                     >
                                         <option value="">Select a customer</option>
                                         <option value="Non-Member">Non-Member</option>
-                                        {customers.map(customer => (
+                                        {customersArray.map(customer => (
                                             <option key={customer.costumerID} value={customer.costumerID}>
                                                 {customer.username} - {customer.email}
                                             </option>

@@ -351,13 +351,13 @@ const InvoicesClient = ({ data }) => {
                 invoice={selectedInvoice}
             />
             
-            <InvoiceModal 
+            <InvoiceModal
                 isOpen={isInvoiceModalOpen}
                 onClose={handleInvoiceModalClose}
                 invoice={selectedInvoice}
                 onSave={handleSaveInvoice}
                 mode={modalMode}
-                customers={data.customer || []}
+                customers={data.customers || []}
                 items={data.items || []}
             />                <ConfirmationModal 
                 isOpen={isDeleteModalOpen}

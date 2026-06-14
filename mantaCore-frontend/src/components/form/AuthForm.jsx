@@ -45,6 +45,9 @@ export default function AuthForm({ mode = 'login', onSwitch }) {
                 const result = await res.json()
 
                 if (res.ok) {
+                    if (!result.user || !result.user.role) {
+                        throw new Error('Invalid user data received from server')
+                    }
                     setAlert({ message: 'Login successful', type: 'success' })
                     setRole(result.user.role)
                     setTimeout(() => {

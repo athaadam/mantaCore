@@ -19,13 +19,17 @@ export default function AccountManagementClient({ initialData }) {
 
 
     const handleAddAccount = (newAccount) => {
-        setAccounts(prev => [...prev, newAccount]);
+        setAccounts(prev => {
+            const validAccounts = (Array.isArray(prev) ? prev : []).filter(acc => acc);
+            return [...validAccounts, newAccount];
+        });
         setAlert({ message: 'User added successfully.', type: 'success' });
     };
 
     const handleUpdateAccount = (updatedAccount) => {
         setAccounts(prev =>
-            prev.map(acc => acc.userID === updatedAccount.userID ? updatedAccount : acc)
+            prev.map(acc => acc && acc.userID === updatedAccount.userID ? updatedAccount : acc)
+                .filter(acc => acc)
         );
         setEditingAccount(null);
         setAlert({ message: 'User updated successfully.', type: 'success' });
@@ -46,10 +50,10 @@ export default function AccountManagementClient({ initialData }) {
         try {
             const res = await apiHit(`deleteUser/${id}`, Cookies.get('auth'), 'PUT');
 
-            // Update the account status in the local state using the response data
+            // Update the account status to inactive in the local state
             const updatedAccounts = accounts.map(acc =>
-                acc.userID === id ? res.user : acc
-            );
+                acc && acc.userID === id ? { ...acc, status: 'inactive' } : acc
+            ).filter(acc => acc); // Filter out any undefined items
 
             setAccounts(updatedAccounts);
             if (editingAccount?.userID === id) setEditingAccount(null);

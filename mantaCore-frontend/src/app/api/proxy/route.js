@@ -4,7 +4,8 @@ export async function POST(req) {
     try {
         const { endpoint, method = 'GET', body = null, skipAuth = false, token: tokenFromBody } = await req.json();
 
-        const cookieToken = cookies().get('auth')?.value;
+        const cookieStore = await cookies();
+        const cookieToken = cookieStore.get('auth')?.value;
         const token = tokenFromBody || cookieToken;
 
         const headers = {

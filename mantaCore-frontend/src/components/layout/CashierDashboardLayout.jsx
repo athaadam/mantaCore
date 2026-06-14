@@ -9,10 +9,10 @@ import { formatRupiah } from "@/libs/utils/formats/formatRupiah";
 import Link from "next/link";
 
 export default function CashierDashboardLayout({ data }) {
-    // Pastikan data tidak undefined/null
-    const customers = data?.customers || [];
-    const myInvoices = data?.myInvoices || [];
-    const items = data?.items || [];
+    // Ensure arrays are always arrays (handle both object and array formats)
+    const customers = Array.isArray(data?.customers) ? data.customers : [];
+    const myInvoices = Array.isArray(data?.myInvoices) ? data.myInvoices : [];
+    const items = Array.isArray(data?.items) ? data.items : [];
     
     // Hitung total dengan aman
     const totalCustomers = customers.length;

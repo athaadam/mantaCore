@@ -10,7 +10,8 @@ export default async function AccountManagementPage() {
     const token = cookieStore.get('auth')?.value;
 
     try {
-        const accounts = await apiHit('getAllUsers', token);
+        const response = await apiHit('getAllUsers', token);
+        const accounts = response.users || [];
         return (
             <div className="flex-1 p-6 lg:p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen overflow-y-auto">
                 <div className="max-w-7xl mx-auto space-y-8">
